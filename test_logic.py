@@ -57,6 +57,31 @@ class TestNames(unittest.TestCase):
         with self.assertRaises(ValueError):
             logic.validate_names(["Parth", "Rahul", "parth"])
 
+    def test_add_names_appends_in_order(self):
+        existing = ["Parth", "Rahul"]
+        self.assertEqual(logic.add_names(existing, ["Aditi", "Neha"]),
+                         ["Parth", "Rahul", "Aditi", "Neha"])
+        self.assertEqual(existing, ["Parth", "Rahul"])  # input not mutated
+
+    def test_add_names_rejects_empty(self):
+        with self.assertRaises(ValueError):
+            logic.add_names(["Parth", "Rahul"], [])
+
+    def test_add_names_rejects_existing_case_insensitive(self):
+        with self.assertRaises(ValueError):
+            logic.add_names(["Parth", "Rahul"], ["rahul"])
+
+    def test_add_names_rejects_duplicates_among_new(self):
+        with self.assertRaises(ValueError):
+            logic.add_names(["Parth", "Rahul"], ["Aditi", "ADITI"])
+
+    def test_person_added_later_has_zero_balance_until_used(self):
+        tx = Transaction("Dinner", "Parth", 1000, {"Parth": 500, "Rahul": 500})
+        participants = logic.add_names(["Parth", "Rahul"], ["Aditi"])
+        balances = logic.compute_balances(participants, [tx])
+        self.assertEqual(balances["Aditi"], {"paid": 0, "share": 0, "net": 0})
+        self.assertEqual(sum(b["net"] for b in balances.values()), 0)
+
 
 class TestSplits(unittest.TestCase):
     def test_equal_even(self):

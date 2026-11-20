@@ -11,6 +11,8 @@ from logic import Transaction
 console = Console()
 
 UNEQUAL_OPTION = "Split unequally (instead of equally)"
+# Contains spaces, so it can never clash with a participant name.
+ADD_PERSON_OPTION = "+ Add new person"
 
 # ---------- Helpers ----------
 
@@ -57,6 +59,19 @@ def ask_participants():
     return logic.validate_names(text.split())
 
 
+def ask_new_participants(existing):
+    """Ask for space-separated names to add; return only the new names."""
+    def check(text):
+        try:
+            logic.add_names(existing, text.split())
+        except ValueError as e:
+            return str(e)
+        return True
+
+    text = _ask(questionary.text("Enter the names of the people to add:", validate=check))
+    return logic.add_names(existing, text.split())[len(existing):]
+
+
 def ask_transaction(participants):
     """Ask for one transaction and return it as a Transaction."""
     description = _ask(questionary.text(
@@ -64,7 +79,7 @@ def ask_transaction(participants):
         validate=lambda t: True if t.strip() else "Description cannot be empty.",
     )).strip()
 
-    payer = _ask(questionary.select("Who paid?", choices=participants))
+    payer = _ask_payer(participants)
     total = _ask_amount("Total amount (₹):")
 
     chosen = _ask(questionary.checkbox(
@@ -89,6 +104,24 @@ def ask_transaction(participants):
     return Transaction(description, payer, total, shares)
 
 
+def _ask_payer(participants):
+    """Ask who paid. Picking ADD_PERSON_OPTION adds people to `participants`
+    in place, then asks again with the first new person preselected."""
+    default = None
+    while True:
+        payer = _ask(questionary.select(
+            "Who paid?",
+            choices=participants + [questionary.Separator(), ADD_PERSON_OPTION],
+            default=default,
+        ))
+        if payer != ADD_PERSON_OPTION:
+            return payer
+        added = ask_new_participants(participants)
+        participants.extend(added)
+        show_message(f"Added: {', '.join(added)}")
+        default = added[0]
+
+
 def _ask_unequal_shares(total, involved):
     """Ask each person's share until they add up exactly to the total."""
     while True:
@@ -106,8 +139,11 @@ def _ask_unequal_shares(total, involved):
 
 
 def ask_next_action(can_delete):
-    """Return 'add', 'delete' or 'finish'."""
-    choices = [questionary.Choice("Add another transaction", value="add")]
+    """Return 'add', 'people', 'delete' or 'finish'."""
+    choices = [
+        questionary.Choice("Add another transaction", value="add"),
+        questionary.Choice("Add people", value="people"),
+    ]
     if can_delete:
         choices.append(questionary.Choice("Delete previous transaction", value="delete"))
     choices.append(questionary.Choice("Finish", value="finish"))

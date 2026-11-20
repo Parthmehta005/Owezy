@@ -55,6 +55,20 @@ def validate_names(names: list[str]) -> list[str]:
     return list(names)
 
 
+def add_names(existing: list[str], new_names: list[str]) -> list[str]:
+    """Return existing + new_names, requiring at least 1 new name and no
+    case-insensitive duplicates (within the new names or against existing ones)."""
+    if not new_names:
+        raise ValueError("Enter at least 1 name.")
+    seen = {name.lower() for name in existing}
+    for name in new_names:
+        key = name.lower()
+        if key in seen:
+            raise ValueError(f"Duplicate name: {name}")
+        seen.add(key)
+    return list(existing) + list(new_names)
+
+
 # ---------- Splits ----------
 
 def split_equal(total: int, participants: list[str]) -> dict[str, int]:

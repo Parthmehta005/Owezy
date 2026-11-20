@@ -19,7 +19,10 @@ def show_summary(participants, transactions):
 
 
 def collect_transactions(participants):
-    """Loop: add a transaction, show the summary, then add / delete / finish."""
+    """Loop: add a transaction, show the summary, then add / add people / delete / finish.
+
+    New people are appended to `participants` in place, so the caller sees them too.
+    """
     transactions = []
     while True:
         transactions.append(ui.ask_transaction(participants))
@@ -32,6 +35,10 @@ def collect_transactions(participants):
                 ui.show_message(f"Deleted: {removed.description}")
                 if transactions:
                     show_summary(participants, transactions)
+            elif action == "people":
+                added = ui.ask_new_participants(participants)
+                participants.extend(added)
+                ui.show_message(f"Added: {', '.join(added)}. Participants: {', '.join(participants)}")
             elif action == "add":
                 break
             else:  # "finish"

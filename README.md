@@ -42,10 +42,10 @@ python main.py
 ```
 
 1. Enter names separated by spaces, e.g. `Parth Rahul Aditi`. Names cannot contain spaces, you need at least 2, and duplicates (case-insensitive) are rejected.
-2. For each transaction, enter a description, choose who paid, and enter the total.
+2. For each transaction, enter a description, choose who paid, and enter the total. If the payer isn't in the group yet, pick **+ Add new person** at the bottom of the "Who paid?" list to add them on the spot.
 3. Select who shared the expense (arrow keys to move, **space** to toggle, **enter** to confirm). The payer does not have to be included. The split is equal by default. To split unequally, also tick **Split unequally** at the bottom of the list.
 4. For an unequal split, enter each person's share. They must add up exactly to the total. Zero shares are allowed.
-5. The summary is shown after each transaction. Then choose **Add another**, **Delete previous transaction**, or **Finish**.
+5. The summary is shown after each transaction. Then choose **Add another**, **Add people**, **Delete previous transaction**, or **Finish**. **Add people** takes space-separated names, rejects duplicates of anyone already in the group, and makes the new people available in later transactions.
 6. After finishing, choose whether to simplify debts and whether to export JSON (`splitwise_export.json`).
 
 ### Example
@@ -123,7 +123,7 @@ After the summary, the app can generate `splitwise_graphs.html` and open it in y
 ## Limitations
 
 - INR only, 2 decimal places, standard thousands grouping (`₹1,200,000.00`)
-- The participant list is fixed once entered
+- People can be added mid-session but not removed or renamed
 - No saving between sessions. JSON export is write-only (no re-import)
 - Only the previous transaction can be deleted (repeatedly), not an arbitrary one
 - Equal-split leftover paise go to the first selected participants in participant order
