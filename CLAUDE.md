@@ -15,7 +15,18 @@ python -m unittest test_logic -v         # all tests
 python -m unittest test_logic.TestSimplifyDebts.test_chain_collapses_to_one_payment   # single test
 ```
 
-There is no linter, formatter, or build step configured.
+The Python CLI has no linter, formatter, or build step.
+
+### Web app (`web/`, run from that folder)
+
+```bash
+npm run dev | lint | typecheck | test | build
+npx vitest run src/core/money.test.ts    # single test file; add -t "name" for one test
+```
+
+- **Next.js 16** (not 15): read the relevant guide in `web/node_modules/next/dist/docs/` before writing Next code (see `web/AGENTS.md`, which `next dev` regenerates; keep it committed). `cacheComponents` and `partialPrefetching` are on in `next.config.ts`.
+- UI: shadcn/ui (`radix-nova` preset, Radix primitives). Add components with `npx shadcn@4.23.0 add <name>`. Class merging comes from shadcn's `cn` package. Theme tokens live in `src/app/globals.css`; use `text-positive` / `text-negative` for money owed to or by the user.
+- Env vars are validated in `src/lib/env.ts`; Supabase clients are in `src/lib/supabase/{client,server}.ts`.
 
 ## Architecture
 

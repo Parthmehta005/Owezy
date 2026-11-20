@@ -22,7 +22,7 @@ Decisions so far:
 ## Tech stack
 | Layer | Choice | Why |
 |---|---|---|
-| App | **Next.js 15 (App Router) + React 19 + TypeScript** | One codebase for UI and server. Deploys on Vercel in one click. |
+| App | **Next.js 16 (App Router) + React 19 + TypeScript** | One codebase for UI and server. Deploys on Vercel in one click. |
 | Styling/UI | **Tailwind CSS + shadcn/ui** (Radix primitives, `vaul` bottom sheets), `lucide-react` icons, `next-themes` for dark mode | Minimal and accessible, with native-feeling bottom sheets on phones. |
 | Data/state | **TanStack Query** | Caches data so screens open instantly. Expenses appear the moment you save (optimistic updates). Refetches when you return to the app, so you see friends' changes without live updates. |
 | Backend | **Supabase**: Postgres, Auth (Google + magic link), Row Level Security, SQL functions | No custom server to write. RLS keeps each group private. Realtime is built in for when live updates are added. |
@@ -94,7 +94,10 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - Heavy code (the sheets) loads only when needed.
 
 ## Milestones
-- [ ] **M1. Setup**: scaffold `web/` and add Tailwind, shadcn and the linter. Manual steps for the owner (with click-by-click instructions): create the Supabase project, create a Google OAuth client, and add the env vars.
+
+Setup notes (M1): moved to Next.js 16 because 15.x bundles a vulnerable postcss that only 16 fixes. Supabase uses the new publishable key (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). Owner setup steps are in `web/README.md`.
+
+- [x] **M1. Setup**: scaffold `web/` and add Tailwind, shadcn and the linter. Manual steps for the owner (with click-by-click instructions): create the Supabase project, create a Google OAuth client, and add the env vars.
 - [ ] **M2. Core logic port + tests** (`web/src/core/`).
 - [ ] **M3. Schema, RLS and RPC** migrations.
 - [ ] **M4. Auth and groups**: sign in, create group, switcher, last-group redirect, settings, invite/join/claim.
