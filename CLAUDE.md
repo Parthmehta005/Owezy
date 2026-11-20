@@ -37,3 +37,4 @@ Key invariants:
 ## Repo notes
 
 - `splitwise_export.json`, `splitwise_graphs.html` and `__pycache__/` are gitignored; they are generated in the CWD on each run.
+- **ROADMAP.md** is the plan and progress tracker for the Next.js + Supabase web app being built in `web/`; **REVIEW.md** is the checklist each milestone must pass before it is committed.
