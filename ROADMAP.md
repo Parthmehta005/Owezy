@@ -123,7 +123,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - `formatInr` uses Indian grouping (`₹12,00,000.00`). `parseAmount` accepts `,` and `₹` like `parse_amount`.
 - Errors are thrown as `Error`s with the same user-facing messages as the Python version.
 - [x] `core/money.ts`: `parseAmount`, `formatInr` + tests
-- [ ] `core/names.ts`: `validateNames`, `addNames` + tests
+- [x] `core/names.ts`: `validateNames`, `addNames` + tests
 - [ ] `core/splits.ts`: `splitEqual`, `validateUnequal` + tests
 - [ ] `core/balances.ts`: `computeBalances`, `pairwiseDebts` + tests
 - [ ] `core/simplify.ts`: `simplifyDebts` + tests (settles everyone to zero; README's greedy-suboptimal example is pinned)
