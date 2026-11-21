@@ -1,0 +1,61 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
+import { notFound } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+import { getCurrentUser } from "@/lib/auth/user";
+import { getGroupView } from "@/lib/data/groups";
+import { AddMembersForm, LeaveGroup, MemberRow, RenameForm } from "./settings-forms";
+
+export const metadata: Metadata = { title: "Group settings · Owezy" };
+
+export default function SettingsPage({ params }: PageProps<"/g/[groupId]/settings">) {
+  return (
+    <Suspense fallback={<div aria-busy className="h-96 animate-pulse" />}>
+      <Settings params={params} />
+    </Suspense>
+  );
+}
+
+async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">["params"] }) {
+  const { groupId } = await params;
+  const user = await getCurrentUser();
+  const view = await getGroupView(groupId, user.id);
+  if (!view) notFound();
+  const { group, members } = view;
+
+  return (
+    <>
+      <header className="sticky top-0 z-10 flex items-center gap-1 border-b bg-background/95 px-2 py-3 backdrop-blur">
+        <Link
+          href={`/g/${group.id}`}
+          className="flex min-w-0 items-center gap-1 rounded-md px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <ChevronLeft aria-hidden className="size-5 shrink-0" />
+          <span className="truncate">{group.name}</span>
+        </Link>
+      </header>
+      <main className="flex flex-1 flex-col gap-10 px-4 py-6">
+        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+
+        <RenameForm groupId={group.id} name={group.name} />
+
+        <section aria-labelledby="members-heading" className="space-y-4">
+          <h2 id="members-heading" className="font-medium">
+            Members
+          </h2>
+          <ul className="divide-y border-y">
+            {members.map((m) => (
+              <MemberRow key={m.id} groupId={group.id} member={m} />
+            ))}
+          </ul>
+          <AddMembersForm groupId={group.id} existingNames={members.map((m) => m.displayName)} />
+        </section>
+
+        <section className="mt-auto">
+          <LeaveGroup groupId={group.id} groupName={group.name} />
+        </section>
+      </main>
+    </>
+  );
+}

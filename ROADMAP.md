@@ -149,7 +149,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] `/new` create group (name + member chips)
 - [x] `/g/[groupId]` shell: header, group switcher sheet, empty state
 - [x] `/` redirect to last group (stored on profile) or `/new`
-- [ ] Settings: rename, members add/remove (blocked if used), leave
+- [x] Settings: rename, members add/remove (blocked if used), leave
 - [ ] Invite link share/copy + `/join/[code]` claim or "I'm new"
 - [ ] Playwright with dev-only test users + two-browser join test
 

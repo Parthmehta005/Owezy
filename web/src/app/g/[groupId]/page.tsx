@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { Suspense } from "react";
+import { Settings } from "lucide-react";
 import { notFound } from "next/navigation";
 import { GroupSwitcher } from "@/components/group-switcher";
 import { RememberLastGroup } from "@/components/remember-last-group";
@@ -26,6 +28,13 @@ async function GroupScreen({ params }: { params: PageProps<"/g/[groupId]">["para
       <RememberLastGroup userId={user.id} groupId={view.group.id} />
       <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-4 py-3 backdrop-blur">
         <GroupSwitcher current={view.group} groups={groups} />
+        <Link
+          href={`/g/${view.group.id}/settings`}
+          className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <Settings aria-hidden className="size-5" />
+          <span className="sr-only">Group settings</span>
+        </Link>
       </header>
       <main className="flex flex-1 flex-col gap-8 px-4 py-6">
         <Members members={view.members} />
