@@ -45,12 +45,12 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M4. Auth & groups
 
-- [ ] Google and email-link sign-in both work.
-- [ ] Sign-out works.
-- [ ] `/` opens the last group, or "create group" if there is none.
-- [ ] The invite link works in a fresh browser.
-- [ ] Claiming a placeholder links it to the right user, and a placeholder can't be claimed twice.
-- [ ] Removing a member is blocked if any expense uses them.
+- [ ] Google and email-link sign-in both work. (Both start correctly with PKCE and the right return URL, checked in Edge with requests intercepted; the full round trip needs the owner's real Google account and inbox.)
+- [x] Sign-out works. (From the switcher sheet and from /new; afterwards / goes to /login.)
+- [x] `/` opens the last group, or "create group" if there is none. (Also: falls back after leaving, ignores a forged foreign last_group_id.)
+- [x] The invite link works in a fresh browser. (Signed out -> /login?next -> back to the invite; Playwright.)
+- [x] Claiming a placeholder links it to the right user, and a placeholder can't be claimed twice. (Including a two-user race.)
+- [x] Removing a member is blocked if any expense uses them. ("Rahul is part of an expense, so they can't be removed.")
 
 ## M5. Expenses
 
