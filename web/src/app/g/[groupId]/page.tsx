@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { GroupSwitcher } from "@/components/group-switcher";
+import { RememberLastGroup } from "@/components/remember-last-group";
 import { getCurrentUser } from "@/lib/auth/user";
 import { getGroupView, listMyGroups, type GroupMember } from "@/lib/data/groups";
 
@@ -22,6 +23,7 @@ async function GroupScreen({ params }: { params: PageProps<"/g/[groupId]">["para
 
   return (
     <>
+      <RememberLastGroup userId={user.id} groupId={view.group.id} />
       <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-4 py-3 backdrop-blur">
         <GroupSwitcher current={view.group} groups={groups} />
       </header>
