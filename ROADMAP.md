@@ -147,7 +147,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Scope:** in: sign-in (Google + email link), sign-out, session refresh proxy, create group, group screen shell (header, switcher, empty "no expenses yet" state), last-group redirect, settings (rename, add/remove member, invite share/copy, leave), join/claim, Playwright setup. Out: adding expenses, balances.
 - [x] Session-refresh proxy + `/login` (Google, email link) + auth callback + sign-out
 - [ ] `/new` create group (name + member chips)
-- [ ] `/g/[groupId]` shell: header, group switcher sheet, empty state
+- [x] `/g/[groupId]` shell: header, group switcher sheet, empty state
 - [ ] `/` redirect to last group (stored on profile) or `/new`
 - [ ] Settings: rename, members add/remove (blocked if used), leave
 - [ ] Invite link share/copy + `/join/[code]` claim or "I'm new"
