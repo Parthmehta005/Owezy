@@ -1,29 +1,38 @@
 # Review checklist
 
-Run this before committing each milestone in [ROADMAP.md](ROADMAP.md). A milestone is done only when everything below for it passes.
+Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit. A milestone's own section is ticked here as each item is verified, and the milestone is done only when all of it passes.
 
-## Every milestone
+## Every commit
 
-- [ ] `npm run lint`, `tsc --noEmit` and `npm run test` pass
-- [ ] No secrets committed (`.env*` is gitignored; only `.env.example` is tracked)
-- [ ] The milestone's checkbox in `ROADMAP.md` is ticked
-- [ ] One focused commit for the milestone
+- `npm run lint`, `npm run typecheck` and `npm run test` pass (run from `web/`)
+- Does one thing that makes sense on its own; it could be reverted or bisected alone
+- Message starts with the milestone tag (`M2: ...`) and says what changed and why
+- The matching task in `ROADMAP.md` is ticked in the same commit
+- No secrets: `.env*` is gitignored and only `.env.example` is tracked
+- Stays inside the current milestone's scope
+
+## End of every milestone
+
+- The milestone's **Goal** in `ROADMAP.md` is shown to work (command output or steps written in the final commit or report)
+- Every item in its section below is ticked
+- `npm run build` passes
+- Pushed to GitHub; then stop and wait for the owner's go-ahead
 
 ## M1. Setup
 
-- [ ] App starts with `npm run dev`.
-- [ ] Env vars are documented in `.env.example`.
-- [ ] Dark/light theme follows the system setting.
-- [ ] No unused boilerplate.
+- [x] App starts with `npm run dev`.
+- [x] Env vars are documented in `.env.example`.
+- [x] Dark/light theme follows the system setting.
+- [x] No unused boilerplate. (Next's default `favicon.ico` stays until the real icon in M7; shadcn's `button.tsx` is first used in M4.)
 
 ## M2. Core logic
 
-- [ ] Every case in `test_logic.py` has a matching Vitest test.
+- [ ] Every case in `test_logic.py` has a matching Vitest test, except `build_export` (no export in v1).
 - [ ] Money is integer paise only (no floats).
 - [ ] Leftover paise go to members in order.
 - [ ] Balances sum to 0.
 - [ ] Settlements bring everyone to zero.
-- [ ] `core/` imports no React or Supabase code.
+- [ ] `core/` imports no React, Next or Supabase code (enforced by an ESLint rule).
 
 ## M3. Schema/RLS/RPC
 
@@ -31,7 +40,8 @@ Run this before committing each milestone in [ROADMAP.md](ROADMAP.md). A milesto
 - [ ] A non-member reads 0 rows and can't write.
 - [ ] RPCs reject shares ≠ total, members from another group, and edits based on an old `updated_at`.
 - [ ] Duplicate names are rejected regardless of capitals.
-- [ ] Migrations apply cleanly to a fresh database.
+- [ ] Migrations apply cleanly to a freshly reset `splitwiselite-dev` database.
+- [ ] Nothing was applied to the prod project.
 
 ## M4. Auth & groups
 
@@ -53,8 +63,8 @@ Run this before committing each milestone in [ROADMAP.md](ROADMAP.md). A milesto
 
 ## M6. Balances
 
-- [ ] Raw debts match `pairwise_debts`.
-- [ ] The simplified view matches `simplify_debts` and shows "N → M payments".
+- [ ] Raw debts match `pairwiseDebts`.
+- [ ] The simplified view matches `simplifyDebts` and shows "N → M payments".
 - [ ] The header summary matches the net balance.
 - [ ] Amounts use the `en-IN` format.
 
