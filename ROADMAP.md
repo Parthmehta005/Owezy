@@ -127,7 +127,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] `core/splits.ts`: `splitEqual`, `validateUnequal` + tests
 - [x] `core/balances.ts`: `computeBalances`, `pairwiseDebts` + tests
 - [x] `core/simplify.ts`: `simplifyDebts` + tests (settles everyone to zero; README's greedy-suboptimal example is pinned)
-- [ ] ESLint rule: `src/core/**` may not import `react`, `next`, `@supabase/*` or `@/` app code
+- [x] ESLint rule: `src/core/**` may not import `react`, `next`, `@supabase/*` or `@/` app code
 
 ### ⬜ M3. Database: schema, RLS and RPC
 **Goal:** running the migrations in `web/supabase/migrations/` on a fresh `splitwiselite-dev` database builds the whole schema. A pgTAP test suite (`supabase test db`) proves: a non-member sees and changes nothing, RPCs reject bad shares, members from another group and stale edits, and duplicate names are rejected regardless of capitals.
