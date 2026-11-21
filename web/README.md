@@ -1,6 +1,6 @@
-# SplitwiseLite web app
+# Owezy web app
 
-Multi-user, mobile-first version of SplitwiseLite. Next.js 16 + Supabase. See [`../ROADMAP.md`](../ROADMAP.md) for the plan and [`../REVIEW.md`](../REVIEW.md) for the per-milestone checklist.
+Owezy: the multi-user, mobile-first version of the expense splitter (originally a Python CLI). Next.js 16 + Supabase. See [`../ROADMAP.md`](../ROADMAP.md) for the plan and [`../REVIEW.md`](../REVIEW.md) for the per-milestone checklist.
 
 ## Commands
 
@@ -33,8 +33,8 @@ Do step 1 before M3 (database) and step 2 before M4 (sign-in). The app runs with
 Development and all automated tests use a separate **dev** project, so tests can never touch real data. Both are free.
 
 1. Sign up at https://supabase.com and click **New project**.
-2. Name it `splitwiselite-dev`. Set a strong database password and save it in a password manager. Pick the region **South Asia (Mumbai)**. Click **Create**.
-3. Repeat for the real app: name it `splitwiselite`, with its own password, also in Mumbai.
+2. Name it `owezy-dev`. Set a strong database password and save it in a password manager. Pick the region **South Asia (Mumbai)**. Click **Create**.
+3. Repeat for the real app: name it `owezy`, with its own password, also in Mumbai.
 4. In the **dev** project:
    1. Open **Project Settings → Data API** and copy the **Project URL**.
    2. Open **Project Settings → API Keys** and copy the **Publishable key** (starts with `sb_publishable_`). Do **not** use the secret key in this app.
@@ -44,7 +44,7 @@ Development and all automated tests use a separate **dev** project, so tests can
 The prod project's keys aren't needed until M7, when they go into Vercel.
 
 ### 2. Google sign-in
-1. Go to https://console.cloud.google.com and create a project (e.g. `SplitwiseLite`).
+1. Go to https://console.cloud.google.com and create a project (e.g. `Owezy`).
 2. Open **APIs & Services → OAuth consent screen**. Choose **External**, fill in the app name and your email, and save. You can leave it in "Testing" for now; add your friends' Gmail addresses under **Test users**.
 3. Open **APIs & Services → Credentials → Create credentials → OAuth client ID** and choose **Web application**.
 4. Under **Authorized redirect URIs**, add `https://<project-ref>.supabase.co/auth/v1/callback` once for **each** Supabase project (dev and prod). The ref is the subdomain in each project's URL.

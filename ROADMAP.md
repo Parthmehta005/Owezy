@@ -1,9 +1,9 @@
-# Roadmap: SplitwiseLite web app (v1)
+# Roadmap: Owezy web app (v1)
 
 Source of truth for the v1 build. Tick a milestone only after it passes its checklist in [REVIEW.md](REVIEW.md).
 
 ## Context
-SplitwiseLite today is a single-user, in-memory Python CLI (`main.py`, `ui.py`, `logic.py`, `visualize.py`). The goal is for it to be a proper app that several people use at the same time, with a simple, elegant UI that needs as few taps as possible, and a path to mobile later.
+Owezy started as a single-user, in-memory Python CLI (`main.py`, `ui.py`, `logic.py`, `visualize.py`). The goal is for it to be a proper app that several people use at the same time, with a simple, elegant UI that needs as few taps as possible, and a path to mobile later.
 
 v1 covers only the basics and puts multi-user groups first. Live updates, settle-up payments, categories, receipts, activity feed and notifications come later, one by one.
 
@@ -100,7 +100,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - Work only inside the current milestone's scope. Anything else goes in "Not in v1" or a later milestone; it is not added on the side.
 - Each task is one commit, or a few if it is large. Every commit makes sense on its own, passes `lint`, `typecheck` and `test`, starts with the milestone tag (e.g. `M2: ...`), and ticks its task here in the same commit. This keeps `git bisect` and review simple.
 - A milestone is ticked only when its Goal is shown to work and its section in [REVIEW.md](REVIEW.md) passes. Then stop and wait for the owner's go-ahead.
-- Environments: two Supabase projects. **`splitwiselite-dev`** is for development, migrations and all automated tests. **`splitwiselite`** (prod) is for real use and only gets migrations that have passed on dev. No Docker needed.
+- Environments: two Supabase projects. **`owezy-dev`** is for development, migrations and all automated tests. **`owezy`** (prod) is for real use and only gets migrations that have passed on dev. No Docker needed.
 
 ## Milestones
 
@@ -130,7 +130,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] ESLint rule: `src/core/**` may not import `react`, `next`, `@supabase/*` or `@/` app code
 
 ### ✅ M3. Database: schema, RLS and RPC
-**Goal:** running the migrations in `web/supabase/migrations/` on a fresh `splitwiselite-dev` database builds the whole schema. A pgTAP test suite (`supabase test db`) proves: a non-member sees and changes nothing, RPCs reject bad shares, members from another group and stale edits, and duplicate names are rejected regardless of capitals.
+**Goal:** running the migrations in `web/supabase/migrations/` on a fresh `owezy-dev` database builds the whole schema. A pgTAP test suite (`supabase test db`) proves: a non-member sees and changes nothing, RPCs reject bad shares, members from another group and stale edits, and duplicate names are rejected regardless of capitals.
 **Scope:** in: Supabase CLI setup, tables, constraints, RLS, a trigger that creates profiles, the RPCs from the data model, SQL tests, generated TypeScript types. Out: any UI or app code calling the database, and applying to prod.
 **Needs from owner:** both Supabase projects created; the dev project's database connection string in `web/.env.test.local` (gitignored).
 **Notes:** `supabase test db` needs Docker even for a remote database, so `scripts/db-test.mjs` runs the pgTAP files over node-postgres instead. pgTAP is created by the runner on dev only, never in migrations.
@@ -183,7 +183,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 
 ## Verification
 - `npm run test`: Vitest runs the applicable ported cases from `test_logic.py` (splits, rounding, netting, settle-to-zero) plus the new ones.
-- RLS check: pgTAP tests on `splitwiselite-dev` show that a user who is not in a group gets nothing back from that group's tables.
+- RLS check: pgTAP tests on `owezy-dev` show that a user who is not in a group gets nothing back from that group's tables.
 - Playwright, with two browser sessions (A and B) in the same group:
   - A adds an expense; B returns to the tab and sees it.
   - Both edit the same expense; the second save gets the conflict message.

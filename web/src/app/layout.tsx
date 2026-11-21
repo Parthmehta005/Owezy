@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SplitwiseLite",
+  title: "Owezy",
   description: "Split expenses with friends in a few taps.",
 };
 

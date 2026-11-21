@@ -56,4 +56,4 @@ Key invariants:
 
 - Work one milestone at a time, only within its **Goal** and **Scope** in `ROADMAP.md`; wait for the owner's go-ahead before starting the next one.
 - Make **several small commits per milestone**, normally one per ROADMAP task. Each must stand alone (reviewable, revertable, bisectable), pass `lint`/`typecheck`/`test`, start with the milestone tag (`M2: ...`), and tick its ROADMAP task in the same commit. Tick REVIEW.md items as they are verified.
-- Automated database tests and migrations target the `splitwiselite-dev` Supabase project only (no Docker); prod gets migrations only after they pass on dev.
+- Automated database tests and migrations target the `owezy-dev` Supabase project only (no Docker); prod gets migrations only after they pass on dev.
