@@ -22,6 +22,7 @@ npx supabase migration new <name>   # new file in supabase/migrations/
 npm run db:push      # apply new migrations to dev
 npm run db:reset     # wipe dev and re-apply every migration (destroys dev data)
 npm run db:test      # run pgTAP tests in supabase/tests/ (add a word to filter, e.g. -- rls)
+npm run db:types     # regenerate src/lib/supabase/types.ts after a schema change
 ```
 
 ## One-time setup (done by the project owner)

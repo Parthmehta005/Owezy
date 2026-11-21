@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "db:push": "node scripts/supabase-dev.mjs db push",
     "db:reset": "node scripts/supabase-dev.mjs db reset --no-seed",
-    "db:test": "node scripts/db-test.mjs"
+    "db:test": "node scripts/db-test.mjs",
+    "db:types": "node scripts/gen-types.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -38,6 +39,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "oxfmt": "0.76.0",
     "pg": "^8.23.1",
     "shadcn": "4.23.0",
     "supabase": "3.2.0",
