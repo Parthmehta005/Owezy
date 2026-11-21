@@ -146,7 +146,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Goal:** on the dev project, person A signs in, creates a group with placeholder names and shares the invite link. Person B opens it, signs in and claims a name. Both now see the same group and members, and `/` takes each of them back to that group. A Playwright test does this with two browsers.
 **Scope:** in: sign-in (Google + email link), sign-out, session refresh proxy, create group, group screen shell (header, switcher, empty "no expenses yet" state), last-group redirect, settings (rename, add/remove member, invite share/copy, leave), join/claim, Playwright setup. Out: adding expenses, balances.
 - [x] Session-refresh proxy + `/login` (Google, email link) + auth callback + sign-out
-- [ ] `/new` create group (name + member chips)
+- [x] `/new` create group (name + member chips)
 - [x] `/g/[groupId]` shell: header, group switcher sheet, empty state
 - [ ] `/` redirect to last group (stored on profile) or `/new`
 - [ ] Settings: rename, members add/remove (blocked if used), leave

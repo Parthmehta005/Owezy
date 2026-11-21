@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Plus } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,6 +49,12 @@ export function GroupSwitcher({ current, groups }: { current: GroupSummary; grou
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/new" className="flex items-center gap-2 rounded-md px-3 py-3 text-primary hover:bg-muted">
+                  <Plus aria-hidden className="size-4" />
+                  New group
+                </Link>
+              </li>
             </ul>
           </nav>
           <DrawerFooter>
