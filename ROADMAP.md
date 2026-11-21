@@ -137,7 +137,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Supabase CLI (dev dependency) + `supabase/config.toml`; scripts to push, reset and test against dev
 - [x] Migration: tables, keys, unique/check constraints, indexes; `profiles` trigger on sign-up
 - [x] Migration: RLS policies (member-of-group helper function)
-- [ ] Migration: `create_group`, `join_group` RPCs
+- [x] Migration: `create_group`, `join_group` RPCs (+ read-only `invite_preview` for the join screen)
 - [ ] Migration: `create_expense`, `update_expense` (stale check), `delete_expense`/`restore_expense` RPCs
 - [ ] pgTAP tests for RLS isolation and every RPC rule
 - [ ] Generated `src/lib/supabase/types.ts`
