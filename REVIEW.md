@@ -27,12 +27,12 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M2. Core logic
 
-- [ ] Every case in `test_logic.py` has a matching Vitest test, except `build_export` (no export in v1).
-- [ ] Money is integer paise only (no floats).
-- [ ] Leftover paise go to members in order.
-- [ ] Balances sum to 0.
-- [ ] Settlements bring everyone to zero.
-- [ ] `core/` imports no React, Next or Supabase code (enforced by an ESLint rule).
+- [x] Every case in `test_logic.py` has a matching Vitest test, except `build_export` (no export in v1). (31 of 32 ported, each tagged with its Python test name.)
+- [x] Money is integer paise only (no floats). (`assertPaise` guards every amount; formatting uses integer rupees + paise.)
+- [x] Leftover paise go to members in order.
+- [x] Balances sum to 0.
+- [x] Settlements bring everyone to zero. (Also checked on 500 seeded random groups.)
+- [x] `core/` imports no React, Next or Supabase code (enforced by an ESLint rule).
 
 ## M3. Schema/RLS/RPC
 

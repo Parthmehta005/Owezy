@@ -114,7 +114,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] `env.ts` (zod) + Supabase browser/server clients; `.env.example`
 - [x] Vitest + `test`/`typecheck` scripts; owner setup steps in `web/README.md`
 
-### ⬜ M2. Core logic port + tests
+### ✅ M2. Core logic port + tests
 **Goal:** `web/src/core/` holds pure TypeScript versions of all the money, split and balance logic v1 needs. A Vitest suite covers every applicable case in `test_logic.py` plus new ones, and `npm run test` passes. Nothing in the app uses it yet.
 **Scope:** in: `money`, `names`, `splits`, `balances` (incl. pairwise debts) and `simplify`, with their tests and a lint guard. Out: `build_export` (no export in v1), any React/Next/Supabase code, UI, and the database. The Python CLI is not changed.
 **Design notes:**
