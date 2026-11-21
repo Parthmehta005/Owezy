@@ -151,7 +151,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] `/` redirect to last group (stored on profile) or `/new`
 - [x] Settings: rename, members add/remove (blocked if used), leave
 - [x] Invite link share/copy + `/join/[code]` claim or "I'm new"
-- [ ] Playwright with dev-only test users + two-browser join test
+- [x] Playwright with dev-only test users + two-browser join test
 
 ### ⬜ M5. Expenses
 **Goal:** in a shared group, members add, edit and delete expenses from the one-screen sheet (equal and unequal). The other member sees the changes on returning to the tab. Concurrent edits are caught with the conflict message. Playwright covers these.
