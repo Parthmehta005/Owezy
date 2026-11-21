@@ -1,4 +1,4 @@
-# Splitwise CLI
+# Owezy CLI
 
 A small, local, terminal-based expense-sharing app inspired by Splitwise. You enter who paid for what and how it was split, and the app shows everyone's balance and proposes a short list of payments that settles all debts.
 
@@ -46,7 +46,7 @@ python main.py
 3. Select who shared the expense (arrow keys to move, **space** to toggle, **enter** to confirm). The payer does not have to be included. The split is equal by default. To split unequally, also tick **Split unequally** at the bottom of the list.
 4. For an unequal split, enter each person's share. They must add up exactly to the total. Zero shares are allowed.
 5. The summary is shown after each transaction. Then choose **Add another**, **Add people**, **Delete previous transaction**, or **Finish**. **Add people** takes space-separated names, rejects duplicates of anyone already in the group, and makes the new people available in later transactions.
-6. After finishing, choose whether to simplify debts and whether to export JSON (`splitwise_export.json`).
+6. After finishing, choose whether to simplify debts and whether to export JSON (`owezy_export.json`).
 
 ### Example
 
@@ -114,11 +114,11 @@ Tests cover equal and unequal splits, the payer sharing or not sharing an expens
 
 ## JSON export
 
-`splitwise_export.json` contains the participants, transactions, balances, and settlements. All amounts are in paise.
+`owezy_export.json` contains the participants, transactions, balances, and settlements. All amounts are in paise.
 
 ## Graph visualization
 
-After the summary, the app can generate `splitwise_graphs.html` and open it in your browser. It shows two graphs side by side: the raw pairwise debts (before) and the simplified settlements (after). Arrows point from payer to receiver and are labelled with the amount. No extra libraries are needed.
+After the summary, the app can generate `owezy_graphs.html` and open it in your browser. It shows two graphs side by side: the raw pairwise debts (before) and the simplified settlements (after). Arrows point from payer to receiver and are labelled with the amount. No extra libraries are needed.
 
 ## Limitations
 

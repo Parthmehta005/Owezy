@@ -8,8 +8,8 @@ import logic
 import ui
 import visualize
 
-EXPORT_FILE = "splitwise_export.json"
-GRAPH_FILE = "splitwise_graphs.html"
+EXPORT_FILE = "owezy_export.json"
+GRAPH_FILE = "owezy_graphs.html"
 
 
 def show_summary(participants, transactions):

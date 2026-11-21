@@ -37,7 +37,7 @@ Strict layering, with `main.py` as the only module that touches the filesystem o
 - `logic.py`: pure functions, no I/O. Owns the `Transaction` dataclass, amount parsing/formatting, split validation, balances, pairwise "before" debts, greedy `simplify_debts`, and `build_export`. Keep it free of printing/input so it stays unit-testable and reusable by another front end.
 - `ui.py`: all terminal interaction (questionary prompts, rich tables). Validators call back into `logic` (e.g. `parse_amount`, `validate_names`) so validation rules live in one place. `_ask` converts questionary's `None` (Ctrl+C) into `KeyboardInterrupt`, which `main.main()` catches.
 - `visualize.py`: pure function `build_html(participants, before, after)` returning a self-contained HTML page with inline SVG (people placed on a circle). No external libraries.
-- `main.py`: session flow (participants → transaction loop with add/delete-last/finish → optional simplify, graphs, JSON export). Writes `splitwise_graphs.html` and `splitwise_export.json` to the CWD.
+- `main.py`: session flow (participants → transaction loop with add/delete-last/finish → optional simplify, graphs, JSON export). Writes `owezy_graphs.html` and `owezy_export.json` to the CWD.
 
 Key invariants:
 
@@ -49,7 +49,7 @@ Key invariants:
 
 ## Repo notes
 
-- `splitwise_export.json`, `splitwise_graphs.html` and `__pycache__/` are gitignored; they are generated in the CWD on each run.
+- `owezy_export.json`, `owezy_graphs.html` (and the pre-rename `splitwise_*` names) and `__pycache__/` are gitignored; they are generated in the CWD on each run.
 - **ROADMAP.md** is the plan and progress tracker for the Next.js + Supabase web app being built in `web/`; **REVIEW.md** holds the per-commit checks and each milestone's checklist.
 
 ## Milestone workflow (web app)
