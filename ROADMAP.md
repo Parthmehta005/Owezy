@@ -142,10 +142,10 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] pgTAP tests for RLS isolation and every RPC rule (written with each migration above) + schema-wide security guards
 - [x] Generated `src/lib/supabase/types.ts`
 
-### ⬜ M4. Auth and groups
+### ✅ M4. Auth and groups
 **Goal:** on the dev project, person A signs in, creates a group with placeholder names and shares the invite link. Person B opens it, signs in and claims a name. Both now see the same group and members, and `/` takes each of them back to that group. A Playwright test does this with two browsers.
 **Scope:** in: sign-in (Google + email link), sign-out, session refresh proxy, create group, group screen shell (header, switcher, empty "no expenses yet" state), last-group redirect, settings (rename, add/remove member, invite share/copy, leave), join/claim, Playwright setup. Out: adding expenses, balances.
-**Notes:** task 3 (group screen) was built before task 2 so creating a group lands on a real page. A separate fix commit (`63864ac`) makes signed-in pages call `connection()` first, after Playwright's server output showed a `Date.now()` prerender error. Milestone stays open until the owner confirms real Google and email-link sign-in.
+**Notes:** task 3 (group screen) was built before task 2 so creating a group lands on a real page. A separate fix commit (`63864ac`) makes signed-in pages call `connection()` first, after Playwright's server output showed a `Date.now()` prerender error. The owner confirmed real Google and email-link sign-in, and an invite join with a second account.
 - [x] Session-refresh proxy + `/login` (Google, email link) + auth callback + sign-out
 - [x] `/new` create group (name + member chips)
 - [x] `/g/[groupId]` shell: header, group switcher sheet, empty state

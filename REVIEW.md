@@ -45,7 +45,7 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M4. Auth & groups
 
-- [ ] Google and email-link sign-in both work. (Both start correctly with PKCE and the right return URL, checked in Edge with requests intercepted; the full round trip needs the owner's real Google account and inbox.)
+- [x] Google and email-link sign-in both work. (Owner tested the real round trip for both, plus joining via invite with a second Google account in a private window.)
 - [x] Sign-out works. (From the switcher sheet and from /new; afterwards / goes to /login.)
 - [x] `/` opens the last group, or "create group" if there is none. (Also: falls back after leaving, ignores a forged foreign last_group_id.)
 - [x] The invite link works in a fresh browser. (Signed out -> /login?next -> back to the invite; Playwright.)
