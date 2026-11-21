@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
+import { InviteLink } from "@/components/invite-link";
 import { getCurrentUser } from "@/lib/auth/user";
 import { getGroupView } from "@/lib/data/groups";
 import { AddMembersForm, LeaveGroup, MemberRow, RenameForm } from "./settings-forms";
@@ -37,6 +38,13 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
       </header>
       <main className="flex flex-1 flex-col gap-10 px-4 py-6">
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+
+        <section aria-labelledby="invite-heading" className="space-y-3">
+          <h2 id="invite-heading" className="font-medium">
+            Invite people
+          </h2>
+          <InviteLink code={view.inviteCode} groupName={group.name} />
+        </section>
 
         <RenameForm groupId={group.id} name={group.name} />
 

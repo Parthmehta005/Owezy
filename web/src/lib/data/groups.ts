@@ -16,6 +16,8 @@ export interface GroupMember {
 
 export interface GroupView {
   group: GroupSummary;
+  /** Secret part of the /join/<code> link; members can see and share it. */
+  inviteCode: string;
   /** In member order (the order equal-split leftovers follow). */
   members: GroupMember[];
 }
@@ -30,7 +32,7 @@ export async function getGroupView(groupId: string, userId: string): Promise<Gro
   if (!UUID.test(groupId)) return null;
   const supabase = await createClient();
   const [groupResult, membersResult] = await Promise.all([
-    supabase.from("groups").select("id, name").eq("id", groupId).maybeSingle(),
+    supabase.from("groups").select("id, name, invite_code").eq("id", groupId).maybeSingle(),
     supabase.from("members").select("id, display_name, user_id").eq("group_id", groupId).order("sort_order"),
   ]);
   if (groupResult.error) throw groupResult.error;
@@ -38,7 +40,8 @@ export async function getGroupView(groupId: string, userId: string): Promise<Gro
   if (!groupResult.data) return null;
 
   return {
-    group: groupResult.data,
+    group: { id: groupResult.data.id, name: groupResult.data.name },
+    inviteCode: groupResult.data.invite_code,
     members: membersResult.data.map((m) => ({
       id: m.id,
       displayName: m.display_name,
