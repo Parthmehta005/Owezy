@@ -66,7 +66,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
   - Unique on `(group_id, lower(display_name))`, matching today's case-insensitive duplicate rule.
   - Unique on `(group_id, user_id)`.
   - Member order is `created_at`, which is used for the equal-split leftover paise (same rule as today).
-- `expenses(id, group_id, description, payer_member_id, total_paise bigint, split_type, created_by, created_at, updated_at, deleted_at null, version)`. Deleting sets `deleted_at` (a soft delete), which makes Undo possible. `version` goes up on every change.
+- `expenses(id, group_id, description, payer_member_id, total_paise bigint, split_type, created_by, created_at, updated_at, deleted_at null, version, expense_date)` (`expense_date` added in M5). Deleting sets `deleted_at` (a soft delete), which makes Undo possible. `version` goes up on every change.
 - `expense_shares(expense_id, member_id, share_paise bigint)`
 - **RLS:** you can read and write a group's rows only if you are a member of that group with `user_id = auth.uid()`.
 - **SQL functions (RPC)**, each one an atomic transaction:
@@ -90,7 +90,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 ## Speed measures
 - One query loads the group, its members, and its expenses with their shares. TanStack Query caches the result, and balances are computed on the phone.
 - Optimistic add, edit and delete, with rollback if the server rejects the change.
-- Data refreshes when you come back to the app or tab, and on pull-to-refresh.
+- Data refreshes when you come back to the app or tab (M5), and on pull-to-refresh (M7).
 - Vercel and Supabase sit in the same Mumbai region.
 - Heavy code (the sheets) loads only when needed.
 
@@ -154,16 +154,28 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Invite link share/copy + `/join/[code]` claim or "I'm new"
 - [x] Playwright with dev-only test users + two-browser join test
 
-### ⬜ M5. Expenses
-**Goal:** in a shared group, members add, edit and delete expenses from the one-screen sheet (equal and unequal). The other member sees the changes on returning to the tab. Concurrent edits are caught with the conflict message. Playwright covers these.
-**Scope:** in: group data query, expense list grouped by date, add/edit sheet, split picker, optimistic updates with rollback, delete with Undo, conflict handling. Out: the Balances tab and the header summary (M6).
-- [ ] Group bundle query hook (group + members + expenses + shares) with TanStack Query
+### ⬜ M5. Expenses (mobile-first)
+**Goal:** on real phones (Android and iPhone) through the dev deployment, members add, edit and delete expenses (equal or unequal, with a date) from the one-screen sheet. The other member sees the changes on returning to the app, and concurrent edits are caught with the conflict message. Playwright covers this on both Android (Chromium mobile emulation) and iPhone (WebKit) engines.
+**Scope:** in: a Vercel deployment of the app against `owezy-dev`; phone-sized tap targets across the whole app; expense date and safe retries (database change); group data query; expense list grouped by date; add/edit sheet that stays usable with the phone keyboard open; split picker; optimistic updates with rollback and Retry; delete with Undo; conflict handling; Playwright on two mobile engines. Out: the Balances tab and header summary (M6); pull-to-refresh, offline mode and production deployment (M7); live updates (later add-on).
+**Mobile rules for every screen from here on:**
+- Tap targets at least 44px tall, inputs at least 16px text (so iPhone doesn't zoom in).
+- Respect safe areas (notch, home bar).
+- Nothing important hidden behind the on-screen keyboard.
+- Amount fields open the number pad. A comma before the last 1–2 digits ("10,50") is a decimal point, never thousands.
+- Saves survive flaky networks: the phone generates the expense id, so retries never duplicate. A failed save keeps what you typed and offers Retry.
+- Dates show in India time.
+**Needs from owner:** a Vercel account connected to the GitHub repo, with the dev env vars; the `*.vercel.app` URL added to `owezy-dev`'s Supabase Redirect URLs (steps in `web/README.md`).
+- [ ] Dev deployment on Vercel (root `web/`, region `bom1`, `owezy-dev` env vars) + owner setup steps
+- [ ] Playwright mobile projects: Android (Chromium, Pixel-sized, touch) and iPhone (WebKit); existing e2e passes on both
+- [ ] Phone-sized tap targets and safe-area insets across existing screens (sign-in, groups, settings, join)
+- [ ] Migration: `expenses.expense_date` (default today in India time) and client-supplied ids so a retried `create_expense` never duplicates; pgTAP; regenerated types
+- [ ] Group bundle query hook (group + members + expenses + shares) with TanStack Query, refetching when the app regains focus
 - [ ] Expense list grouped by date, with the "your effect" amount per row
-- [ ] Add sheet: amount, description, paid by, equal split (optimistic)
+- [ ] Add sheet: amount (number pad, comma-decimal rule), description, date, paid by, equal split, "you get back" preview; optimistic with Retry; keyboard-safe on both engines
 - [ ] Split picker: choose members, unequal mode with "₹X left" and the Save rule
 - [ ] Edit an expense, with stale-edit conflict handling
 - [ ] Delete with Undo toast
-- [ ] Playwright: add/see on refocus, unequal split, conflict
+- [ ] Playwright on both engines: add/see on refocus, unequal split, conflict, retry without duplicates, tap-target sizes
 
 ### ⬜ M6. Balances view
 **Goal:** the group screen shows your net summary ("You get back / You owe / All settled"), plus a Balances tab with raw pairwise debts and a Simplify toggle showing "N → M payments". All numbers come from `core/` and match it.
@@ -175,11 +187,12 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 
 ### ⬜ M7. Polish and deploy
 **Goal:** the app is live on a `*.vercel.app` URL against the prod Supabase project. It installs to a phone's home screen, both test users can use it on their phones, and it meets the Lighthouse targets in REVIEW.md.
-**Scope:** in: PWA manifest and real icons (replacing Next's default favicon), loading/empty/error states, Vercel project and env vars, prod migrations and sign-in URLs, Playwright against the preview deploy, Lighthouse fixes. Out: everything in "Not in v1".
+**Scope:** in: PWA manifest and real icons (replacing Next's default favicon), loading/empty/error states, pull-to-refresh, switching Vercel production to the prod project, prod migrations and sign-in URLs, Playwright against the preview deploy, Lighthouse fixes. Out: everything in "Not in v1".
 - [ ] App icon, favicon and `manifest.ts`
 - [ ] Loading, empty and error states across screens
 - [ ] Apply migrations to prod; prod sign-in redirect URLs (owner steps)
-- [ ] Vercel project (region `bom1`) connected to GitHub, with env vars
+- [ ] Switch the Vercel production environment to the `owezy` (prod) project; preview deployments stay on `owezy-dev`
+- [ ] Pull-to-refresh in the installed app (iPhone home-screen apps have none built in)
 - [ ] Playwright against preview; Lighthouse fixes; phone test
 
 ## Verification

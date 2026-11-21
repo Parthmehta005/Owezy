@@ -54,3 +54,19 @@ The prod project's keys aren't needed until M7, when they go into Vercel.
 7. In the **dev** project, open **Authentication → URL Configuration**. Set **Site URL** to `http://localhost:3000` and add `http://localhost:3000/**` under **Redirect URLs**. The production URL gets added in M7.
 
 Email-link sign-in is on by default in Supabase. Nothing to set up for it.
+
+### 3. Vercel (dev deployment, before M5)
+This puts the app on a real `https://` address so it can be tested on phones. Until M7 it uses the **dev** Supabase project.
+
+1. Go to https://vercel.com and **Sign up with GitHub**.
+2. Click **Add New… → Project**. Find `Parthmehta005/Owezy` and click **Import**. If it isn't listed, use **Adjust GitHub App Permissions** to give Vercel access to that repo.
+3. On the configure screen:
+   - **Root Directory**: click **Edit** and choose `web`. Vercel should then detect **Next.js**.
+   - **Environment Variables**: add the same two values as in `web/.env.local` (the **dev** project's):
+     `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+     These are safe to put here. Never add the database URL from `.env.test.local`.
+4. Click **Deploy** and wait for it to finish. Copy the address it shows, e.g. `https://owezy-abc123.vercel.app`. Under **Settings → Domains** you can usually change it to something shorter like `owezy-dev.vercel.app` if it's free.
+5. In Supabase **owezy-dev → Authentication → URL Configuration → Redirect URLs**, add `https://<your-vercel-address>/**`, using the exact address from step 4. Keep the localhost entry. Save.
+6. On your phone, open the address and sign in with Google.
+
+Each push to `main` redeploys automatically. The server region (Mumbai, `bom1`) is set in `web/vercel.json`, so there's nothing to change for it.
