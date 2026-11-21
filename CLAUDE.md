@@ -48,4 +48,10 @@ Key invariants:
 ## Repo notes
 
 - `splitwise_export.json`, `splitwise_graphs.html` and `__pycache__/` are gitignored; they are generated in the CWD on each run.
-- **ROADMAP.md** is the plan and progress tracker for the Next.js + Supabase web app being built in `web/`; **REVIEW.md** is the checklist each milestone must pass before it is committed.
+- **ROADMAP.md** is the plan and progress tracker for the Next.js + Supabase web app being built in `web/`; **REVIEW.md** holds the per-commit checks and each milestone's checklist.
+
+## Milestone workflow (web app)
+
+- Work one milestone at a time, only within its **Goal** and **Scope** in `ROADMAP.md`; wait for the owner's go-ahead before starting the next one.
+- Make **several small commits per milestone**, normally one per ROADMAP task. Each must stand alone (reviewable, revertable, bisectable), pass `lint`/`typecheck`/`test`, start with the milestone tag (`M2: ...`), and tick its ROADMAP task in the same commit. Tick REVIEW.md items as they are verified.
+- Automated database tests and migrations target the `splitwiselite-dev` Supabase project only (no Docker); prod gets migrations only after they pass on dev.
