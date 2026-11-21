@@ -139,7 +139,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Migration: RLS policies (member-of-group helper function)
 - [x] Migration: `create_group`, `join_group` RPCs (+ read-only `invite_preview` for the join screen)
 - [x] Migration: `create_expense`, `update_expense` (stale check), `delete_expense`/`restore_expense` RPCs
-- [ ] pgTAP tests for RLS isolation and every RPC rule
+- [x] pgTAP tests for RLS isolation and every RPC rule (written with each migration above) + schema-wide security guards
 - [ ] Generated `src/lib/supabase/types.ts`
 
 ### ⬜ M4. Auth and groups
