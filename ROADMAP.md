@@ -129,7 +129,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] `core/simplify.ts`: `simplifyDebts` + tests (settles everyone to zero; README's greedy-suboptimal example is pinned)
 - [x] ESLint rule: `src/core/**` may not import `react`, `next`, `@supabase/*` or `@/` app code
 
-### ⬜ M3. Database: schema, RLS and RPC
+### ✅ M3. Database: schema, RLS and RPC
 **Goal:** running the migrations in `web/supabase/migrations/` on a fresh `splitwiselite-dev` database builds the whole schema. A pgTAP test suite (`supabase test db`) proves: a non-member sees and changes nothing, RPCs reject bad shares, members from another group and stale edits, and duplicate names are rejected regardless of capitals.
 **Scope:** in: Supabase CLI setup, tables, constraints, RLS, a trigger that creates profiles, the RPCs from the data model, SQL tests, generated TypeScript types. Out: any UI or app code calling the database, and applying to prod.
 **Needs from owner:** both Supabase projects created; the dev project's database connection string in `web/.env.test.local` (gitignored).

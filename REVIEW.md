@@ -36,12 +36,12 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M3. Schema/RLS/RPC
 
-- [ ] RLS is on for every table.
-- [ ] A non-member reads 0 rows and can't write.
-- [ ] RPCs reject shares ≠ total, members from another group, and edits based on an old `version`.
-- [ ] Duplicate names are rejected regardless of capitals.
-- [ ] Migrations apply cleanly to a freshly reset `splitwiselite-dev` database.
-- [ ] Nothing was applied to the prod project.
+- [x] RLS is on for every table. (`05_security_guards_test.sql` checks every table, including future ones.)
+- [x] A non-member reads 0 rows and can't write. (`02_rls_test.sql`; also checked against the live API signed out: 401 on all tables.)
+- [x] RPCs reject shares ≠ total, members from another group, and edits based on an old `version`.
+- [x] Duplicate names are rejected regardless of capitals.
+- [x] Migrations apply cleanly to a freshly reset `splitwiselite-dev` database. (Reset, re-applied 4 migrations, all 131 checks passed.)
+- [x] Nothing was applied to the prod project. (The db scripts only read `SUPABASE_DEV_DB_URL`; prod credentials are not on this machine.)
 
 ## M4. Auth & groups
 

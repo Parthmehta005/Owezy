@@ -27,6 +27,8 @@ npx vitest run src/core/money.test.ts    # single test file; add -t "name" for o
 - **Next.js 16** (not 15): read the relevant guide in `web/node_modules/next/dist/docs/` before writing Next code (see `web/AGENTS.md`, which `next dev` regenerates; keep it committed). `cacheComponents` and `partialPrefetching` are on in `next.config.ts`.
 - UI: shadcn/ui (`radix-nova` preset, Radix primitives). Add components with `npx shadcn@4.23.0 add <name>`. Class merging comes from shadcn's `cn` package. Theme tokens live in `src/app/globals.css`; use `text-positive` / `text-negative` for money owed to or by the user.
 - Env vars are validated in `src/lib/env.ts`; Supabase clients are in `src/lib/supabase/{client,server}.ts`.
+- Database (dev project only, no Docker): `npm run db:push | db:reset | db:test | db:types`. Every schema change is a **new** migration (`npx supabase migration new <name>`), never an edit to one already pushed. Follow it with `db:push`, pgTAP tests in `supabase/tests/` (each file `begin; ... rollback;`), then `db:types`.
+- DB conventions: RLS on every table; expenses/shares are written only via security-definer RPCs; every new function must `revoke execute ... from public, anon` (Supabase grants anon by default) and set `search_path = ''`. `05_security_guards_test.sql` enforces this. RPC errors use SQLSTATE codes (42501, 22023, 23505, P0002, PT409 → HTTP 409 for stale `expected_version`).
 
 ## Architecture
 
