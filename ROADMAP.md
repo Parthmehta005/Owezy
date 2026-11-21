@@ -135,7 +135,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Needs from owner:** both Supabase projects created; the dev project's database connection string in `web/.env.test.local` (gitignored).
 **Notes:** `supabase test db` needs Docker even for a remote database, so `scripts/db-test.mjs` runs the pgTAP files over node-postgres instead. pgTAP is created by the runner on dev only, never in migrations.
 - [x] Supabase CLI (dev dependency) + `supabase/config.toml`; scripts to push, reset and test against dev
-- [ ] Migration: tables, keys, unique/check constraints, indexes; `profiles` trigger on sign-up
+- [x] Migration: tables, keys, unique/check constraints, indexes; `profiles` trigger on sign-up
 - [ ] Migration: RLS policies (member-of-group helper function)
 - [ ] Migration: `create_group`, `join_group` RPCs
 - [ ] Migration: `create_expense`, `update_expense` (stale check), `delete_expense`/`restore_expense` RPCs
