@@ -133,7 +133,8 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Goal:** running the migrations in `web/supabase/migrations/` on a fresh `splitwiselite-dev` database builds the whole schema. A pgTAP test suite (`supabase test db`) proves: a non-member sees and changes nothing, RPCs reject bad shares, members from another group and stale edits, and duplicate names are rejected regardless of capitals.
 **Scope:** in: Supabase CLI setup, tables, constraints, RLS, a trigger that creates profiles, the RPCs from the data model, SQL tests, generated TypeScript types. Out: any UI or app code calling the database, and applying to prod.
 **Needs from owner:** both Supabase projects created; the dev project's database connection string in `web/.env.test.local` (gitignored).
-- [ ] Supabase CLI (dev dependency) + `supabase/config.toml`; scripts to push, reset and test against dev
+**Notes:** `supabase test db` needs Docker even for a remote database, so `scripts/db-test.mjs` runs the pgTAP files over node-postgres instead. pgTAP is created by the runner on dev only, never in migrations.
+- [x] Supabase CLI (dev dependency) + `supabase/config.toml`; scripts to push, reset and test against dev
 - [ ] Migration: tables, keys, unique/check constraints, indexes; `profiles` trigger on sign-up
 - [ ] Migration: RLS policies (member-of-group helper function)
 - [ ] Migration: `create_group`, `join_group` RPCs

@@ -15,6 +15,15 @@ npm run test         # Vitest, single run (test:watch to keep it running)
 npm run build
 ```
 
+Database (dev project only; reads `SUPABASE_DEV_DB_URL` from `.env.test.local`, no Docker):
+
+```bash
+npx supabase migration new <name>   # new file in supabase/migrations/
+npm run db:push      # apply new migrations to dev
+npm run db:reset     # wipe dev and re-apply every migration (destroys dev data)
+npm run db:test      # run pgTAP tests in supabase/tests/ (add a word to filter, e.g. -- rls)
+```
+
 ## One-time setup (done by the project owner)
 
 Do step 1 before M3 (database) and step 2 before M4 (sign-in). The app runs without them until then.

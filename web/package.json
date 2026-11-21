@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:push": "node scripts/supabase-dev.mjs db push",
+    "db:reset": "node scripts/supabase-dev.mjs db reset --no-seed",
+    "db:test": "node scripts/db-test.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -30,11 +33,14 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "pg": "^8.23.1",
     "shadcn": "4.23.0",
+    "supabase": "3.2.0",
     "tailwindcss": "4.3.3",
     "typescript": "^5",
     "vitest": "^5.1.1"
