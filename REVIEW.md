@@ -38,7 +38,7 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 - [ ] RLS is on for every table.
 - [ ] A non-member reads 0 rows and can't write.
-- [ ] RPCs reject shares ≠ total, members from another group, and edits based on an old `updated_at`.
+- [ ] RPCs reject shares ≠ total, members from another group, and edits based on an old `version`.
 - [ ] Duplicate names are rejected regardless of capitals.
 - [ ] Migrations apply cleanly to a freshly reset `splitwiselite-dev` database.
 - [ ] Nothing was applied to the prod project.

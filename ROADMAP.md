@@ -66,12 +66,12 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
   - Unique on `(group_id, lower(display_name))`, matching today's case-insensitive duplicate rule.
   - Unique on `(group_id, user_id)`.
   - Member order is `created_at`, which is used for the equal-split leftover paise (same rule as today).
-- `expenses(id, group_id, description, payer_member_id, total_paise bigint, split_type, created_by, created_at, updated_at, deleted_at null)`. Deleting sets `deleted_at` (a soft delete), which makes Undo possible.
+- `expenses(id, group_id, description, payer_member_id, total_paise bigint, split_type, created_by, created_at, updated_at, deleted_at null, version)`. Deleting sets `deleted_at` (a soft delete), which makes Undo possible. `version` goes up on every change.
 - `expense_shares(expense_id, member_id, share_paise bigint)`
 - **RLS:** you can read and write a group's rows only if you are a member of that group with `user_id = auth.uid()`.
 - **SQL functions (RPC)**, each one an atomic transaction:
   - `create_expense`: rejects the save if the shares don't sum exactly to the total, or if a member belongs to a different group.
-  - `update_expense(..., expected_updated_at)`: if someone else edited the expense in the meantime, it fails with "This was changed by someone else", and the app reloads it. This handles two people editing at once.
+  - `update_expense(..., expected_version)`: if someone else edited the expense in the meantime, it fails with "This was changed by someone else" (HTTP 409), and the app reloads it. This handles two people editing at once. An integer version is used instead of `updated_at` because JavaScript dates drop Postgres's microseconds.
   - `join_group(code, claim_member_id | new_name)`
   - `create_group(name, member_names[])`
 - All money is integer paise end to end. JS numbers are exact up to about 9×10¹⁵ paise, far beyond any real amount.
@@ -138,7 +138,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Migration: tables, keys, unique/check constraints, indexes; `profiles` trigger on sign-up
 - [x] Migration: RLS policies (member-of-group helper function)
 - [x] Migration: `create_group`, `join_group` RPCs (+ read-only `invite_preview` for the join screen)
-- [ ] Migration: `create_expense`, `update_expense` (stale check), `delete_expense`/`restore_expense` RPCs
+- [x] Migration: `create_expense`, `update_expense` (stale check), `delete_expense`/`restore_expense` RPCs
 - [ ] pgTAP tests for RLS isolation and every RPC rule
 - [ ] Generated `src/lib/supabase/types.ts`
 
