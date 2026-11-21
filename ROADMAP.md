@@ -122,7 +122,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - Simplify ties are broken by that member order instead of by name. Still deterministic, and it stays stable when names change.
 - `formatInr` uses Indian grouping (`₹12,00,000.00`). `parseAmount` accepts `,` and `₹` like `parse_amount`.
 - Errors are thrown as `Error`s with the same user-facing messages as the Python version.
-- [ ] `core/money.ts`: `parseAmount`, `formatInr` + tests
+- [x] `core/money.ts`: `parseAmount`, `formatInr` + tests
 - [ ] `core/names.ts`: `validateNames`, `addNames` + tests
 - [ ] `core/splits.ts`: `splitEqual`, `validateUnequal` + tests
 - [ ] `core/balances.ts`: `computeBalances`, `pairwiseDebts` + tests

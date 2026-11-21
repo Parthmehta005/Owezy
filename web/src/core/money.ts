@@ -1,0 +1,51 @@
+/**
+ * Money helpers. All amounts are integer paise (1 rupee = 100 paise), INR only.
+ * Port of parse_amount / format_inr from logic.py. Pure: no I/O, no framework code.
+ */
+
+/** An amount in integer paise. */
+export type Paise = number;
+
+const AMOUNT_PATTERN = /^(\d+)(?:\.(\d{1,2}))?$/;
+
+// Indian digit grouping (12,00,000). Integer rupees only, so no float rounding.
+const RUPEES_FORMAT = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+
+/** Throws unless `value` is a whole number of paise that JS can represent exactly. */
+export function assertPaise(value: number, label = "Amount"): asserts value is Paise {
+  if (!Number.isSafeInteger(value)) {
+    throw new Error(`${label} must be a whole number of paise.`);
+  }
+}
+
+/**
+ * Convert text like "1,200.50" or "₹5" to paise.
+ * Commas and the ₹ sign are ignored; at most 2 decimals are allowed.
+ * Throws an Error with a user-facing message if the text is invalid.
+ */
+export function parseAmount(text: string, { allowZero = false } = {}): Paise {
+  const cleaned = text.trim().replaceAll(",", "").replaceAll("₹", "");
+  const match = AMOUNT_PATTERN.exec(cleaned);
+  if (!match) {
+    throw new Error("Invalid amount. Use a positive number with at most 2 decimals, e.g. 1200.50");
+  }
+  const [, rupees, fraction = ""] = match;
+  const paise = Number(rupees) * 100 + Number(fraction.padEnd(2, "0"));
+  if (!Number.isSafeInteger(paise)) {
+    throw new Error("Amount is too large.");
+  }
+  if (paise === 0 && !allowZero) {
+    throw new Error("Amount must be greater than 0.");
+  }
+  return paise;
+}
+
+/** Format paise as "₹12,00,000.50"; negative values get a leading "-" ("-₹1.50"). */
+export function formatInr(paise: Paise): string {
+  assertPaise(paise);
+  const abs = Math.abs(paise);
+  const rupees = Math.floor(abs / 100);
+  const rest = abs % 100;
+  const sign = paise < 0 ? "-" : "";
+  return `${sign}₹${RUPEES_FORMAT.format(rupees)}.${String(rest).padStart(2, "0")}`;
+}
