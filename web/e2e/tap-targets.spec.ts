@@ -53,7 +53,14 @@ test("every tap target is at least 44px tall", async ({ browser }, testInfo) => 
   const a = await phoneFor(browser, testInfo, asha);
   const page = await a.newPage();
   await page.goto("/new");
-  await page.getByLabel("Who else?").pressSequentially("Rahul Neha ");
+  // Server-rendered: typing before the page's scripts attach loses the chips
+  // (the group then has only Asha, and nothing to owe). Retry until they show.
+  const others = page.getByLabel("Who else?");
+  await expect(async () => {
+    await others.fill("");
+    await others.pressSequentially("Rahul Neha ");
+    await expect(page.getByRole("button", { name: "Remove Neha" })).toBeVisible({ timeout: 1000 });
+  }).toPass();
   await check(page, "new group");
   await page.getByLabel("Group name").fill("Tap test");
   await page.getByRole("button", { name: "Create group" }).click();
