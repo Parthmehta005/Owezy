@@ -48,6 +48,7 @@ export type Database = {
           created_by: string | null;
           deleted_at: string | null;
           description: string;
+          expense_date: string;
           group_id: string;
           id: string;
           payer_member_id: string;
@@ -62,6 +63,7 @@ export type Database = {
           created_by?: string | null;
           deleted_at?: string | null;
           description: string;
+          expense_date?: string;
           group_id: string;
           id?: string;
           payer_member_id: string;
@@ -75,6 +77,7 @@ export type Database = {
           created_by?: string | null;
           deleted_at?: string | null;
           description?: string;
+          expense_date?: string;
           group_id?: string;
           id?: string;
           payer_member_id?: string;
@@ -199,6 +202,8 @@ export type Database = {
       create_expense: {
         Args: {
           description: string;
+          expense_date?: string;
+          expense_id?: string;
           group_id: string;
           payer_member_id: string;
           shares: Json;
@@ -210,6 +215,7 @@ export type Database = {
           created_by: string | null;
           deleted_at: string | null;
           description: string;
+          expense_date: string;
           group_id: string;
           id: string;
           payer_member_id: string;
@@ -236,6 +242,7 @@ export type Database = {
           created_by: string | null;
           deleted_at: string | null;
           description: string;
+          expense_date: string;
           group_id: string;
           id: string;
           payer_member_id: string;
@@ -263,6 +270,7 @@ export type Database = {
           created_by: string | null;
           deleted_at: string | null;
           description: string;
+          expense_date: string;
           group_id: string;
           id: string;
           payer_member_id: string;
@@ -282,6 +290,7 @@ export type Database = {
         Args: {
           description: string;
           expected_version: number;
+          expense_date?: string;
           expense_id: string;
           payer_member_id: string;
           shares: Json;
@@ -293,6 +302,7 @@ export type Database = {
           created_by: string | null;
           deleted_at: string | null;
           description: string;
+          expense_date: string;
           group_id: string;
           id: string;
           payer_member_id: string;
