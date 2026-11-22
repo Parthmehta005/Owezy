@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { cleanupDevUsers, closeDb, createDevUser, signIn } from "./support/dev-users";
+import { cleanupDevUsers, closeDb, createDevUser, phoneFor } from "./support/dev-users";
 
 test.beforeAll(cleanupDevUsers);
 test.afterAll(async () => {
@@ -17,17 +17,19 @@ test("signed-out visitors are sent to sign in, keeping where they were going", a
 // The M4 goal: A creates a group with placeholder names and shares the
 // invite; B opens it and claims a name; both see the same group and
 // members, and "/" brings each of them back to it.
-test("two people share a group through an invite link", async ({ browser, baseURL }) => {
+test("two people share a group through an invite link", async ({ browser }, testInfo) => {
   const asha = await createDevUser("asha", "Asha Rao");
   const bilal = await createDevUser("bilal", "Bilal Khan");
 
-  const a = await browser.newContext();
-  await signIn(a, asha, baseURL!);
+  const a = await phoneFor(browser, testInfo, asha);
   const pageA = await a.newPage();
 
   // A has no groups yet, so "/" opens "New group".
   await pageA.goto("/");
   await expect(pageA).toHaveURL(/\/new$/);
+  // Guard against losing the phone emulation in extra contexts: after our
+  // page (with its viewport tag) loads, it must be phone-width and touch.
+  expect(await pageA.evaluate(() => matchMedia("(pointer: coarse)").matches && window.innerWidth < 500)).toBe(true);
   await pageA.getByLabel("Group name").fill("Goa trip");
   await expect(pageA.getByLabel("Your name in this group")).toHaveValue("Asha Rao");
   await pageA.getByLabel("Your name in this group").fill("Asha");
@@ -45,8 +47,7 @@ test("two people share a group through an invite link", async ({ browser, baseUR
   const invite = await inviteUrl.innerText();
 
   // B opens it and claims "Rahul" with one tap.
-  const b = await browser.newContext();
-  await signIn(b, bilal, baseURL!);
+  const b = await phoneFor(browser, testInfo, bilal);
   const pageB = await b.newPage();
   await pageB.goto(invite);
   await expect(pageB.getByRole("heading", { level: 1 })).toHaveText("Goa trip");
@@ -65,8 +66,7 @@ test("two people share a group through an invite link", async ({ browser, baseUR
   }
 
   // The invite can't be used to claim Rahul again.
-  const c = await browser.newContext();
-  await signIn(c, await createDevUser("chitra", "Chitra"), baseURL!);
+  const c = await phoneFor(browser, testInfo, await createDevUser("chitra", "Chitra"));
   const pageC = await c.newPage();
   await pageC.goto(invite);
   await expect(pageC.locator("#claim-heading + ul button")).toHaveText(["I'm Neha"]);

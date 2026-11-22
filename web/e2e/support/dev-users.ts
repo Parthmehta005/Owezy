@@ -9,7 +9,7 @@
  * project, so tests can never touch prod.
  */
 import { createServerClient } from "@supabase/ssr";
-import type { BrowserContext } from "@playwright/test";
+import type { Browser, BrowserContext, TestInfo } from "@playwright/test";
 import pg from "pg";
 
 process.loadEnvFile(".env.local");
@@ -77,6 +77,19 @@ export async function createDevUser(tag: string, fullName: string): Promise<DevU
 /** Put a user's session cookies into a browser context. */
 export async function signIn(context: BrowserContext, user: DevUser, baseURL: string) {
   await context.addCookies(user.cookies.map((c) => ({ ...c, url: baseURL })));
+}
+
+/**
+ * A new browser context ("another person's phone") with the current
+ * project's device settings. browser.newContext() on its own does NOT
+ * inherit them, so the Android/iPhone emulation would silently be lost.
+ * Signed in as `user` if given.
+ */
+export async function phoneFor(browser: Browser, testInfo: TestInfo, user?: DevUser) {
+  const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch, baseURL } = testInfo.project.use;
+  const context = await browser.newContext({ viewport, userAgent, deviceScaleFactor, isMobile, hasTouch, baseURL });
+  if (user) await signIn(context, user, baseURL!);
+  return context;
 }
 
 /** Delete every e2e user and every group they were part of (children first). */

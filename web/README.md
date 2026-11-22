@@ -12,7 +12,8 @@ npm run dev          # http://localhost:3000
 npm run lint
 npm run typecheck
 npm run test         # Vitest, single run (test:watch to keep it running)
-npm run test:e2e     # Playwright: builds, starts on :3100, runs e2e/ in installed Edge against the dev project
+npm run test:e2e     # Playwright: builds, starts on :3100, runs e2e/ as an Android phone (installed Edge) and an iPhone (WebKit) against the dev project
+                     # first time only: npx playwright install webkit
 npm run build
 ```
 
