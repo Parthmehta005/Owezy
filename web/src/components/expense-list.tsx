@@ -16,10 +16,12 @@ export function ExpenseList({
   expenses,
   members,
   meId,
+  onSelect,
 }: {
   expenses: BundleExpense[];
   members: BundleMember[];
   meId: string | null;
+  onSelect: (expense: BundleExpense) => void;
 }) {
   const today = useIndiaToday();
   const names = new Map(members.map((m) => [m.id, m.displayName]));
@@ -37,7 +39,13 @@ export function ExpenseList({
           </h3>
           <ul className="divide-y">
             {day.items.map((e) => (
-              <ExpenseRow key={e.id} expense={e} payerName={e.payerId === meId ? "You" : (names.get(e.payerId) ?? "Someone")} meId={meId} />
+              <ExpenseRow
+                key={e.id}
+                expense={e}
+                payerName={e.payerId === meId ? "You" : (names.get(e.payerId) ?? "Someone")}
+                meId={meId}
+                onSelect={() => onSelect(e)}
+              />
             ))}
           </ul>
         </div>
@@ -46,10 +54,27 @@ export function ExpenseList({
   );
 }
 
-function ExpenseRow({ expense, payerName, meId }: { expense: BundleExpense; payerName: string; meId: string | null }) {
+function ExpenseRow({
+  expense,
+  payerName,
+  meId,
+  onSelect,
+}: {
+  expense: BundleExpense;
+  payerName: string;
+  meId: string | null;
+  onSelect: () => void;
+}) {
   const effect: Effect = meId ? expenseEffect(expense, meId) : { kind: "not_involved" };
   return (
-    <li className="flex min-h-16 items-center gap-3 py-3" data-testid="expense-row" data-pending={expense.pending || undefined}>
+    <li data-testid="expense-row" data-pending={expense.pending || undefined}>
+      {/* Tap to edit. Not while it's still saving. */}
+      <button
+        type="button"
+        onClick={onSelect}
+        disabled={expense.pending}
+        className="-mx-2 flex min-h-16 w-[calc(100%+1rem)] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-muted/50 disabled:cursor-default"
+      >
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{expense.description}</p>
         <p className="truncate text-sm text-muted-foreground">
@@ -58,6 +83,7 @@ function ExpenseRow({ expense, payerName, meId }: { expense: BundleExpense; paye
         </p>
       </div>
       <EffectLabel effect={effect} />
+      </button>
     </li>
   );
 }

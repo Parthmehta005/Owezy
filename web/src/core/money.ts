@@ -55,3 +55,11 @@ export function formatInr(paise: Paise): string {
   const sign = paise < 0 ? "-" : "";
   return `${sign}₹${RUPEES_FORMAT.format(rupees)}.${String(rest).padStart(2, "0")}`;
 }
+
+/** Paise as text for an amount field: "900", "10.50" (no ₹, no grouping), so it reads back with parseAmount. */
+export function toAmountInput(paise: Paise): string {
+  assertPaise(paise);
+  const rupees = Math.floor(paise / 100);
+  const rest = paise % 100;
+  return rest === 0 ? String(rupees) : `${rupees}.${String(rest).padStart(2, "0")}`;
+}

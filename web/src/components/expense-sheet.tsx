@@ -5,19 +5,22 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "cn";
 import { addDays, dateLabel } from "@/core/dates";
 import { expenseEffect } from "@/core/effect";
-import { formatInr, parseAmount } from "@/core/money";
+import { formatInr, parseAmount, toAmountInput } from "@/core/money";
 import { buildShares } from "@/core/splits";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { BundleMember } from "@/lib/data/bundle";
+import type { BundleExpense, BundleMember } from "@/lib/data/bundle";
 import type { NewExpense } from "@/lib/data/expense-mutations";
 
-/** What the sheet starts from: a fresh expense, or one whose save failed. */
+/** What the sheet starts from: a fresh expense, an existing one to edit, or one whose save failed. */
 export interface ExpenseDraft {
-  /** Stays the same across retries, so the server can't create a duplicate. */
+  mode: "add" | "edit";
+  /** Add: generated here and kept across retries, so the server can't create a duplicate. Edit: the expense's id. */
   id: string;
+  /** Edit: the version being edited (stale-edit check). */
+  version?: number;
   amountText: string;
   description: string;
   payerId: string;
@@ -35,7 +38,28 @@ export interface ExpenseDraft {
 }
 
 export function newDraft(payerId: string, today: string): ExpenseDraft {
-  return { id: crypto.randomUUID(), amountText: "", description: "", payerId, date: today, splitMode: "equal" };
+  return { mode: "add", id: crypto.randomUUID(), amountText: "", description: "", payerId, date: today, splitMode: "equal" };
+}
+
+/** A draft for editing an existing expense, filled in with its current details. */
+export function draftFromExpense(expense: BundleExpense, extra?: Partial<ExpenseDraft>): ExpenseDraft {
+  const shareIds = Object.keys(expense.shares);
+  return {
+    mode: "edit",
+    id: expense.id,
+    version: expense.version,
+    amountText: toAmountInput(expense.totalPaise),
+    description: expense.description,
+    payerId: expense.payerId,
+    date: expense.date,
+    splitMode: expense.splitType,
+    includedIds: expense.splitType === "equal" ? shareIds : undefined,
+    unequalTexts:
+      expense.splitType === "unequal"
+        ? Object.fromEntries(Object.entries(expense.shares).map(([id, paise]) => [id, toAmountInput(paise)]))
+        : undefined,
+    ...extra,
+  };
 }
 
 function tryParse(text: string) {
@@ -169,7 +193,7 @@ function ExpenseForm({
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
-        <DrawerTitle className="text-base font-semibold">Add expense</DrawerTitle>
+        <DrawerTitle className="text-base font-semibold">{draft.mode === "edit" ? "Edit expense" : "Add expense"}</DrawerTitle>
         <Button type="submit" disabled={!canSave}>
           Save
         </Button>
@@ -179,7 +203,7 @@ function ExpenseForm({
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-5">
         {draft.error && (
           <p role="alert" className="rounded-lg border border-negative/30 bg-negative/10 px-3 py-2 text-sm text-negative">
-            Not saved: {draft.error} Your details are below; tap Save to try again.
+            {draft.error}
           </p>
         )}
 

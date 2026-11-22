@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertPaise, formatInr, parseAmount } from "./money";
+import { assertPaise, formatInr, parseAmount, toAmountInput } from "./money";
 
 describe("parseAmount", () => {
   // test_logic.py: TestMoney.test_parse_valid_amounts
@@ -84,6 +84,21 @@ describe("assertPaise", () => {
     expect(() => assertPaise(-500)).not.toThrow();
     for (const bad of [0.1, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
       expect(() => assertPaise(bad)).toThrow();
+    }
+  });
+});
+
+describe("toAmountInput", () => {
+  it("drops .00 and keeps two decimals otherwise", () => {
+    expect(toAmountInput(90000)).toBe("900");
+    expect(toAmountInput(1050)).toBe("10.50");
+    expect(toAmountInput(5)).toBe("0.05");
+    expect(toAmountInput(0)).toBe("0");
+  });
+
+  it("round-trips through parseAmount", () => {
+    for (const paise of [1, 50, 1050, 90000, 120000025]) {
+      expect(parseAmount(toAmountInput(paise), { allowZero: true })).toBe(paise);
     }
   });
 });

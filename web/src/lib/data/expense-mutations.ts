@@ -87,3 +87,80 @@ export function useCreateExpense(groupId: string) {
     onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
   });
 }
+
+export interface ExpenseEdit extends NewExpense {
+  /** The version the edit was based on; the server rejects it (PT409) if someone changed it since. */
+  expectedVersion: number;
+}
+
+/** True when a save failed because someone else changed the expense first. */
+export function isConflict(error: unknown) {
+  return (error as Partial<PostgrestError> | undefined)?.code === "PT409";
+}
+
+/** True when the expense no longer exists (someone deleted it). */
+export function isGone(error: unknown) {
+  return (error as Partial<PostgrestError> | undefined)?.code === "P0002";
+}
+
+/**
+ * Edit an expense optimistically: the row updates at once (marked pending)
+ * and goes back to how it was if the save fails. Refetched afterwards.
+ */
+export function useUpdateExpense(groupId: string) {
+  const queryClient = useQueryClient();
+  const key = groupKeys.bundle(groupId);
+
+  return useMutation({
+    mutationFn: async (input: ExpenseEdit) => {
+      const { data, error } = await createClient().rpc("update_expense", {
+        expense_id: input.id,
+        expected_version: input.expectedVersion,
+        description: input.description,
+        payer_member_id: input.payerId,
+        total_paise: input.totalPaise,
+        split_type: input.splitType,
+        shares: input.shares,
+        expense_date: input.date,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<GroupBundle | null>(key)?.expenses.find((e) => e.id === input.id);
+      queryClient.setQueryData<GroupBundle | null>(key, (bundle) =>
+        bundle
+          ? {
+              ...bundle,
+              expenses: bundle.expenses
+                .map((e) =>
+                  e.id === input.id
+                    ? {
+                        ...e,
+                        description: input.description.trim(),
+                        payerId: input.payerId,
+                        totalPaise: input.totalPaise,
+                        splitType: input.splitType,
+                        shares: input.shares,
+                        date: input.date,
+                        pending: true,
+                      }
+                    : e,
+                )
+                .sort(byListOrder),
+            }
+          : bundle,
+      );
+      return { previous };
+    },
+    onError: (_error, input, context) => {
+      const previous = context?.previous;
+      if (!previous) return;
+      queryClient.setQueryData<GroupBundle | null>(key, (bundle) =>
+        bundle ? { ...bundle, expenses: bundle.expenses.map((e) => (e.id === input.id ? previous : e)).sort(byListOrder) } : bundle,
+      );
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
+  });
+}

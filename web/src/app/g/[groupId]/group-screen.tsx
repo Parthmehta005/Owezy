@@ -2,14 +2,22 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
 import { ExpenseList } from "@/components/expense-list";
-import { ExpenseSheet, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
+import { ExpenseSheet, draftFromExpense, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
 import { GroupSwitcher } from "@/components/group-switcher";
 import { Button } from "@/components/ui/button";
-import type { BundleMember, GroupBundle } from "@/lib/data/bundle";
-import { saveErrorMessage, useCreateExpense } from "@/lib/data/expense-mutations";
+import { groupKeys, type BundleMember, type GroupBundle } from "@/lib/data/bundle";
+import {
+  isConflict,
+  isGone,
+  saveErrorMessage,
+  useCreateExpense,
+  useUpdateExpense,
+  type NewExpense,
+} from "@/lib/data/expense-mutations";
 import type { GroupSummary } from "@/lib/data/groups";
 import { useGroupBundle } from "@/lib/data/use-group-bundle";
 
@@ -28,10 +36,58 @@ export function GroupScreen({
 }) {
   const { data: bundle } = useGroupBundle(groupId, userId, initial, initialAt);
   const createExpense = useCreateExpense(groupId);
+  const updateExpense = useUpdateExpense(groupId);
+  const queryClient = useQueryClient();
+  const [notice, setNotice] = useState<string | null>(null);
   const [today] = useState(() => indiaDate(new Date()));
   const [sheetOpen, setSheetOpen] = useState(false);
   const [draft, setDraft] = useState<ExpenseDraft | null>(null);
   const keyboardPrimer = useRef<HTMLInputElement>(null);
+
+  const nextAttempt = (d: ExpenseDraft | null) => (d?.attempt ?? 0) + 1;
+
+  /** Bring the sheet back with what was typed and why it failed; Save retries. */
+  function reopenWithError(typed: ExpenseDraft, error: unknown) {
+    setDraft((d) => ({
+      ...typed,
+      error: `Not saved: ${saveErrorMessage(error)} Your details are below; tap Save to try again.`,
+      attempt: nextAttempt(d),
+    }));
+    setSheetOpen(true);
+  }
+
+  function save(expense: NewExpense, typed: ExpenseDraft) {
+    setSheetOpen(false);
+    setNotice(null);
+    if (typed.mode === "add") {
+      createExpense.mutate(expense, { onError: (error) => reopenWithError(typed, error) });
+      return;
+    }
+    updateExpense.mutate(
+      { ...expense, expectedVersion: typed.version ?? 1 },
+      {
+        onError: async (error) => {
+          if (!isConflict(error) && !isGone(error)) return reopenWithError(typed, error);
+          // Someone else changed or deleted it first: load the latest and show that.
+          await queryClient.refetchQueries({ queryKey: groupKeys.bundle(groupId) });
+          const latest = queryClient
+            .getQueryData<GroupBundle | null>(groupKeys.bundle(groupId))
+            ?.expenses.find((e) => e.id === expense.id);
+          if (!latest) {
+            setNotice(`"${typed.description.trim() || "That expense"}" was deleted by someone else, so your changes weren't saved.`);
+            return;
+          }
+          setDraft((d) =>
+            draftFromExpense(latest, {
+              error: "Someone else changed this expense while you were editing. These are the latest details; make your change again.",
+              attempt: nextAttempt(d),
+            }),
+          );
+          setSheetOpen(true);
+        },
+      },
+    );
+  }
 
   // A refresh found the group gone for this user (e.g. they left on another device).
   if (!bundle) {
@@ -58,6 +114,11 @@ export function GroupScreen({
         </Link>
       </header>
       <main className="flex flex-1 flex-col gap-8 px-4 pt-6 pb-28">
+        {notice && (
+          <p role="alert" className="rounded-lg border border-negative/30 bg-negative/10 px-3 py-2 text-sm text-negative">
+            {notice}
+          </p>
+        )}
         <Members members={bundle.members} />
         {bundle.expenses.length === 0 ? (
           <section aria-labelledby="expenses-heading" className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
@@ -67,7 +128,16 @@ export function GroupScreen({
             <p className="max-w-xs text-sm text-muted-foreground">Expenses added to this group will show up here.</p>
           </section>
         ) : (
-          <ExpenseList expenses={bundle.expenses} members={bundle.members} meId={bundle.meId} />
+          <ExpenseList
+            expenses={bundle.expenses}
+            members={bundle.members}
+            meId={bundle.meId}
+            onSelect={(e) => {
+              setNotice(null);
+              setDraft(draftFromExpense(e));
+              setSheetOpen(true);
+            }}
+          />
         )}
       </main>
 
@@ -96,16 +166,7 @@ export function GroupScreen({
           members={bundle.members}
           meId={bundle.meId}
           today={today}
-          onSave={(expense, typed) => {
-            setSheetOpen(false);
-            createExpense.mutate(expense, {
-              // Bring the sheet back with what was typed; Save retries with the same id.
-              onError: (error) => {
-                setDraft((d) => ({ ...typed, error: saveErrorMessage(error), attempt: (d?.attempt ?? 0) + 1 }));
-                setSheetOpen(true);
-              },
-            });
-          }}
+          onSave={save}
         />
       )}
     </>
