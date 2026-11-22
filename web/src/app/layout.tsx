@@ -39,7 +39,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <Providers>
           {/* Mobile-first: one column, centred at 480px on larger screens. */}
-          <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col">{children}</div>
+          <div className="mx-auto flex w-full max-w-[480px] flex-1 flex-col pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+            {children}
+          </div>
         </Providers>
       </body>
     </html>

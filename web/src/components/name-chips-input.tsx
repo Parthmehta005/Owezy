@@ -53,7 +53,7 @@ export function NameChipsInput({
   return (
     <div
       className={cn(
-        "flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg border border-input bg-transparent px-2 py-1.5 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30",
+        "flex min-h-11 flex-wrap items-center gap-x-1.5 rounded-lg border border-input bg-transparent px-2 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30",
         // Also override the focus colours: the error shows while typing, i.e. while focused.
         invalid &&
           "border-destructive ring-3 ring-destructive/20 focus-within:border-destructive focus-within:ring-destructive/20 dark:ring-destructive/40 dark:focus-within:ring-destructive/40",
@@ -65,7 +65,7 @@ export function NameChipsInput({
           <input type="hidden" name={name} value={n} />
           <button
             type="button"
-            className="rounded-full p-0.5 text-muted-foreground hover:bg-background hover:text-foreground"
+            className="-my-3.5 flex h-11 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground"
             onClick={() => onNamesChange(names.filter((_, j) => j !== i))}
           >
             <X aria-hidden className="size-3.5" />
@@ -91,7 +91,7 @@ export function NameChipsInput({
         aria-invalid={invalid || undefined}
         autoComplete="off"
         autoCapitalize="words"
-        className="min-w-24 flex-1 bg-transparent px-1 py-0.5 text-base outline-none placeholder:text-muted-foreground md:text-sm"
+        className="h-11 min-w-24 flex-1 bg-transparent px-1 text-base outline-none placeholder:text-muted-foreground md:text-sm"
       />
     </div>
   );

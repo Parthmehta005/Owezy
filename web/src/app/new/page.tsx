@@ -11,9 +11,9 @@ export const metadata: Metadata = { title: "New group · Owezy" };
 
 export default function NewGroupPage() {
   return (
-    <main className="flex flex-1 flex-col gap-8 px-4 py-8">
+    <main className="flex flex-1 flex-col gap-8 px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-8">
       <div className="space-y-1">
-        <Link href="/" className="-ml-1 inline-block rounded px-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link href="/" className="-ml-2 inline-flex min-h-11 items-center rounded px-2 text-sm text-muted-foreground hover:text-foreground">
           Cancel
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">New group</h1>

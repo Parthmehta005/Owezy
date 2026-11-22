@@ -22,7 +22,7 @@ export function GroupSwitcher({ current, groups }: { current: GroupSummary; grou
       <DrawerTrigger asChild>
         <button
           type="button"
-          className="-mx-2 flex min-w-0 items-center gap-1 rounded-md px-2 py-1 text-left text-xl font-semibold tracking-tight hover:bg-muted"
+          className="-mx-2 flex min-h-11 min-w-0 items-center gap-1 rounded-md px-2 text-left text-xl font-semibold tracking-tight hover:bg-muted"
         >
           <span className="truncate">{current.name}</span>
           <ChevronDown aria-hidden className="size-5 shrink-0 text-muted-foreground" />
@@ -42,7 +42,7 @@ export function GroupSwitcher({ current, groups }: { current: GroupSummary; grou
                   <Link
                     href={`/g/${g.id}`}
                     aria-current={g.id === current.id ? "page" : undefined}
-                    className="flex items-center justify-between gap-3 rounded-md px-3 py-3 hover:bg-muted"
+                    className="flex min-h-12 items-center justify-between gap-3 rounded-md px-3 hover:bg-muted"
                   >
                     <span className="truncate">{g.name}</span>
                     {g.id === current.id && <Check aria-hidden className="size-4 text-primary" />}
@@ -50,7 +50,7 @@ export function GroupSwitcher({ current, groups }: { current: GroupSummary; grou
                 </li>
               ))}
               <li>
-                <Link href="/new" className="flex items-center gap-2 rounded-md px-3 py-3 text-primary hover:bg-muted">
+                <Link href="/new" className="flex min-h-12 items-center gap-2 rounded-md px-3 text-primary hover:bg-muted">
                   <Plus aria-hidden className="size-4" />
                   New group
                 </Link>

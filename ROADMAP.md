@@ -167,7 +167,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Needs from owner:** a Vercel account connected to the GitHub repo, with the dev env vars; the `*.vercel.app` URL added to `owezy-dev`'s Supabase Redirect URLs (steps in `web/README.md`).
 - [x] Dev deployment on Vercel (root `web/`, region `bom1`, `owezy-dev` env vars) + owner setup steps
 - [x] Playwright mobile projects: Android (Chromium, Pixel-sized, touch) and iPhone (WebKit); existing e2e passes on both
-- [ ] Phone-sized tap targets and safe-area insets across existing screens (sign-in, groups, settings, join)
+- [x] Phone-sized tap targets and safe-area insets across existing screens (sign-in, groups, settings, join)
 - [ ] Migration: `expenses.expense_date` (default today in India time) and client-supplied ids so a retried `create_expense` never duplicates; pgTAP; regenerated types
 - [ ] Group bundle query hook (group + members + expenses + shares) with TanStack Query, refetching when the app regains focus
 - [ ] Expense list grouped by date, with the "your effect" amount per row

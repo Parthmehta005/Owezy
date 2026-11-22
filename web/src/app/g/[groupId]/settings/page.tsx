@@ -27,10 +27,10 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center gap-1 border-b bg-background/95 px-2 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-1 border-b bg-background/95 px-2 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
         <Link
           href={`/g/${group.id}`}
-          className="flex min-w-0 items-center gap-1 rounded-md px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="flex min-h-11 min-w-0 items-center gap-1 rounded-md px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <ChevronLeft aria-hidden className="size-5 shrink-0" />
           <span className="truncate">{group.name}</span>

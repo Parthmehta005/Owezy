@@ -1,0 +1,82 @@
+import { expect, test, type Page } from "@playwright/test";
+import { cleanupDevUsers, closeDb, createDevUser, phoneFor } from "./support/dev-users";
+
+/**
+ * Phones need tap targets at least 44px tall. Measures every visible
+ * button, link and text field on each screen (and in open sheets/dialogs).
+ */
+const MIN = 44;
+
+async function smallTargets(page: Page) {
+  return page.evaluate((min) => {
+    const els = document.querySelectorAll<HTMLElement>(
+      'a[href], button, input:not([type="hidden"]), textarea, select, [role="button"]',
+    );
+    const out: string[] = [];
+    for (const el of els) {
+      if (el.closest("[hidden], [aria-hidden='true'], nextjs-portal")) continue;
+      const r = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      if (r.width === 0 || r.height === 0 || style.visibility === "hidden" || style.display === "none") continue;
+      if (r.height < min - 0.5) {
+        const label = (el.getAttribute("aria-label") || el.innerText || el.id || el.getAttribute("name") || el.getAttribute("placeholder") || el.tagName).trim().replace(/\s+/g, " ");
+        out.push(`${el.tagName.toLowerCase()} "${label.slice(0, 30)}" is ${Math.round(r.height)}px tall`);
+      }
+    }
+    return out;
+  }, MIN);
+}
+
+test.beforeAll(cleanupDevUsers);
+test.afterAll(async () => {
+  await cleanupDevUsers();
+  await closeDb();
+});
+
+test("every tap target is at least 44px tall", async ({ browser }, testInfo) => {
+  const problems: Record<string, string[]> = {};
+  const check = async (page: Page, screen: string) => {
+    const small = await smallTargets(page);
+    if (small.length) problems[screen] = small;
+  };
+
+  // Signed out.
+  const anon = await phoneFor(browser, testInfo);
+  const login = await anon.newPage();
+  await login.goto("/login");
+  await login.getByRole("button", { name: "Continue with Google" }).waitFor();
+  await check(login, "login");
+
+  // Signed in: new group (with chips), group screen, switcher, settings, leave confirm.
+  const asha = await createDevUser("tap-asha", "Asha");
+  const a = await phoneFor(browser, testInfo, asha);
+  const page = await a.newPage();
+  await page.goto("/new");
+  await page.getByLabel("Who else?").pressSequentially("Rahul Neha ");
+  await check(page, "new group");
+  await page.getByLabel("Group name").fill("Tap test");
+  await page.getByRole("button", { name: "Create group" }).click();
+  await page.getByRole("heading", { name: "No expenses yet" }).waitFor();
+  await check(page, "group");
+  await page.getByRole("button", { name: /Switch group/ }).click();
+  await page.getByRole("dialog").waitFor();
+  await check(page, "group switcher");
+  await page.keyboard.press("Escape");
+  await page.getByRole("link", { name: "Group settings" }).click();
+  await page.getByRole("heading", { name: "Settings" }).waitFor();
+  await page.getByLabel("Add people").pressSequentially("Kiran ");
+  await check(page, "settings");
+  await page.getByRole("button", { name: "Leave group" }).click();
+  await check(page, "leave confirm");
+  const invite = await page.getByTestId("invite-url").innerText();
+
+  // Join screen, as someone else.
+  const b = await phoneFor(browser, testInfo, await createDevUser("tap-bilal", "Bilal"));
+  const join = await b.newPage();
+  await join.goto(invite);
+  await join.getByText("You're invited to").waitFor();
+  await check(join, "join");
+
+  await Promise.all([anon.close(), a.close(), b.close()]);
+  expect(problems).toEqual({});
+});

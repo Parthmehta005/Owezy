@@ -26,11 +26,11 @@ async function GroupScreen({ params }: { params: PageProps<"/g/[groupId]">["para
   return (
     <>
       <RememberLastGroup userId={user.id} groupId={view.group.id} />
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
         <GroupSwitcher current={view.group} groups={groups} />
         <Link
           href={`/g/${view.group.id}/settings`}
-          className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Settings aria-hidden className="size-5" />
           <span className="sr-only">Group settings</span>

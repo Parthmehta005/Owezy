@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Join a group · Owezy" };
 // /login?next=/join/<code> and sign-in brings them back.
 export default function JoinPage({ params }: PageProps<"/join/[code]">) {
   return (
-    <main className="flex flex-1 flex-col justify-center gap-8 px-4 py-10">
+    <main className="flex flex-1 flex-col justify-center gap-8 px-4 pt-[calc(2.5rem+env(safe-area-inset-top))] pb-10">
       <Suspense fallback={<div aria-busy className="h-72 animate-pulse rounded-lg bg-muted/40" />}>
         <Join params={params} />
       </Suspense>
