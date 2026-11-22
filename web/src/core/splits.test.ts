@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { splitEqual, validateUnequal } from "./splits";
+import { buildShares, splitEqual, validateUnequal } from "./splits";
 
 const sum = (shares: Record<string, number>) => Object.values(shares).reduce((a, b) => a + b, 0);
 
@@ -60,5 +60,40 @@ describe("validateUnequal", () => {
   it("rejects negative or fractional shares even if they sum correctly", () => {
     expect(() => validateUnequal(1000, { A: 1500, B: -500 })).toThrow("Shares cannot be negative.");
     expect(() => validateUnequal(1000, { A: 500.5, B: 499.5 })).toThrow();
+  });
+});
+
+describe("buildShares", () => {
+  it("equal: splits between the included people, in member order", () => {
+    expect(buildShares({ mode: "equal", totalPaise: 1000, memberIds: ["A", "C"] })).toEqual({
+      shares: { A: 500, C: 500 },
+      remainingPaise: 0,
+      problem: null,
+    });
+  });
+
+  it("equal: nobody included is a problem; no total yet is just incomplete", () => {
+    expect(buildShares({ mode: "equal", totalPaise: 1000, memberIds: [] }).problem).toBe("Select at least one person.");
+    expect(buildShares({ mode: "equal", totalPaise: null, memberIds: ["A"] })).toEqual({ shares: null, remainingPaise: null, problem: null });
+  });
+
+  it("unequal: reports what's left or over, and only gives shares when exact", () => {
+    expect(buildShares({ mode: "unequal", totalPaise: 1000, amounts: { A: 700 } })).toEqual({ shares: null, remainingPaise: 300, problem: null });
+    expect(buildShares({ mode: "unequal", totalPaise: 1000, amounts: { A: 700, B: 400 } }).remainingPaise).toBe(-100);
+    expect(buildShares({ mode: "unequal", totalPaise: 1000, amounts: { A: 700, B: 300, C: 0 } })).toEqual({
+      shares: { A: 700, B: 300 },
+      remainingPaise: 0,
+      problem: null,
+    });
+  });
+
+  it("unequal: an unreadable amount is a problem", () => {
+    expect(buildShares({ mode: "unequal", totalPaise: 1000, amounts: { A: null, B: 1000 } }).problem).toBe(
+      "One of the amounts isn't a number.",
+    );
+  });
+
+  it("unequal: without a total there is nothing to compare against", () => {
+    expect(buildShares({ mode: "unequal", totalPaise: null, amounts: { A: 500 } })).toEqual({ shares: null, remainingPaise: null, problem: null });
   });
 });

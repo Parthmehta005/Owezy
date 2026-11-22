@@ -6,7 +6,7 @@ import { cn } from "cn";
 import { addDays, dateLabel } from "@/core/dates";
 import { expenseEffect } from "@/core/effect";
 import { formatInr, parseAmount } from "@/core/money";
-import { splitEqual } from "@/core/splits";
+import { buildShares } from "@/core/splits";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,11 @@ export interface ExpenseDraft {
   description: string;
   payerId: string;
   date: string;
+  splitMode: "equal" | "unequal";
+  /** Equal mode: who's included (undefined = everyone). */
+  includedIds?: string[];
+  /** Unequal mode: what was typed per member. */
+  unequalTexts?: Record<string, string>;
   /** Why the last save failed, if it did. */
   error?: string;
   /** Failed attempts so far. Each failure remounts the form so Save works again,
@@ -30,7 +35,7 @@ export interface ExpenseDraft {
 }
 
 export function newDraft(payerId: string, today: string): ExpenseDraft {
-  return { id: crypto.randomUUID(), amountText: "", description: "", payerId, date: today };
+  return { id: crypto.randomUUID(), amountText: "", description: "", payerId, date: today, splitMode: "equal" };
 }
 
 function tryParse(text: string) {
@@ -41,7 +46,17 @@ function tryParse(text: string) {
   }
 }
 
-type Panel = "payer" | null;
+/** A per-person amount: blank counts as 0; unreadable text is null. */
+function parseShareText(text: string) {
+  if (text.trim() === "") return 0;
+  try {
+    return parseAmount(text, { allowZero: true });
+  } catch {
+    return null;
+  }
+}
+
+type Panel = "payer" | "split" | null;
 
 export function ExpenseSheet({
   open,
@@ -97,14 +112,32 @@ function ExpenseForm({
   const [description, setDescription] = useState(draft.description);
   const [payerId, setPayerId] = useState(draft.payerId);
   const [date, setDate] = useState(draft.date);
+  const [splitMode, setSplitMode] = useState(draft.splitMode);
+  const [includedIds, setIncludedIds] = useState<string[]>(draft.includedIds ?? members.map((m) => m.id));
+  const [unequalTexts, setUnequalTexts] = useState<Record<string, string>>(draft.unequalTexts ?? {});
   const [panel, setPanel] = useState<Panel>(null);
   const [submitted, setSubmitted] = useState(false);
   const descriptionRef = useRef<HTMLInputElement>(null);
 
   const total = tryParse(amountText);
-  const memberIds = members.map((m) => m.id);
-  const shares = total ? splitEqual(total, memberIds) : null;
+  // Keep member order (it decides who gets leftover paise in an equal split).
+  const included = members.map((m) => m.id).filter((id) => includedIds.includes(id));
+  const split =
+    splitMode === "equal"
+      ? buildShares({ mode: "equal", totalPaise: total, memberIds: included })
+      : buildShares({
+          mode: "unequal",
+          totalPaise: total,
+          amounts: Object.fromEntries(members.map((m) => [m.id, parseShareText(unequalTexts[m.id] ?? "")])),
+        });
+  const shares = split.shares;
   const canSave = Boolean(total && shares && description.trim()) && !submitted;
+  const splitLabel =
+    splitMode === "unequal"
+      ? "Unequally"
+      : included.length === members.length
+        ? `Equally, all ${members.length}`
+        : `Equally, ${included.length} ${included.length === 1 ? "person" : "people"}`;
   const payer = members.find((m) => m.id === payerId);
   const payerLabel = payerId === meId ? "You" : (payer?.displayName ?? "Choose");
 
@@ -113,8 +146,8 @@ function ExpenseForm({
     if (!canSave || !total || !shares) return;
     setSubmitted(true); // a second tap before the sheet closes does nothing
     onSave(
-      { id: draft.id, description: description.trim(), payerId, totalPaise: total, splitType: "equal", shares, date },
-      { ...draft, amountText, description, payerId, date, error: undefined },
+      { id: draft.id, description: description.trim(), payerId, totalPaise: total, splitType: splitMode, shares, date },
+      { ...draft, amountText, description, payerId, date, splitMode, includedIds, unequalTexts, error: undefined },
     );
   }
 
@@ -197,7 +230,7 @@ function ExpenseForm({
 
         <div className="flex flex-wrap gap-2">
           <Chip label="Paid by" value={payerLabel} open={panel === "payer"} onClick={() => setPanel(panel === "payer" ? null : "payer")} />
-          <Chip label="Split" value={`Equally, all ${members.length}`} />
+          <Chip label="Split" value={splitLabel} open={panel === "split"} onClick={() => setPanel(panel === "split" ? null : "split")} />
           <label className="relative flex min-h-11 items-center gap-1 rounded-full border px-3 text-sm focus-within:ring-3 focus-within:ring-ring/50">
             <span className="text-muted-foreground">Date</span>
             <span className="font-medium">{dateLabel(date, today)}</span>
@@ -210,7 +243,8 @@ function ExpenseForm({
               min="2000-01-01"
               max={addDays(today, 365)}
               onChange={(e) => e.target.value && setDate(e.target.value)}
-              className="absolute inset-0 cursor-pointer opacity-0"
+              // -inset-px: cover the chip's border too, so the target is the full 44px.
+              className="absolute -inset-px cursor-pointer opacity-0"
             />
           </label>
         </div>
@@ -236,6 +270,23 @@ function ExpenseForm({
             ))}
           </fieldset>
         )}
+
+        {panel === "split" && (
+          <SplitPanel
+            members={members}
+            meId={meId}
+            mode={splitMode}
+            onModeChange={setSplitMode}
+            includedIds={includedIds}
+            onToggle={(id) => setIncludedIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))}
+            equalShares={splitMode === "equal" ? shares : null}
+            unequalTexts={unequalTexts}
+            onUnequalChange={(id, text) => setUnequalTexts((t) => ({ ...t, [id]: text }))}
+            totalPaise={total}
+            remainingPaise={split.remainingPaise}
+          />
+        )}
+        {split.problem && <p className="text-sm text-destructive">{split.problem}</p>}
 
         {preview && (
           <p className="text-sm text-muted-foreground" data-testid="expense-preview">
@@ -263,5 +314,132 @@ function Chip({ label, value, open, onClick }: { label: string; value: string; o
       <span className="font-medium">{value}</span>
       {onClick && <ChevronDown aria-hidden className={cn("size-4 text-muted-foreground transition-transform", open && "rotate-180")} />}
     </button>
+  );
+}
+
+function SplitPanel({
+  members,
+  meId,
+  mode,
+  onModeChange,
+  includedIds,
+  onToggle,
+  equalShares,
+  unequalTexts,
+  onUnequalChange,
+  totalPaise,
+  remainingPaise,
+}: {
+  members: BundleMember[];
+  meId: string | null;
+  mode: "equal" | "unequal";
+  onModeChange: (mode: "equal" | "unequal") => void;
+  includedIds: string[];
+  onToggle: (id: string) => void;
+  equalShares: Record<string, number> | null;
+  unequalTexts: Record<string, string>;
+  onUnequalChange: (id: string, text: string) => void;
+  totalPaise: number | null;
+  remainingPaise: number | null;
+}) {
+  const name = (m: BundleMember) => (m.id === meId ? `${m.displayName} (you)` : m.displayName);
+  let status = "";
+  if (totalPaise === null) status = "Enter the total first";
+  else if (remainingPaise === 0) status = `✓ All ${formatInr(totalPaise)} assigned`;
+  else if (remainingPaise !== null && remainingPaise > 0) status = `${formatInr(remainingPaise)} left`;
+  else if (remainingPaise !== null) status = `${formatInr(-remainingPaise)} over`;
+
+  return (
+    <div className="space-y-3 rounded-lg border p-3">
+      <div role="radiogroup" aria-label="How to split" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+        {(["equal", "unequal"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            role="radio"
+            aria-checked={mode === m}
+            onClick={() => onModeChange(m)}
+            className={cn("min-h-11 rounded-md text-sm font-medium", mode === m ? "bg-background shadow-sm" : "text-muted-foreground")}
+          >
+            {m === "equal" ? "Equally" : "Unequally"}
+          </button>
+        ))}
+      </div>
+
+      {mode === "equal" ? (
+        <div>
+          {members.map((m) => {
+            const on = includedIds.includes(m.id);
+            return (
+              <button
+                key={m.id}
+                type="button"
+                role="checkbox"
+                aria-checked={on}
+                onClick={() => onToggle(m.id)}
+                className="flex min-h-12 w-full items-center gap-3 border-b px-1 text-left last:border-b-0"
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    "flex size-5 shrink-0 items-center justify-center rounded border",
+                    on ? "border-primary bg-primary text-primary-foreground" : "border-input",
+                  )}
+                >
+                  {on && <Check className="size-3.5" />}
+                </span>
+                <span className="flex-1 truncate">{name(m)}</span>
+                {on && equalShares?.[m.id] !== undefined && (
+                  <span className="text-sm text-muted-foreground tabular-nums">{formatInr(equalShares[m.id])}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {members.map((m) => {
+            const text = unequalTexts[m.id] ?? "";
+            const bad = parseShareText(text) === null;
+            return (
+              <div key={m.id} className="flex min-h-12 items-center gap-3">
+                <label htmlFor={`share-${m.id}`} className="flex-1 truncate">
+                  {name(m)}
+                </label>
+                <div className={cn("flex w-32 items-center rounded-lg border px-2", bad && "border-destructive")}>
+                  <span aria-hidden className="text-muted-foreground">
+                    ₹
+                  </span>
+                  <input
+                    id={`share-${m.id}`}
+                    inputMode="decimal"
+                    autoComplete="off"
+                    placeholder="0"
+                    value={text}
+                    onChange={(e) => onUnequalChange(m.id, e.target.value)}
+                    aria-invalid={bad || undefined}
+                    className="h-11 w-full min-w-0 bg-transparent px-1 text-right text-base tabular-nums outline-none"
+                  />
+                </div>
+              </div>
+            );
+          })}
+          <p
+            role="status"
+            data-testid="split-remaining"
+            className={cn(
+              "pt-1 text-sm font-medium",
+              remainingPaise === 0
+                ? "text-positive"
+                : remainingPaise !== null && remainingPaise < 0
+                  ? "text-destructive"
+                  : "text-muted-foreground",
+            )}
+          >
+            {status}
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

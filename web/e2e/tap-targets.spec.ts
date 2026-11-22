@@ -58,6 +58,16 @@ test("every tap target is at least 44px tall", async ({ browser }, testInfo) => 
   await page.getByRole("button", { name: "Create group" }).click();
   await page.getByRole("heading", { name: "No expenses yet" }).waitFor();
   await check(page, "group");
+  await page.getByRole("button", { name: "Add expense" }).click();
+  await page.keyboard.type("900");
+  await page.getByRole("button", { name: /Paid by/ }).click();
+  await check(page, "add sheet + payer list");
+  await page.getByRole("button", { name: /^Split/ }).click();
+  await check(page, "add sheet + equal split");
+  await page.getByRole("radio", { name: "Unequally" }).click();
+  await check(page, "add sheet + unequal split");
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.getByRole("dialog").waitFor({ state: "hidden" });
   await page.getByRole("button", { name: /Switch group/ }).click();
   await page.getByRole("dialog").waitFor();
   await check(page, "group switcher");
