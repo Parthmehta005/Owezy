@@ -174,7 +174,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Add sheet: amount (number pad, comma-decimal rule), description, date, paid by, equal split, "you get back" preview; optimistic with Retry; keyboard-safe on both engines
 - [x] Split picker: choose members, unequal mode with "₹X left" and the Save rule
 - [x] Edit an expense, with stale-edit conflict handling
-- [ ] Delete with Undo toast
+- [x] Delete with Undo toast
 - [ ] Playwright on both engines: add/see on refocus, unequal split, conflict, retry without duplicates, tap-target sizes
 
 ### ⬜ M6. Balances view

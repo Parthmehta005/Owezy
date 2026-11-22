@@ -164,3 +164,50 @@ export function useUpdateExpense(groupId: string) {
     onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
   });
 }
+
+/** Remove one expense from the cached list (returns the removed one, for putting it back). */
+function removeFromCache(bundle: GroupBundle | null | undefined, id: string) {
+  return bundle ? { ...bundle, expenses: bundle.expenses.filter((e) => e.id !== id) } : bundle;
+}
+
+function putBackInCache(bundle: GroupBundle | null | undefined, expense: BundleExpense) {
+  return bundle
+    ? { ...bundle, expenses: [{ ...expense, pending: false }, ...bundle.expenses.filter((e) => e.id !== expense.id)].sort(byListOrder) }
+    : bundle;
+}
+
+/** Soft-delete an expense: gone from the list at once, back if the server refuses. */
+export function useDeleteExpense(groupId: string) {
+  const queryClient = useQueryClient();
+  const key = groupKeys.bundle(groupId);
+  return useMutation({
+    mutationFn: async (expense: BundleExpense) => {
+      const { error } = await createClient().rpc("delete_expense", { expense_id: expense.id });
+      if (error) throw error;
+    },
+    onMutate: async (expense) => {
+      await queryClient.cancelQueries({ queryKey: key });
+      queryClient.setQueryData<GroupBundle | null>(key, (b) => removeFromCache(b, expense.id));
+    },
+    onError: (_error, expense) => queryClient.setQueryData<GroupBundle | null>(key, (b) => putBackInCache(b, expense)),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
+  });
+}
+
+/** Undo a delete: back in the list at once, removed again if the server refuses. */
+export function useRestoreExpense(groupId: string) {
+  const queryClient = useQueryClient();
+  const key = groupKeys.bundle(groupId);
+  return useMutation({
+    mutationFn: async (expense: BundleExpense) => {
+      const { error } = await createClient().rpc("restore_expense", { expense_id: expense.id });
+      if (error) throw error;
+    },
+    onMutate: async (expense) => {
+      await queryClient.cancelQueries({ queryKey: key });
+      queryClient.setQueryData<GroupBundle | null>(key, (b) => putBackInCache(b, expense));
+    },
+    onError: (_error, expense) => queryClient.setQueryData<GroupBundle | null>(key, (b) => removeFromCache(b, expense.id)),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: key }),
+  });
+}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Plus, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
 import { ExpenseList } from "@/components/expense-list";
@@ -15,6 +16,8 @@ import {
   isGone,
   saveErrorMessage,
   useCreateExpense,
+  useDeleteExpense,
+  useRestoreExpense,
   useUpdateExpense,
   type NewExpense,
 } from "@/lib/data/expense-mutations";
@@ -37,6 +40,8 @@ export function GroupScreen({
   const { data: bundle } = useGroupBundle(groupId, userId, initial, initialAt);
   const createExpense = useCreateExpense(groupId);
   const updateExpense = useUpdateExpense(groupId);
+  const deleteExpense = useDeleteExpense(groupId);
+  const restoreExpense = useRestoreExpense(groupId);
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState<string | null>(null);
   const [today] = useState(() => indiaDate(new Date()));
@@ -87,6 +92,34 @@ export function GroupScreen({
         },
       },
     );
+  }
+
+  function remove(expenseId: string) {
+    const expense = bundle?.expenses.find((e) => e.id === expenseId);
+    if (!expense) return;
+    setSheetOpen(false);
+    setNotice(null);
+    const name = expense.description;
+    const deleting = deleteExpense.mutateAsync(expense);
+    deleting.catch((error) => toast.error(`Couldn't delete "${name}". ${saveErrorMessage(error)}`));
+    toast(`Deleted "${name}"`, {
+      duration: 6000,
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          // Wait for the delete to land first, or a slow delete could
+          // arrive after the restore and remove it again.
+          try {
+            await deleting;
+          } catch {
+            return; // the delete failed, so it's still there
+          }
+          restoreExpense.mutate(expense, {
+            onError: (error) => toast.error(`Couldn't bring back "${name}". ${saveErrorMessage(error)}`),
+          });
+        },
+      },
+    });
   }
 
   // A refresh found the group gone for this user (e.g. they left on another device).
@@ -167,6 +200,7 @@ export function GroupScreen({
           meId={bundle.meId}
           today={today}
           onSave={save}
+          onDelete={remove}
         />
       )}
     </>

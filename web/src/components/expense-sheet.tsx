@@ -90,6 +90,7 @@ export function ExpenseSheet({
   meId,
   today,
   onSave,
+  onDelete,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -98,6 +99,8 @@ export function ExpenseSheet({
   meId: string | null;
   today: string;
   onSave: (expense: NewExpense, draft: ExpenseDraft) => void;
+  /** Edit mode only. */
+  onDelete: (expenseId: string) => void;
 }) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
@@ -111,7 +114,7 @@ export function ExpenseSheet({
       >
         {/* Remount per draft so a retry starts from what was typed. */}
         <ExpenseForm key={`${draft.id}:${draft.attempt ?? 0}`} draft={draft} members={members} meId={meId} today={today}
-          onCancel={() => onOpenChange(false)} onSave={onSave} />
+          onCancel={() => onOpenChange(false)} onSave={onSave} onDelete={onDelete} />
       </DrawerContent>
     </Drawer>
   );
@@ -124,6 +127,7 @@ function ExpenseForm({
   today,
   onCancel,
   onSave,
+  onDelete,
 }: {
   draft: ExpenseDraft;
   members: BundleMember[];
@@ -131,6 +135,7 @@ function ExpenseForm({
   today: string;
   onCancel: () => void;
   onSave: (expense: NewExpense, draft: ExpenseDraft) => void;
+  onDelete: (expenseId: string) => void;
 }) {
   const [amountText, setAmountText] = useState(draft.amountText);
   const [description, setDescription] = useState(draft.description);
@@ -316,6 +321,13 @@ function ExpenseForm({
           <p className="text-sm text-muted-foreground" data-testid="expense-preview">
             {preview}
           </p>
+        )}
+
+        {/* No confirm step: deleting shows an Undo instead. */}
+        {draft.mode === "edit" && (
+          <Button type="button" variant="ghost" className="w-full text-destructive" onClick={() => onDelete(draft.id)}>
+            Delete expense
+          </Button>
         )}
       </div>
     </form>
