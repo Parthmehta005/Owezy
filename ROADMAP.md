@@ -154,7 +154,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Invite link share/copy + `/join/[code]` claim or "I'm new"
 - [x] Playwright with dev-only test users + two-browser join test
 
-### ⬜ M5. Expenses (mobile-first)
+### ✅ M5. Expenses (mobile-first)
 **Goal:** on real phones (Android and iPhone) through the dev deployment, members add, edit and delete expenses (equal or unequal, with a date) from the one-screen sheet. The other member sees the changes on returning to the app, and concurrent edits are caught with the conflict message. Playwright covers this on both Android (Chromium mobile emulation) and iPhone (WebKit) engines.
 **Scope:** in: a Vercel deployment of the app against `owezy-dev`; phone-sized tap targets across the whole app; expense date and safe retries (database change); group data query; expense list grouped by date; add/edit sheet that stays usable with the phone keyboard open; split picker; optimistic updates with rollback and Retry; delete with Undo; conflict handling; Playwright on two mobile engines. Out: the Balances tab and header summary (M6); pull-to-refresh, offline mode and production deployment (M7); live updates (later add-on).
 **Mobile rules for every screen from here on:**

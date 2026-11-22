@@ -64,7 +64,7 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 - [x] Every tap target is at least 44px tall (checked by Playwright on every screen). (Including the sheet, both split modes, edit/delete and the Undo toast.)
 - [x] Expenses are grouped by their date, shown in India time. (core/dates.ts, tested across the UTC/IST midnight.)
 - [x] Playwright passes on both Android (Chromium mobile) and iPhone (WebKit) engines. (17 tests x 2 engines, no server errors.)
-- [ ] Owner checked on a real phone via the dev deployment: the keyboard never hides Save, nothing sits under the notch or home bar.
+- [x] Owner checked on a real phone via the dev deployment: the keyboard never hides Save, nothing sits under the notch or home bar. (Owner tested add, edit, split, delete/Undo on the live dev URL.)
 
 ## M6. Balances
 
