@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { computeBalances } from "@/core/balances";
+import { computeBalances, pairwiseDebts } from "@/core/balances";
 import type { BundleExpense, GroupBundle } from "@/lib/data/bundle";
-import { groupBalances, mySummary } from "./balances-view";
+import { debtLines, groupBalances, mySummary, rawDebts } from "./balances-view";
 
 /**
  * Fixture group (amounts in paise), worked out by hand:
@@ -57,5 +57,43 @@ describe("mySummary", () => {
 
   it("is null for someone who isn't a member", () => {
     expect(summaryFor(null)).toBeNull();
+  });
+});
+
+describe("raw debts", () => {
+  it("are exactly core pairwiseDebts", () => {
+    const bundle = fixture("asha");
+    expect(rawDebts(bundle)).toEqual(pairwiseDebts(bundle.expenses));
+  });
+
+  it("read from Asha's side: hers first, then biggest first", () => {
+    const bundle = fixture("asha");
+    expect(debtLines(bundle, rawDebts(bundle)).map((l) => [l.text, l.amountPaise, l.tone])).toEqual([
+      ["Rahul owes you", 100000, "positive"],
+      ["Neha owes you", 100000, "positive"],
+      ["Bilal owes Neha", 12000000, "neutral"],
+      ["Bilal owes Rahul", 30000, "neutral"],
+    ]);
+  });
+
+  it("read from Bilal's side", () => {
+    const bundle = fixture("bilal");
+    expect(debtLines(bundle, rawDebts(bundle)).map((l) => [l.text, l.tone])).toEqual([
+      ["You owe Neha", "negative"],
+      ["You owe Rahul", "negative"],
+      ["Rahul owes Asha", "neutral"],
+      ["Neha owes Asha", "neutral"],
+    ]);
+  });
+
+  it("net out opposite debts between the same two people", () => {
+    const bundle = {
+      ...fixture("asha"),
+      expenses: [
+        expense("a", "asha", 1000, { asha: 500, rahul: 500 }),
+        expense("b", "rahul", 600, { asha: 300, rahul: 300 }),
+      ],
+    };
+    expect(debtLines(bundle, rawDebts(bundle)).map((l) => [l.text, l.amountPaise])).toEqual([["Rahul owes you", 200]]);
   });
 });

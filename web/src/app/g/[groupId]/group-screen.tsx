@@ -7,10 +7,12 @@ import { toast } from "sonner";
 import { Plus, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
 import { BalanceSummary } from "@/components/balance-summary";
+import { BalancesView } from "@/components/balances-view";
 import { ExpenseList } from "@/components/expense-list";
 import { ExpenseSheet, draftFromExpense, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
 import { GroupSwitcher } from "@/components/group-switcher";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { groupKeys, type BundleMember, type GroupBundle } from "@/lib/data/bundle";
 import {
   isConflict,
@@ -22,7 +24,7 @@ import {
   useUpdateExpense,
   type NewExpense,
 } from "@/lib/data/expense-mutations";
-import { groupBalances, mySummary } from "@/lib/balances-view";
+import { debtLines, groupBalances, mySummary, rawDebts } from "@/lib/balances-view";
 import type { GroupSummary } from "@/lib/data/groups";
 import { useGroupBundle } from "@/lib/data/use-group-bundle";
 
@@ -50,7 +52,9 @@ export function GroupScreen({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [draft, setDraft] = useState<ExpenseDraft | null>(null);
   const keyboardPrimer = useRef<HTMLInputElement>(null);
+  const [tab, setTab] = useState("expenses");
   const summary = useMemo(() => (bundle ? mySummary(bundle, groupBalances(bundle)) : null), [bundle]);
+  const rawLines = useMemo(() => (bundle ? debtLines(bundle, rawDebts(bundle)) : []), [bundle]);
 
   const nextAttempt = (d: ExpenseDraft | null) => (d?.attempt ?? 0) + 1;
 
@@ -157,25 +161,36 @@ export function GroupScreen({
         )}
         {summary && <BalanceSummary summary={summary} />}
         <Members members={bundle.members} />
-        {bundle.expenses.length === 0 ? (
-          <section aria-labelledby="expenses-heading" className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
-            <h2 id="expenses-heading" className="text-lg font-medium">
-              No expenses yet
-            </h2>
-            <p className="max-w-xs text-sm text-muted-foreground">Expenses added to this group will show up here.</p>
-          </section>
-        ) : (
-          <ExpenseList
-            expenses={bundle.expenses}
-            members={bundle.members}
-            meId={bundle.meId}
-            onSelect={(e) => {
-              setNotice(null);
-              setDraft(draftFromExpense(e));
-              setSheetOpen(true);
-            }}
-          />
-        )}
+        <Tabs value={tab} onValueChange={setTab} className="flex-1 gap-4">
+          <TabsList className="w-full">
+            <TabsTrigger value="expenses">Expenses</TabsTrigger>
+            <TabsTrigger value="balances">Balances</TabsTrigger>
+          </TabsList>
+          <TabsContent value="expenses" className="flex flex-col text-base">
+            {bundle.expenses.length === 0 ? (
+              <section aria-labelledby="expenses-heading" className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
+                <h2 id="expenses-heading" className="text-lg font-medium">
+                  No expenses yet
+                </h2>
+                <p className="max-w-xs text-sm text-muted-foreground">Expenses added to this group will show up here.</p>
+              </section>
+            ) : (
+              <ExpenseList
+                expenses={bundle.expenses}
+                members={bundle.members}
+                meId={bundle.meId}
+                onSelect={(e) => {
+                  setNotice(null);
+                  setDraft(draftFromExpense(e));
+                  setSheetOpen(true);
+                }}
+              />
+            )}
+          </TabsContent>
+          <TabsContent value="balances" className="text-base">
+            <BalancesView lines={rawLines} />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* iPhone opens the keyboard only if focus happens during the tap itself.
