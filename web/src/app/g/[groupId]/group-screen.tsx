@@ -24,7 +24,7 @@ import {
   useUpdateExpense,
   type NewExpense,
 } from "@/lib/data/expense-mutations";
-import { debtLines, groupBalances, mySummary, rawDebts } from "@/lib/balances-view";
+import { debtLines, groupBalances, mySummary, rawDebts, simplifiedDebts } from "@/lib/balances-view";
 import type { GroupSummary } from "@/lib/data/groups";
 import { useGroupBundle } from "@/lib/data/use-group-bundle";
 
@@ -53,8 +53,16 @@ export function GroupScreen({
   const [draft, setDraft] = useState<ExpenseDraft | null>(null);
   const keyboardPrimer = useRef<HTMLInputElement>(null);
   const [tab, setTab] = useState("expenses");
-  const summary = useMemo(() => (bundle ? mySummary(bundle, groupBalances(bundle)) : null), [bundle]);
-  const rawLines = useMemo(() => (bundle ? debtLines(bundle, rawDebts(bundle)) : []), [bundle]);
+  const [simplify, setSimplify] = useState(false);
+  const view = useMemo(() => {
+    if (!bundle) return null;
+    const balances = groupBalances(bundle);
+    return {
+      summary: mySummary(bundle, balances),
+      raw: debtLines(bundle, rawDebts(bundle)),
+      simplified: debtLines(bundle, simplifiedDebts(bundle, balances)),
+    };
+  }, [bundle]);
 
   const nextAttempt = (d: ExpenseDraft | null) => (d?.attempt ?? 0) + 1;
 
@@ -159,7 +167,7 @@ export function GroupScreen({
             {notice}
           </p>
         )}
-        {summary && <BalanceSummary summary={summary} />}
+        {view?.summary && <BalanceSummary summary={view.summary} />}
         <Members members={bundle.members} />
         <Tabs value={tab} onValueChange={setTab} className="flex-1 gap-4">
           <TabsList className="w-full">
@@ -188,7 +196,12 @@ export function GroupScreen({
             )}
           </TabsContent>
           <TabsContent value="balances" className="text-base">
-            <BalancesView lines={rawLines} />
+            <BalancesView
+              raw={view?.raw ?? []}
+              simplified={view?.simplified ?? []}
+              simplify={simplify}
+              onSimplifyChange={setSimplify}
+            />
           </TabsContent>
         </Tabs>
       </main>

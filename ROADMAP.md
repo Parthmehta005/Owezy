@@ -182,7 +182,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Scope:** in: header summary, Balances tab, Simplify toggle and tests. Out: settle-up payments.
 - [x] Header net summary from `computeBalances`
 - [x] Balances tab: raw pairwise debts
-- [ ] Simplify toggle + payment-count line
+- [x] Simplify toggle + payment-count line
 - [ ] Tests for view numbers vs `core/` on a fixture group
 
 ### ⬜ M7. Polish and deploy

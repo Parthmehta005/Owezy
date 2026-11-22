@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { computeBalances, pairwiseDebts } from "@/core/balances";
+import { simplifyDebts } from "@/core/simplify";
 import type { BundleExpense, GroupBundle } from "@/lib/data/bundle";
-import { debtLines, groupBalances, mySummary, rawDebts } from "./balances-view";
+import { debtLines, groupBalances, mySummary, paymentCount, rawDebts, simplifiedDebts } from "./balances-view";
 
 /**
  * Fixture group (amounts in paise), worked out by hand:
@@ -95,5 +96,38 @@ describe("raw debts", () => {
       ],
     };
     expect(debtLines(bundle, rawDebts(bundle)).map((l) => [l.text, l.amountPaise])).toEqual([["Rahul owes you", 200]]);
+  });
+});
+
+describe("simplified debts", () => {
+  it("are exactly core simplifyDebts in member order", () => {
+    const bundle = fixture("asha");
+    const balances = groupBalances(bundle);
+    expect(simplifiedDebts(bundle, balances)).toEqual(simplifyDebts([...ids], balances));
+  });
+
+  it("settle the fixture in 3 payments instead of 4, read from Bilal's side", () => {
+    const bundle = fixture("bilal");
+    const lines = debtLines(bundle, simplifiedDebts(bundle, groupBalances(bundle)));
+    expect(lines.map((l) => [l.text, l.amountPaise])).toEqual([
+      ["You owe Neha", 11900000],
+      ["You owe Asha", 130000],
+      ["Rahul owes Asha", 70000],
+    ]);
+    expect(paymentCount(rawDebts(bundle).length, lines.length)).toBe("4 → 3 payments");
+  });
+
+  it("leave everyone at zero", () => {
+    const bundle = fixture("asha");
+    const nets = Object.fromEntries(Object.entries(groupBalances(bundle)).map(([id, b]) => [id, b.net]));
+    for (const d of simplifiedDebts(bundle, groupBalances(bundle))) {
+      nets[d.from] += d.amountPaise;
+      nets[d.to] -= d.amountPaise;
+    }
+    expect(Object.values(nets).every((n) => n === 0)).toBe(true);
+  });
+
+  it("count one payment in the singular", () => {
+    expect(paymentCount(1, 1)).toBe("1 → 1 payment");
   });
 });

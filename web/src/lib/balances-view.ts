@@ -5,6 +5,7 @@
  */
 import { computeBalances, pairwiseDebts } from "@/core/balances";
 import type { Paise } from "@/core/money";
+import { simplifyDebts } from "@/core/simplify";
 import type { Balances, Debt } from "@/core/types";
 import type { GroupBundle } from "@/lib/data/bundle";
 
@@ -62,4 +63,17 @@ export function debtLines(bundle: GroupBundle, debts: readonly Debt[]): DebtLine
   return lines.sort(
     (a, b) => mine(a) - mine(b) || b.amountPaise - a.amountPaise || rank(a.from) - rank(b.from) || rank(a.to) - rank(b.to),
   );
+}
+
+/** The fewest-payments-we-can-find way to settle everyone up (core simplifyDebts, greedy). */
+export function simplifiedDebts(bundle: GroupBundle, balances: Balances): Debt[] {
+  return simplifyDebts(
+    bundle.members.map((m) => m.id),
+    balances,
+  );
+}
+
+/** "4 → 3 payments": how many payments simplifying saves. */
+export function paymentCount(raw: number, simplified: number): string {
+  return `${raw} → ${simplified} ${simplified === 1 ? "payment" : "payments"}`;
 }
