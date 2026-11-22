@@ -19,7 +19,18 @@ export default function NewGroupPage() {
         <h1 className="text-2xl font-semibold tracking-tight">New group</h1>
         <p className="text-muted-foreground">Name it, add the people, and start splitting.</p>
       </div>
-      <Suspense fallback={<div className="h-80" />}>
+      <Suspense
+        fallback={
+          <div aria-busy aria-label="Loading" className="h-80 animate-pulse space-y-6">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-4 w-24 rounded bg-muted" />
+                <div className="h-11 rounded-md bg-muted" />
+              </div>
+            ))}
+          </div>
+        }
+      >
         <Form />
       </Suspense>
       {/* Someone with no groups lands here, so they need a way out. */}

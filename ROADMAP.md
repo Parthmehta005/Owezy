@@ -189,7 +189,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 **Goal:** the app is live on a `*.vercel.app` URL against the prod Supabase project. It installs to a phone's home screen, both test users can use it on their phones, and it meets the Lighthouse targets in REVIEW.md.
 **Scope:** in: PWA manifest and real icons (replacing Next's default favicon), loading/empty/error states, pull-to-refresh, switching Vercel production to the prod project, prod migrations and sign-in URLs, Playwright against the preview deploy, Lighthouse fixes. Out: everything in "Not in v1".
 - [x] App icon, favicon and `manifest.ts`
-- [ ] Loading, empty and error states across screens
+- [x] Loading, empty and error states across screens
 - [ ] Apply migrations to prod; prod sign-in redirect URLs (owner steps)
 - [ ] Switch the Vercel production environment to the `owezy` (prod) project; preview deployments stay on `owezy-dev`
 - [ ] Pull-to-refresh in the installed app (iPhone home-screen apps have none built in)

@@ -41,7 +41,7 @@ export function GroupScreen({
   initialAt: number;
   groups: GroupSummary[];
 }) {
-  const { data: bundle } = useGroupBundle(groupId, userId, initial, initialAt);
+  const { data: bundle, isRefetchError, isFetching, refetch } = useGroupBundle(groupId, userId, initial, initialAt);
   const createExpense = useCreateExpense(groupId);
   const updateExpense = useUpdateExpense(groupId);
   const deleteExpense = useDeleteExpense(groupId);
@@ -166,6 +166,15 @@ export function GroupScreen({
           <p role="alert" className="rounded-lg border border-negative/30 bg-negative/10 px-3 py-2 text-sm text-negative">
             {notice}
           </p>
+        )}
+        {/* A background refresh failed (after retries): keep showing what we have. */}
+        {isRefetchError && (
+          <div role="status" className="flex items-center justify-between gap-3 rounded-lg border px-3 py-1 text-sm">
+            <span className="text-muted-foreground">Couldn&apos;t refresh. Showing what was loaded before.</span>
+            <Button variant="outline" size="sm" disabled={isFetching} onClick={() => refetch()}>
+              {isFetching ? "Refreshing…" : "Retry"}
+            </Button>
+          </div>
         )}
         {view?.summary && <BalanceSummary summary={view.summary} />}
         <Members members={bundle.members} />

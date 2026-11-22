@@ -21,5 +21,9 @@ export function useGroupBundle(groupId: string, userId: string, initial: GroupBu
     initialDataUpdatedAt: initialAt,
     staleTime: 30_000,
     refetchOnWindowFocus: "always",
+    // Supabase's client already retries reads on network errors (3 times over
+    // about 7s). Retrying again here would make a lost connection take 30s+
+    // to show "Couldn't refresh".
+    retry: false,
   });
 }

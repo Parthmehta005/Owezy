@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Group settings · Owezy" };
 
 export default function SettingsPage({ params }: PageProps<"/g/[groupId]/settings">) {
   return (
-    <Suspense fallback={<div aria-busy className="h-96 animate-pulse" />}>
+    <Suspense fallback={<SettingsSkeleton />}>
       <Settings params={params} />
     </Suspense>
   );
@@ -65,5 +65,24 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
         </section>
       </main>
     </>
+  );
+}
+
+function SettingsSkeleton() {
+  return (
+    <div aria-busy aria-label="Loading settings" className="animate-pulse">
+      <div className="border-b px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2">
+        <div className="h-11 w-32 rounded-md bg-muted" />
+      </div>
+      <div className="space-y-10 px-4 py-6">
+        <div className="h-8 w-28 rounded bg-muted" />
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="space-y-3">
+            <div className="h-5 w-32 rounded bg-muted" />
+            <div className="h-11 rounded-md bg-muted" />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
