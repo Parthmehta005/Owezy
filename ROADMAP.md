@@ -169,7 +169,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Playwright mobile projects: Android (Chromium, Pixel-sized, touch) and iPhone (WebKit); existing e2e passes on both
 - [x] Phone-sized tap targets and safe-area insets across existing screens (sign-in, groups, settings, join)
 - [x] Migration: `expenses.expense_date` (default today in India time) and client-supplied ids so a retried `create_expense` never duplicates; pgTAP; regenerated types
-- [ ] Group bundle query hook (group + members + expenses + shares) with TanStack Query, refetching when the app regains focus
+- [x] Group bundle query hook (group + members + expenses + shares) with TanStack Query, refetching when the app regains focus
 - [ ] Expense list grouped by date, with the "your effect" amount per row
 - [ ] Add sheet: amount (number pad, comma-decimal rule), description, date, paid by, equal split, "you get back" preview; optimistic with Retry; keyboard-safe on both engines
 - [ ] Split picker: choose members, unequal mode with "₹X left" and the Save rule

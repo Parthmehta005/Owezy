@@ -9,6 +9,7 @@
  * project, so tests can never touch prod.
  */
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Browser, BrowserContext, TestInfo } from "@playwright/test";
 import pg from "pg";
 
@@ -43,6 +44,8 @@ export interface DevUser {
   id: string;
   email: string;
   cookies: { name: string; value: string }[];
+  /** Signed in as this user, for setting things up "from another phone" via the API (RLS applies). */
+  api: SupabaseClient;
 }
 
 /** Create a confirmed password user (tag must be unique per test run) and sign them in. */
@@ -71,7 +74,7 @@ export async function createDevUser(tag: string, fullName: string): Promise<DevU
   });
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
-  return { id: rows[0].id, email, cookies: [...jar].map(([name, value]) => ({ name, value })) };
+  return { id: rows[0].id, email, cookies: [...jar].map(([name, value]) => ({ name, value })), api: supabase };
 }
 
 /** Put a user's session cookies into a browser context. */
