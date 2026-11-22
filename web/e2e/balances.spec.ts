@@ -1,4 +1,5 @@
-import { expect, test, type Browser, type Page, type TestInfo } from "@playwright/test";
+import type { Browser, Page, TestInfo } from "@playwright/test";
+import { expect, test } from "./support/test";
 import { computeBalances, pairwiseDebts } from "../src/core/balances";
 import { formatInr } from "../src/core/money";
 import { simplifyDebts } from "../src/core/simplify";

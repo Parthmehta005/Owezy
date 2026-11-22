@@ -12,6 +12,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Browser, BrowserContext, TestInfo } from "@playwright/test";
 import pg from "pg";
+import { passVercelProtection } from "./test";
 
 process.loadEnvFile(".env.local");
 process.loadEnvFile(".env.test.local");
@@ -91,6 +92,7 @@ export async function signIn(context: BrowserContext, user: DevUser, baseURL: st
 export async function phoneFor(browser: Browser, testInfo: TestInfo, user?: DevUser) {
   const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch, baseURL } = testInfo.project.use;
   const context = await browser.newContext({ viewport, userAgent, deviceScaleFactor, isMobile, hasTouch, baseURL });
+  await passVercelProtection(context, baseURL);
   if (user) await signIn(context, user, baseURL!);
   return context;
 }

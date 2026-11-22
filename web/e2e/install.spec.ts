@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./support/test";
 
 /**
  * What a phone needs to offer "Install app" / "Add to Home Screen", checked

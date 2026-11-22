@@ -1,4 +1,5 @@
-import { expect, test, type Browser, type TestInfo } from "@playwright/test";
+import type { Browser, TestInfo } from "@playwright/test";
+import { expect, test } from "./support/test";
 import { cleanupDevUsers, closeDb, createDevUser, phoneFor, type DevUser } from "./support/dev-users";
 
 test.beforeAll(cleanupDevUsers);
