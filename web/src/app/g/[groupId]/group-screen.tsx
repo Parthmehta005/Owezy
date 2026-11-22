@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Settings } from "lucide-react";
+import { ExpenseList } from "@/components/expense-list";
 import { GroupSwitcher } from "@/components/group-switcher";
 import { Button } from "@/components/ui/button";
 import type { BundleMember, GroupBundle } from "@/lib/data/bundle";
@@ -57,12 +58,7 @@ export function GroupScreen({
             <p className="max-w-xs text-sm text-muted-foreground">Expenses added to this group will show up here.</p>
           </section>
         ) : (
-          <section aria-labelledby="expenses-heading">
-            {/* The full list (grouped by date) replaces this in the next task. */}
-            <h2 id="expenses-heading" className="text-lg font-medium">
-              {bundle.expenses.length} {bundle.expenses.length === 1 ? "expense" : "expenses"}
-            </h2>
-          </section>
+          <ExpenseList expenses={bundle.expenses} members={bundle.members} meId={bundle.meId} />
         )}
       </main>
     </>

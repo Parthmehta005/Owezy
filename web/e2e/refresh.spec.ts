@@ -40,7 +40,8 @@ test("returning to the app shows changes others made", async ({ browser }, testI
   // Bilal comes back to the app.
   // A real visibilitychange bubbles from document to window, where TanStack listens.
   await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange", { bubbles: true })));
-  await expect(page.getByRole("heading", { name: "1 expense" })).toBeVisible();
+  await expect(page.getByTestId("expense-row")).toHaveCount(1);
+  await expect(page.getByTestId("expense-row")).toContainText("Dinner");
   await expect(page.getByRole("button", { name: /Switch group/ })).toContainText("Goa 2026");
   await b.close();
 });
