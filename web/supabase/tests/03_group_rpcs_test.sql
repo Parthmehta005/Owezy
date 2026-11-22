@@ -42,8 +42,8 @@ select throws_ok($$select public.create_group('X', repeat('n', 41))$$, '22023', 
 -- Remember the invite code and the member ids, as the owner.
 reset role;
 insert into ctx select 'code', invite_code from public.groups where id = (select v::uuid from ctx where k = 'g');
-insert into ctx select 'rahul', id::text from public.members where display_name = 'Rahul';
-insert into ctx select 'solo_member', m.id::text from public.members m join public.groups g on g.id = m.group_id where g.name = 'Solo';
+insert into ctx select 'rahul', id::text from public.members where display_name = 'Rahul' and group_id = (select v::uuid from ctx where k = 'g');
+insert into ctx select 'solo_member', m.id::text from public.members m join public.groups g on g.id = m.group_id where g.name = 'Solo' and g.created_by = '00000000-0000-0000-0000-00000000000a';
 set local role authenticated;
 
 -- ------------------------------------------------ invite_preview, as Bilal (not a member yet)
