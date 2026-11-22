@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
+import { BalanceSummary } from "@/components/balance-summary";
 import { ExpenseList } from "@/components/expense-list";
 import { ExpenseSheet, draftFromExpense, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
 import { GroupSwitcher } from "@/components/group-switcher";
@@ -21,6 +22,7 @@ import {
   useUpdateExpense,
   type NewExpense,
 } from "@/lib/data/expense-mutations";
+import { groupBalances, mySummary } from "@/lib/balances-view";
 import type { GroupSummary } from "@/lib/data/groups";
 import { useGroupBundle } from "@/lib/data/use-group-bundle";
 
@@ -48,6 +50,7 @@ export function GroupScreen({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [draft, setDraft] = useState<ExpenseDraft | null>(null);
   const keyboardPrimer = useRef<HTMLInputElement>(null);
+  const summary = useMemo(() => (bundle ? mySummary(bundle, groupBalances(bundle)) : null), [bundle]);
 
   const nextAttempt = (d: ExpenseDraft | null) => (d?.attempt ?? 0) + 1;
 
@@ -152,6 +155,7 @@ export function GroupScreen({
             {notice}
           </p>
         )}
+        {summary && <BalanceSummary summary={summary} />}
         <Members members={bundle.members} />
         {bundle.expenses.length === 0 ? (
           <section aria-labelledby="expenses-heading" className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">

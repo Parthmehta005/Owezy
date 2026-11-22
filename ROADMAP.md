@@ -180,7 +180,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 ### ⬜ M6. Balances view
 **Goal:** the group screen shows your net summary ("You get back / You owe / All settled"), plus a Balances tab with raw pairwise debts and a Simplify toggle showing "N → M payments". All numbers come from `core/` and match it.
 **Scope:** in: header summary, Balances tab, Simplify toggle and tests. Out: settle-up payments.
-- [ ] Header net summary from `computeBalances`
+- [x] Header net summary from `computeBalances`
 - [ ] Balances tab: raw pairwise debts
 - [ ] Simplify toggle + payment-count line
 - [ ] Tests for view numbers vs `core/` on a fixture group
