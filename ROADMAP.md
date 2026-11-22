@@ -183,7 +183,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Header net summary from `computeBalances`
 - [x] Balances tab: raw pairwise debts
 - [x] Simplify toggle + payment-count line
-- [ ] Tests for view numbers vs `core/` on a fixture group
+- [x] Tests for view numbers vs `core/` on a fixture group
 
 ### ⬜ M7. Polish and deploy
 **Goal:** the app is live on a `*.vercel.app` URL against the prod Supabase project. It installs to a phone's home screen, both test users can use it on their phones, and it meets the Lighthouse targets in REVIEW.md.

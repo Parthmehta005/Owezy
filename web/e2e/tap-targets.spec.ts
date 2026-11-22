@@ -72,6 +72,10 @@ test("every tap target is at least 44px tall", async ({ browser }, testInfo) => 
   await page.getByTestId("expense-row").first().waitFor();
   await page.waitForTimeout(500);
   await check(page, "group with an expense");
+  await page.getByRole("tab", { name: "Balances" }).click();
+  await page.getByRole("switch", { name: /Simplify/ }).click();
+  await check(page, "balances, simplified");
+  await page.getByRole("tab", { name: "Expenses" }).click();
   await page.getByTestId("expense-row").first().getByRole("button").click();
   await page.getByRole("dialog").waitFor();
   await check(page, "edit sheet");
