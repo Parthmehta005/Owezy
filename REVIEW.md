@@ -68,10 +68,10 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M6. Balances
 
-- [ ] Raw debts match `pairwiseDebts`.
-- [ ] The simplified view matches `simplifyDebts` and shows "N → M payments".
-- [ ] The header summary matches the net balance.
-- [ ] Amounts use the `en-IN` format.
+- [x] Raw debts match `pairwiseDebts`. (Unit: view helper equals core; e2e: screen equals core run on the database rows, both engines.)
+- [x] The simplified view matches `simplifyDebts` and shows "N → M payments". (Fixture: 4 → 3; payments leave every net at zero; mutation-checked.)
+- [x] The header summary matches the net balance. (Gets back / owes / all settled; updates the moment an expense is saved.)
+- [x] Amounts use the `en-IN` format. (₹1,20,000.00 and ₹1,19,000.00 checked on screen.)
 
 ## M7. Polish & deploy
 
