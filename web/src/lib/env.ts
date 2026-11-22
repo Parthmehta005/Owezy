@@ -1,25 +1,35 @@
-import { z } from "zod";
-
 // NEXT_PUBLIC_* values are inlined at build time, so each must be referenced
 // literally (not via a dynamic process.env[key] lookup).
-const schema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
-});
+//
+// Checked by hand rather than with zod: this file is part of the browser
+// bundle (via the Supabase client), and zod alone would add ~60 kB there.
 
-let cached: z.infer<typeof schema> | undefined;
+export interface PublicEnv {
+  NEXT_PUBLIC_SUPABASE_URL: string;
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+}
+
+let cached: PublicEnv | undefined;
+
+function isUrl(value: string | undefined): value is string {
+  if (!value) return false;
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "https:" || protocol === "http:";
+  } catch {
+    return false;
+  }
+}
 
 /** Validated public env vars. Throws a readable error if any are missing. */
-export function env() {
+export function env(): PublicEnv {
   if (cached) return cached;
-  const parsed = schema.safeParse({
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-  });
-  if (!parsed.success) {
-    const missing = parsed.error.issues.map((i) => i.path.join(".")).join(", ");
-    throw new Error(`Missing or invalid env vars: ${missing}. Copy web/.env.example to web/.env.local and fill it in.`);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const missing = [!isUrl(url) && "NEXT_PUBLIC_SUPABASE_URL", !key && "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"].filter(Boolean);
+  if (missing.length > 0 || !isUrl(url) || !key) {
+    throw new Error(`Missing or invalid env vars: ${missing.join(", ")}. Copy web/.env.example to web/.env.local and fill it in.`);
   }
-  cached = parsed.data;
+  cached = { NEXT_PUBLIC_SUPABASE_URL: url, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: key };
   return cached;
 }
