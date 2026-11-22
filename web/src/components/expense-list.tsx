@@ -49,11 +49,12 @@ export function ExpenseList({
 function ExpenseRow({ expense, payerName, meId }: { expense: BundleExpense; payerName: string; meId: string | null }) {
   const effect: Effect = meId ? expenseEffect(expense, meId) : { kind: "not_involved" };
   return (
-    <li className="flex min-h-16 items-center gap-3 py-3" data-testid="expense-row">
+    <li className="flex min-h-16 items-center gap-3 py-3" data-testid="expense-row" data-pending={expense.pending || undefined}>
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{expense.description}</p>
         <p className="truncate text-sm text-muted-foreground">
           {payerName} paid {formatInr(expense.totalPaise)}
+          {expense.pending && <span className="italic"> · Saving…</span>}
         </p>
       </div>
       <EffectLabel effect={effect} />

@@ -15,6 +15,20 @@ describe("parseAmount", () => {
     expect(parseAmount("₹12,00,000.25")).toBe(120000025);
   });
 
+  it("reads a comma before the last 1-2 digits as a decimal point (Android keyboards)", () => {
+    expect(parseAmount("10,50")).toBe(1050);
+    expect(parseAmount("10,5")).toBe(1050);
+    expect(parseAmount("1,20,000,75")).toBe(12000075);
+    // Grouping commas (followed by 3 digits) are still grouping.
+    expect(parseAmount("1,200")).toBe(120000);
+    expect(parseAmount("1,20,000")).toBe(12000000);
+    // With a real decimal point present, commas are only grouping.
+    expect(parseAmount("1,234.50")).toBe(123450);
+    expect(() => parseAmount("1,23.45")).not.toThrow();
+    expect(() => parseAmount("10,505")).not.toThrow(); // 10505 rupees (grouping), not a decimal
+    expect(parseAmount("10,505")).toBe(1050500);
+  });
+
   // test_logic.py: TestMoney.test_parse_invalid_amounts
   it.each(["", "abc", "-5", "10.555", "1.2.3", "0", "0.00", "1e3", ".5", "5."])(
     "rejects %j",

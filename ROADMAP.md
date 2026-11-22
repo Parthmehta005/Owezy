@@ -171,7 +171,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Migration: `expenses.expense_date` (default today in India time) and client-supplied ids so a retried `create_expense` never duplicates; pgTAP; regenerated types
 - [x] Group bundle query hook (group + members + expenses + shares) with TanStack Query, refetching when the app regains focus
 - [x] Expense list grouped by date, with the "your effect" amount per row
-- [ ] Add sheet: amount (number pad, comma-decimal rule), description, date, paid by, equal split, "you get back" preview; optimistic with Retry; keyboard-safe on both engines
+- [x] Add sheet: amount (number pad, comma-decimal rule), description, date, paid by, equal split, "you get back" preview; optimistic with Retry; keyboard-safe on both engines
 - [ ] Split picker: choose members, unequal mode with "₹X left" and the Save rule
 - [ ] Edit an expense, with stale-edit conflict handling
 - [ ] Delete with Undo toast

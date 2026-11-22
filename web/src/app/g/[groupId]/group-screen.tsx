@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Settings } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus, Settings } from "lucide-react";
+import { indiaDate } from "@/core/dates";
 import { ExpenseList } from "@/components/expense-list";
+import { ExpenseSheet, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
 import { GroupSwitcher } from "@/components/group-switcher";
 import { Button } from "@/components/ui/button";
 import type { BundleMember, GroupBundle } from "@/lib/data/bundle";
+import { saveErrorMessage, useCreateExpense } from "@/lib/data/expense-mutations";
 import type { GroupSummary } from "@/lib/data/groups";
 import { useGroupBundle } from "@/lib/data/use-group-bundle";
 
@@ -23,6 +27,11 @@ export function GroupScreen({
   groups: GroupSummary[];
 }) {
   const { data: bundle } = useGroupBundle(groupId, userId, initial, initialAt);
+  const createExpense = useCreateExpense(groupId);
+  const [today] = useState(() => indiaDate(new Date()));
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [draft, setDraft] = useState<ExpenseDraft | null>(null);
+  const keyboardPrimer = useRef<HTMLInputElement>(null);
 
   // A refresh found the group gone for this user (e.g. they left on another device).
   if (!bundle) {
@@ -48,7 +57,7 @@ export function GroupScreen({
           <span className="sr-only">Group settings</span>
         </Link>
       </header>
-      <main className="flex flex-1 flex-col gap-8 px-4 py-6">
+      <main className="flex flex-1 flex-col gap-8 px-4 pt-6 pb-28">
         <Members members={bundle.members} />
         {bundle.expenses.length === 0 ? (
           <section aria-labelledby="expenses-heading" className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
@@ -61,6 +70,44 @@ export function GroupScreen({
           <ExpenseList expenses={bundle.expenses} members={bundle.members} meId={bundle.meId} />
         )}
       </main>
+
+      {/* iPhone opens the keyboard only if focus happens during the tap itself.
+          The + button focuses this field synchronously; the sheet then moves
+          focus to the amount and the number pad stays up. */}
+      <input ref={keyboardPrimer} aria-hidden tabIndex={-1} inputMode="decimal" className="fixed top-0 left-0 size-px opacity-0" />
+      <Button
+        size="icon-lg"
+        className="fixed right-[max(1.25rem,calc((100vw-480px)/2+1.25rem))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-20 size-14 rounded-full shadow-lg"
+        onClick={() => {
+          keyboardPrimer.current?.focus();
+          setDraft(newDraft(bundle.meId ?? bundle.members[0].id, today));
+          setSheetOpen(true);
+        }}
+      >
+        <Plus aria-hidden className="size-6" />
+        <span className="sr-only">Add expense</span>
+      </Button>
+
+      {draft && (
+        <ExpenseSheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          draft={draft}
+          members={bundle.members}
+          meId={bundle.meId}
+          today={today}
+          onSave={(expense, typed) => {
+            setSheetOpen(false);
+            createExpense.mutate(expense, {
+              // Bring the sheet back with what was typed; Save retries with the same id.
+              onError: (error) => {
+                setDraft((d) => ({ ...typed, error: saveErrorMessage(error), attempt: (d?.attempt ?? 0) + 1 }));
+                setSheetOpen(true);
+              },
+            });
+          }}
+        />
+      )}
     </>
   );
 }

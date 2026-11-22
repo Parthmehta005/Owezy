@@ -24,7 +24,13 @@ export function assertPaise(value: number, label = "Amount"): asserts value is P
  * Throws an Error with a user-facing message if the text is invalid.
  */
 export function parseAmount(text: string, { allowZero = false } = {}): Paise {
-  const cleaned = text.trim().replaceAll(",", "").replaceAll("₹", "");
+  let raw = text.trim().replaceAll("₹", "").replaceAll(" ", "");
+  // Some Android keyboards type "," as the decimal point. A comma followed
+  // by just 1-2 digits at the end can't be digit grouping (both Indian
+  // "1,20,000" and western "1,200" end in groups of 3), so it's a decimal:
+  // "10,50" is ₹10.50, never ₹1,050.
+  if (!raw.includes(".")) raw = raw.replace(/,(\d{1,2})$/, ".$1");
+  const cleaned = raw.replaceAll(",", "");
   const match = AMOUNT_PATTERN.exec(cleaned);
   if (!match) {
     throw new Error("Invalid amount. Use a positive number with at most 2 decimals, e.g. 1200.50");

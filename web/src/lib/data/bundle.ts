@@ -28,6 +28,8 @@ export interface BundleExpense {
   /** For stale-edit detection: pass back as expected_version. */
   version: number;
   shares: Shares;
+  /** Shown before the server has confirmed it (optimistic update). Client-only. */
+  pending?: boolean;
 }
 
 export interface GroupBundle {
