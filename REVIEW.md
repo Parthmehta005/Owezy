@@ -54,16 +54,16 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M5. Expenses
 
-- [ ] Add takes 3 taps plus typing.
-- [ ] Unequal Save stays disabled until the shares add up exactly.
-- [ ] Optimistic add/edit/delete rolls back on a server error, keeping what was typed, with Retry.
-- [ ] Retrying a save (or tapping Save twice on a slow network) never creates a duplicate expense.
-- [ ] Undo restores a deleted expense.
-- [ ] Two users editing the same expense: the second save shows the conflict message.
-- [ ] The number pad opens for amounts; "10,50" is read as ₹10.50, never ₹1,050.
-- [ ] Every tap target is at least 44px tall (checked by Playwright on every screen).
-- [ ] Expenses are grouped by their date, shown in India time.
-- [ ] Playwright passes on both Android (Chromium mobile) and iPhone (WebKit) engines.
+- [x] Add takes 3 taps plus typing. (+, description, Save; the amount is focused with the number pad on open. e2e on both engines.)
+- [x] Unequal Save stays disabled until the shares add up exactly. (Counter: left / over / ✓ assigned.)
+- [x] Optimistic add/edit/delete rolls back on a server error, keeping what was typed, with Retry. (Add and delete failures are e2e-tested; an edit failure uses the same rollback code, and its conflict path is tested.)
+- [x] Retrying a save (or tapping Save twice on a slow network) never creates a duplicate expense. (Including a lost reply; the test fails if the client id is removed.)
+- [x] Undo restores a deleted expense. (Also when tapped while the delete is still in flight; checked live on Vercel too.)
+- [x] Two users editing the same expense: the second save shows the conflict message. (And is shown the latest version to redo the change.)
+- [x] The number pad opens for amounts; "10,50" is read as ₹10.50, never ₹1,050. (inputmode=decimal on every amount field; comma rule unit- and e2e-tested.)
+- [x] Every tap target is at least 44px tall (checked by Playwright on every screen). (Including the sheet, both split modes, edit/delete and the Undo toast.)
+- [x] Expenses are grouped by their date, shown in India time. (core/dates.ts, tested across the UTC/IST midnight.)
+- [x] Playwright passes on both Android (Chromium mobile) and iPhone (WebKit) engines. (17 tests x 2 engines, no server errors.)
 - [ ] Owner checked on a real phone via the dev deployment: the keyboard never hides Save, nothing sits under the notch or home bar.
 
 ## M6. Balances
