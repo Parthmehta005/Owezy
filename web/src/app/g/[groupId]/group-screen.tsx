@@ -11,6 +11,7 @@ import { BalancesView } from "@/components/balances-view";
 import { ExpenseList } from "@/components/expense-list";
 import { ExpenseSheet, draftFromExpense, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
 import { GroupSwitcher } from "@/components/group-switcher";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { groupKeys, type BundleMember, type GroupBundle } from "@/lib/data/bundle";
@@ -151,6 +152,7 @@ export function GroupScreen({
 
   return (
     <>
+      <PullToRefresh onRefresh={() => refetch()} />
       <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
         <GroupSwitcher current={bundle.group} groups={groups} />
         <Link

@@ -192,7 +192,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Loading, empty and error states across screens
 - [ ] Apply migrations to prod; prod sign-in redirect URLs (owner steps)
 - [ ] Switch the Vercel production environment to the `owezy` (prod) project; preview deployments stay on `owezy-dev`
-- [ ] Pull-to-refresh in the installed app (iPhone home-screen apps have none built in)
+- [x] Pull-to-refresh in the installed app (iPhone home-screen apps have none built in)
 - [ ] Playwright against preview; Lighthouse fixes; phone test
 
 ## Verification
