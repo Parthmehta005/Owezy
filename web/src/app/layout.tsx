@@ -15,7 +15,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Owezy",
+  applicationName: "Owezy",
   description: "Split expenses with friends in a few taps.",
+  // iPhone home-screen app. "default" keeps the clock and battery readable
+  // (the translucent style draws them in white, invisible on the light theme).
+  appleWebApp: { capable: true, title: "Owezy", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
