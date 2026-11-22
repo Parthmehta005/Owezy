@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "typecheck": "next typegen && tsc --noEmit",
     "db:push": "node scripts/supabase-dev.mjs db push",
+    "db:push:prod": "node scripts/supabase-prod.mjs",
     "db:reset": "node scripts/supabase-dev.mjs db reset --no-seed",
     "db:test": "node scripts/db-test.mjs",
     "db:types": "node scripts/gen-types.mjs",
