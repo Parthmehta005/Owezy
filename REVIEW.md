@@ -80,3 +80,58 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 - [x] Vercel and Supabase run in Mumbai. (Vercel functions in bom1 via vercel.json; both Supabase projects on ap-south-1, prod confirmed when its migrations were applied.)
 - [x] Production sign-in redirect URLs are set. (Owner signed in with Google on https://owezy-chi.vercel.app and created a group; it landed in the prod database.)
 - [x] Playwright two-user tests pass against the preview deploy. (51 tests x 2 engines on a protected branch preview via the bypass secret; the guard refuses the live site because it uses prod.)
+
+## M8. A better UI
+
+- [ ] The owner chose a direction from the mockups, and the chosen tokens are written in ROADMAP.md.
+- [ ] Every screen uses the new tokens and components (no leftover stock styling), in light and dark mode.
+- [ ] The group screen shows your total and the people behind it without scrolling, on a small phone (360×640).
+- [ ] Add an expense is still 3 taps plus typing, and the number pad still opens straight away.
+- [ ] Every text/background pair is ≥ 4.5:1; every tap target ≥ 44px; motion is off with "reduce motion".
+- [ ] Screenshot tests cover the key screens in light/dark on both engines; the full e2e suite passes.
+- [ ] Lighthouse mobile still ≥ 90 performance, ≥ 95 accessibility.
+- [ ] Owner checked it on a phone.
+
+## M9. Settle up
+
+- [ ] Recording a payment lowers both people's balances by exactly that amount; settling every simplified payment brings everyone to zero (unit + e2e).
+- [ ] Payments use idempotent ids and the version check, like expenses; a non-member can't create or see them (pgTAP).
+- [ ] The UPI link opens a UPI app with the right payee, amount and note (checked on a real Android phone); a missing UPI ID hides the button.
+- [ ] Undo works for payments; partial payments work.
+
+## M10. Open sign-in
+
+- [ ] A Gmail account that isn't a test user can sign in on prod.
+- [ ] The privacy and terms pages are reachable signed out and linked from sign-in.
+- [ ] Email links arrive from the new sender, beyond the old hourly limit.
+- [ ] Deleting an account removes the user's profile and sign-in; their group names stay as placeholders, so others' balances still add up (pgTAP).
+
+## M11. Live updates
+
+- [ ] Another member's change shows within ~2 s without switching away (Playwright, two phones, both engines).
+- [ ] A non-member receives no realtime events for the group.
+- [ ] After the phone sleeps and wakes, updates resume.
+- [ ] Your own optimistic changes don't duplicate or flicker.
+
+## M12. Categories, notes, receipts
+
+- [ ] Adding an expense without a category/note/photo is still 3 taps.
+- [ ] Category suggestions are unit-tested; photos are resized before upload.
+- [ ] A non-member can't read a receipt, even with its URL (Storage policy test).
+
+## M13. Activity and notifications
+
+- [ ] Every add/edit/delete/settle writes exactly one activity row, in the same transaction.
+- [ ] Notifications are opt-in, only for things involving you, and open the right group.
+- [ ] Works on Android and on an installed iPhone app (iOS 16.4+).
+
+## M14. Offline mode
+
+- [ ] With the network off, the installed app opens and shows the last data.
+- [ ] Offline changes sync once on reconnect, never duplicated; conflicts show the usual message.
+- [ ] A new deploy reaches users (the service worker doesn't keep an old version forever).
+
+## M15. App-store builds
+
+- [ ] Decision written up and approved by the owner before any build work.
+- [ ] Invite links open the installed store app.

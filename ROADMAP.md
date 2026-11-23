@@ -1,6 +1,6 @@
-# Roadmap: Owezy web app (v1)
+# Roadmap: Owezy web app
 
-Source of truth for the v1 build. Tick a milestone only after it passes its checklist in [REVIEW.md](REVIEW.md).
+Source of truth for the build: v1 (M1–M7, done) and the v2 plan (M8 onward). Tick a milestone only after it passes its checklist in [REVIEW.md](REVIEW.md).
 
 ## Context
 Owezy started as a single-user, in-memory Python CLI (`main.py`, `ui.py`, `logic.py`, `visualize.py`). The goal is for it to be a proper app that several people use at the same time, with a simple, elegant UI that needs as few taps as possible, and a path to mobile later.
@@ -97,7 +97,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 ## How milestones are worked
 
 - Each milestone has a **Goal** (what is demonstrably true when it is done), a **Scope** (what is in and out), and **Tasks**.
-- Work only inside the current milestone's scope. Anything else goes in "Not in v1" or a later milestone; it is not added on the side.
+- Work only inside the current milestone's scope. Anything else goes in a later milestone; it is not added on the side.
 - Each task is one commit, or a few if it is large. Every commit makes sense on its own, passes `lint`, `typecheck` and `test`, starts with the milestone tag (e.g. `M2: ...`), and ticks its task here in the same commit. This keeps `git bisect` and review simple.
 - A milestone is ticked only when its Goal is shown to work and its section in [REVIEW.md](REVIEW.md) passes. Then stop and wait for the owner's go-ahead.
 - Environments: two Supabase projects. **`owezy-dev`** is for development, migrations and all automated tests. **`owezy`** (prod) is for real use and only gets migrations that have passed on dev. No Docker needed.
@@ -187,7 +187,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 
 ### ✅ M7. Polish and deploy
 **Goal:** the app is live on a `*.vercel.app` URL against the prod Supabase project. It installs to a phone's home screen, both test users can use it on their phones, and it meets the Lighthouse targets in REVIEW.md.
-**Scope:** in: PWA manifest and real icons (replacing Next's default favicon), loading/empty/error states, pull-to-refresh, switching Vercel production to the prod project, prod migrations and sign-in URLs, Playwright against the preview deploy, Lighthouse fixes. Out: everything in "Not in v1".
+**Scope:** in: PWA manifest and real icons (replacing Next's default favicon), loading/empty/error states, pull-to-refresh, switching Vercel production to the prod project, prod migrations and sign-in URLs, Playwright against the preview deploy, Lighthouse fixes. Out: the add-ons now planned for v2 (M8 onward).
 - [x] App icon, favicon and `manifest.ts`
 - [x] Loading, empty and error states across screens
 - [x] Apply migrations to prod; prod sign-in redirect URLs (owner steps)
@@ -207,10 +207,89 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 ## Open follow-up from v1
 - [ ] iPhone home-screen check (REVIEW.md M7): add to the home screen from Safari, then check it opens full-screen into the group, pull-to-refresh works, the clock and battery are readable, and nothing sits under the notch or home bar. Android is verified; the iPhone engine is covered by Playwright (WebKit), but not on a real device.
 
-## Not in v1 (planned add-ons)
-- Live updates (Supabase Realtime)
-- Settle-up payments and a UPI pay button. Until this exists, there is no way to record that someone paid a debt back.
-- Categories, notes and receipt photos
-- Activity feed and notifications
-- Offline mode
-- Native app-store builds
+## v2 plan (after v1)
+v1 works, but it looks like a template: stock shadcn styling, a plain-text summary, text-only rows and a bare balances list. v2 starts with a design pass, then adds features **one milestone at a time, each only after the owner's go-ahead**. The order below is a suggestion and can be changed before a milestone starts.
+
+### ⬜ M8. A better UI
+**Goal:** the owner picks a design direction from mockups, and every screen is rebuilt in it. Opening a group answers "where do I stand, and with whom?" at a glance, and the app looks like a product rather than a template, in light and dark mode on Android and iPhone. All existing tests still pass, and the mobile rules (44px taps, keyboard-safe sheets, safe areas, Lighthouse ≥ 90/95) still hold.
+**Scope:** in: visual design system, layout and component restyle of every existing screen, avatars, motion, empty states, screenshot tests. Out: new features (categories, settle-up and so on come in later milestones); behaviour changes beyond layout. The Expenses / Balances / add-sheet flows keep working the same way.
+**Ideas the mockups will explore:**
+- A brand palette and a display typeface for amounts. Dark mode tinted with the brand colour, not flat grey.
+- Coloured initial avatars per member, used wherever a name appears.
+- A balance card at the top: your total, plus the people behind it ("Rahul owes you ₹700 · Neha ₹1,300"). The members row moves into the header (avatar stack) and settings.
+- Expense rows with the payer's avatar and a coloured "you lent / you owe" amount. Whole rupees drop the ".00" (₹900, but ₹10.50).
+- Balances as one card per person ("You ↔ Rahul") showing direction, with the simplified view as a short list of payments.
+- Warmer empty states with a clear next step. Light motion (rows sliding in, the total counting to its new value, tab transitions) that respects "reduce motion".
+- [ ] Design direction: 2–3 mockups of the group screen, balances and add sheet (light + dark, phone size). The owner picks one; the choices (colours, type, radius, density) are recorded here
+- [ ] Design tokens: palette, type scale, radius, shadows, tinted dark mode, applied to `globals.css` and the `ui/` components; contrast ≥ 4.5:1 checked for every pair
+- [ ] Member avatars (deterministic colour per member) across chips, rows, pickers and balances
+- [ ] Group screen: balance card with the per-person breakdown, header avatar stack, restyled tabs and add button
+- [ ] Expense list: avatar rows, effect amounts, sticky date headers, whole rupees without ".00" (`formatInr` option + tests)
+- [ ] Balances: per-person cards and the simplified payments list
+- [ ] Add/edit sheet restyle (same flow, same 3 taps, number pad still opens straight away)
+- [ ] Sign-in, new group, join, settings, error and empty screens restyled
+- [ ] Motion, with `prefers-reduced-motion` respected
+- [ ] Playwright screenshot tests of key screens (light/dark, both engines); tap-size, contrast and Lighthouse re-checked; owner checks on a phone
+
+### ⬜ M9. Settle up (and pay with UPI)
+**Goal:** from Balances, either person can record "Rahul paid Asha ₹700", and everyone's balances drop accordingly. If the person being paid has added a UPI ID, **Pay with UPI** opens the payer's UPI app (GPay, PhonePe, Paytm…) with the amount filled in; after paying, they confirm it in Owezy. Payments show in the expense list and can be edited or deleted with Undo, like expenses.
+**Scope:** in: a payments table and RPCs (RLS, pgTAP, idempotent ids, version check), payments counted in `core/` balances, a Settle up sheet (amount pre-filled from the balance, partial amounts allowed), an optional UPI ID per user (settings), a `upi://pay` deep link, payment rows in the list. Out: payment gateways or automatic confirmation (UPI apps don't report back to a web app, so the payer confirms by hand); other currencies.
+- [ ] Migration: `payments` (or a payment kind of expense) + RPCs + RLS + pgTAP; types
+- [ ] `core/`: balances, pairwise debts and simplify include payments (unit tests, including "settling everything brings all to zero")
+- [ ] UPI ID on the user's profile (optional, validated `name@bank`), editable in settings
+- [ ] Settle up sheet from Balances: who pays whom, amount (prefilled, editable), date; optimistic with Undo
+- [ ] Pay with UPI: deep link with payee, name, amount and note; "Did the payment go through?" confirm step
+- [ ] Payment rows in the list (tap to edit/delete); summary and balances update at once
+- [ ] Playwright on both engines: settle in full, settle partly, Undo, two people settling at once
+
+### ⬜ M10. Open sign-in to everyone
+**Goal:** anyone with an invite link can sign in with Google without being added as a test user. Owezy has a privacy policy and terms page, and (optionally) its own domain.
+**Scope:** in: `/privacy` and `/terms` pages, an optional custom domain (owner buys it; Vercel + Supabase + Google URLs updated), publishing the Google app, a custom email sender for sign-in links (Supabase's built-in one only sends a few per hour). Out: anything else.
+- [ ] `/privacy` and `/terms` pages (plain language: what's stored, who can see it, how to delete your data)
+- [ ] Optional own domain: owner steps (buy, connect to Vercel, update Supabase Site/Redirect URLs and Google)
+- [ ] Publish the Google app: Branding page (home page, privacy, terms, authorized domain), owner steps
+- [ ] Email sign-in links via a real email service (e.g. Resend's free tier) set as Supabase's SMTP, owner steps
+- [ ] "Delete my account" in settings (needed for the privacy policy to be honest), with a pgTAP test
+
+### ⬜ M11. Live updates
+**Goal:** when a friend adds, edits, deletes or settles, it appears on everyone's open screen within about 2 seconds, with no need to switch away or pull to refresh.
+**Scope:** in: Supabase Realtime on the open group's rows (respecting RLS), refreshing the cached group data, reconnecting after the phone sleeps, a quiet "Updated" cue. Out: typing indicators or presence; chat.
+- [ ] Realtime authorization for the group's tables (only members get changes), tested on dev
+- [ ] Subscribe on the group screen; refresh the bundle on change (batched); resubscribe after sleep or reconnect
+- [ ] Your own changes don't flicker (optimistic row reconciled, not duplicated)
+- [ ] Playwright: two phones; B sees A's change without any focus or pull
+
+### ⬜ M12. Categories, notes and receipt photos
+**Goal:** an expense can have a category (with an icon, suggested from the description, e.g. "Uber" → Travel), a note, and a receipt photo that every member can open full-screen. Adding an expense without them is still 3 taps.
+**Scope:** in: a fixed category list with icons, auto-suggest, an optional note, one photo per expense (resized on the phone, stored in a private Supabase Storage bucket readable only by group members). Out: custom categories, spending charts, receipt scanning or OCR.
+- [ ] Migration: category + note columns, Storage bucket with member-only policies, pgTAP
+- [ ] Category picker with icons + suggestion from the description (unit-tested keyword map)
+- [ ] Note field
+- [ ] Receipt photo: take or pick, shrink on the phone, upload with progress, view full-screen, replace or remove
+- [ ] Icons on list rows; Playwright on both engines (including that a non-member can't open a receipt)
+
+### ⬜ M13. Activity feed and notifications
+**Goal:** each group has an activity feed ("Rahul added Dinner ₹900 · 2h ago", "Neha settled ₹700 with you"). Members who opt in get a phone notification when something involves them, on Android and on iPhones that installed the app (iOS 16.4+).
+**Scope:** in: an activity log written by the RPCs, a feed screen, web push (opt-in per user and group), notifications for "an expense involving you" and "someone settled with you". Out: email digests, reminders to pay (maybe later).
+- [ ] Migration: activity table written inside the existing RPCs (atomic), RLS, pgTAP
+- [ ] Activity feed screen per group (paged)
+- [ ] Web push: keys (owner steps), subscription storage, opt-in flow and settings toggle
+- [ ] Sending: a database-triggered function sends the push; links open the right group
+- [ ] Tests: the feed in Playwright; push sending with a fake push endpoint
+
+### ⬜ M14. Offline mode
+**Goal:** with no signal (e.g. on a trip), the installed app opens, shows the last-loaded groups, and lets you add, edit or delete expenses. They're marked "waiting to sync" and sync by themselves when the connection returns, never duplicating. Conflicts use the existing "someone else changed this" flow.
+**Scope:** in: a service worker caching the app shell, persisted query cache, a queue of offline changes (the ids are already client-made, so retries can't duplicate), an offline banner and per-row sync state. Out: creating groups or joining offline.
+- [ ] Service worker: app shell and static assets (updates without getting stuck on an old version)
+- [ ] Persist the TanStack cache (groups, bundles) to IndexedDB
+- [ ] Offline mutation queue with replay on reconnect; conflict and "deleted meanwhile" handling
+- [ ] Offline banner and "waiting to sync" rows
+- [ ] Playwright: go offline, add/edit/delete, come back online, everything lands once
+
+### ⬜ M15. App-store builds (decide later)
+**Goal:** Owezy is in the Play Store (and, if wanted, the App Store), built from the same code.
+**Scope:** in: wrapping the web app with Capacitor (or a Trusted Web Activity for Android), native push and invite deep links, store listings. Out: a separate native rewrite.
+**Needs from owner:** a Google Play developer account (one-time fee); an Apple developer account (yearly fee) for iPhone.
+- [ ] Decide: Android-only TWA vs Capacitor for both; costs and effort written up for the owner
+- [ ] Android build, deep links for `/join/<code>`, Play internal testing
+- [ ] (If iPhone) App Store build and TestFlight
