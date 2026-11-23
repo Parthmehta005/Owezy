@@ -143,6 +143,7 @@ Do this only after Part B. The prod database is already set up (Part A).
 2. **Key:** `NEXT_PUBLIC_SUPABASE_URL`. **Value:** the prod Project URL from C1. **Environments:** only **Production**. Click **Save**.
 3. Again with **Key:** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, **Value:** the prod publishable key, **Environments:** only **Production**. **Save**.
 4. You now have four rows: two for **Production** (prod values) and two for **Preview, Development** (dev values).
+5. If Vercel warns "Remove the public framework prefix to keep this value private" and suggests **Config**, accept **Config** and keep the name exactly as it is. These two values are meant to be public: phones use them to reach Supabase, and the data is protected by Supabase's row-level security. Removing `NEXT_PUBLIC_` would break sign-in. If that warning ever appears for anything else, stop: the Supabase secret key and database URLs never go into Vercel.
 
 **C4. Rebuild the live site with the new values (Vercel)**
 1. Click the **Deployments** tab at the top.
