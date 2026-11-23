@@ -12,14 +12,14 @@ export default async function remoteGuard() {
   const base = process.env.E2E_BASE_URL!.replace(/\/$/, "");
   const devRef = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).hostname.split(".")[0];
 
-  const page = await fetch(`${base}/login`, { headers: bypassHeaders() });
+  const page = await fetch(`${base}/login`, { headers: bypassHeaders({ setCookie: false }) });
   if (!page.ok) {
     throw new Error(`e2e: ${base}/login answered ${page.status}. A protected preview needs VERCEL_AUTOMATION_BYPASS_SECRET in .env.test.local.`);
   }
   const scripts = [...(await page.text()).matchAll(/<script src="([^"]+)"/g)].map((m) => new URL(m[1], base).href);
   const refs = new Set<string>();
   for (const src of scripts) {
-    const js = await (await fetch(src, { headers: bypassHeaders() })).text();
+    const js = await (await fetch(src, { headers: bypassHeaders({ setCookie: false }) })).text();
     for (const m of js.matchAll(/https:\/\/([a-z0-9]{20})\.supabase\.co/g)) refs.add(m[1]);
   }
   if (refs.size !== 1 || !refs.has(devRef)) {

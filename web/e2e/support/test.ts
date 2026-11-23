@@ -19,9 +19,15 @@ try {
 
 const BYPASS = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
-/** Headers that pass Vercel's protection; only ever sent to the deployment under test. */
-export function bypassHeaders(): Record<string, string> {
-  return BYPASS ? { "x-vercel-protection-bypass": BYPASS, "x-vercel-set-bypass-cookie": "true" } : {};
+/**
+ * Headers that pass Vercel's protection; only ever sent to the deployment
+ * under test. `setCookie` also asks for the bypass cookie, which Vercel
+ * answers with a redirect: fine for browsers and Playwright's request
+ * contexts (they keep cookies), a redirect loop for plain fetch().
+ */
+export function bypassHeaders({ setCookie = true } = {}): Record<string, string> {
+  if (!BYPASS) return {};
+  return setCookie ? { "x-vercel-protection-bypass": BYPASS, "x-vercel-set-bypass-cookie": "true" } : { "x-vercel-protection-bypass": BYPASS };
 }
 
 /** Give a browser context Vercel's bypass cookie (no-op locally). */
