@@ -125,27 +125,34 @@ Publishing (so anyone can use Google sign-in) needs a home page, a privacy polic
 #### Part C: point the live site at prod (Vercel, about 5 minutes)
 Do this only after Part B. The prod database is already set up (Part A).
 
-**C1. Get prod's two values (Supabase)**
-1. In the **owezy** project, click the gear icon (**Project Settings**) at the bottom of the left sidebar.
-2. Click **Data API** and copy the **Project URL** (`https://<prod-ref>.supabase.co`). Paste it into a notepad for a minute.
-3. Click **API Keys** and copy the **Publishable key** (starts with `sb_publishable_`). Paste it into the notepad too. Do **not** use the secret key.
+**C1. Collect the four values**
+Each variable name gets two values: one for prod, one for dev.
+- **Prod values (Supabase, `owezy` project):** click the gear icon (**Project Settings**) at the bottom of the left sidebar.
+  - **Data API** → copy the **Project URL** (`https://<prod-ref>.supabase.co`).
+  - **API Keys** → copy the **Publishable key** (starts with `sb_publishable_`). Do **not** use the secret key.
+- **Dev values:** open `web/.env.local` on your computer (VS Code or Notepad). It holds the dev `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Copy each value after the `=`.
 
-**C2. Keep the existing (dev) values for previews only (Vercel)**
+Paste all four into a notepad for a few minutes, labelled so you don't mix them up.
+
+**C2. Add the four variables (Vercel)**
 1. Go to https://vercel.com, open the **owezy** project, and click **Settings** (top tabs) → **Environment Variables** (left).
-2. You'll see `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, each labelled **All Environments** (or Production, Preview, Development).
-3. For `NEXT_PUBLIC_SUPABASE_URL`, click the **⋯** at the end of its row → **Edit**.
-4. Under **Environments**, untick **Production**, leaving **Preview** and **Development** ticked. Don't change the value. Click **Save**.
-5. Do the same for `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-6. Both rows now say **Preview, Development**.
+2. If any old `NEXT_PUBLIC_SUPABASE_…` rows are still there, delete them (**⋯ → Delete**), so you start clean.
+3. Add each row below with the **Add New** / **Add Environment Variable** form. For each one, fill in **Key** and **Value**, choose the **Type**, tick exactly the listed **Environments**, and click **Save**.
 
-**C3. Add the prod values for Production (Vercel)**
-1. On the same page, find the form to add a variable (at the top, or the **Add New** / **Add Environment Variable** button).
-2. **Key:** `NEXT_PUBLIC_SUPABASE_URL`. **Value:** the prod Project URL from C1. **Environments:** only **Production**. Click **Save**.
-3. Again with **Key:** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, **Value:** the prod publishable key, **Environments:** only **Production**. **Save**.
-4. You now have four rows: two for **Production** (prod values) and two for **Preview, Development** (dev values).
-5. If Vercel warns "Remove the public framework prefix to keep this value private" and suggests **Config**, accept **Config** and keep the name exactly as it is. These two values are meant to be public: phones use them to reach Supabase, and the data is protected by Supabase's row-level security. Removing `NEXT_PUBLIC_` would break sign-in. If that warning ever appears for anything else, stop: the Supabase secret key and database URLs never go into Vercel.
+| # | Key | Value | Type | Environments |
+|---|---|---|---|---|
+| 1 | `NEXT_PUBLIC_SUPABASE_URL` | prod Project URL | **Config** | **Production** only |
+| 2 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | prod publishable key | **Config** | **Production** only |
+| 3 | `NEXT_PUBLIC_SUPABASE_URL` | dev URL (from `.env.local`) | **Config** | **Preview** and **Development** |
+| 4 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | dev key (from `.env.local`) | **Config** | **Preview** and **Development** |
 
-**C4. Rebuild the live site with the new values (Vercel)**
+4. Check the list. You should have four rows: two for **Production** and two for **Preview, Development**. Watch for typos in the key names, which must match exactly.
+
+About **Type**:
+- Choose **Config**, not **Secret**/**Sensitive**. Both values are public by design: every visitor's phone uses them to reach Supabase, and your data is protected by Supabase's row-level security, not by hiding these. Vercel may warn "Remove the public framework prefix to keep this value private"; choose **Config** and keep the names exactly as they are. Removing `NEXT_PUBLIC_` would break sign-in.
+- Nothing in Owezy goes into Vercel as a **Secret**. The Supabase secret key and the database URLs (`.env.test.local`, `.env.prod.local`) must never be added to Vercel at all.
+
+**C3. Rebuild the live site with the new values (Vercel)**
 1. Click the **Deployments** tab at the top.
 2. The top row with a **Production** label (and **Current**) is the live one. Click the **⋯** at the end of that row → **Redeploy** → **Redeploy** again to confirm.
 3. Wait until it shows **Ready** (about 1–2 minutes).
