@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C · Add expense</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #3B3B3B; color: #111111; font-family: 'IBM Plex Sans', system-ui, sans-serif">
+  <div role="dialog" aria-label="Add expense" style="position: absolute; left: 0; right: 0; top: 16px; bottom: 0; background: #FFFFFF; border-radius: 12px 12px 0 0; display: flex; flex-direction: column; gap: 16px; padding: 4px 16px 0">
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #111111">
+      <button type="button" style="min-height: 48px; padding: 0 4px; border: 0; background: none; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: #595959">CANCEL</button>
+      <h2 style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.1em">NEW EXPENSE</h2>
+      <button type="button" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 6px; background: #111111; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; color: #FFFFFF">SAVE</button>
+    </div>
+
+    <label style="display: flex; align-items: baseline; gap: 6px; padding-top: 8px">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 36px; font-weight: 500; color: #595959">₹</span>
+      <input value="1,240" inputmode="decimal" aria-label="Amount in rupees" style="width: 100%; border: 0; background: none; font-family: 'IBM Plex Mono', monospace; font-size: 64px; font-weight: 700; letter-spacing: -0.03em; color: #111111; outline: none">
+    </label>
+
+    <input value="Breakfast at Infantaria" aria-label="What was it for?" style="min-height: 48px; padding: 0; border: 0; border-bottom: 1.5px solid #111111; background: none; font: inherit; font-size: 18px; font-weight: 500; color: #111111">
+
+    <div style="display: flex; flex-direction: column">
+      <sc-for list="{{fields}}" as="f" hint-placeholder-count="3">
+        <button type="button" style="display: flex; align-items: baseline; gap: 6px; min-height: 48px; padding: 14px 0 0; box-sizing: border-box; border: 0; background: none; font: inherit; color: #111111; text-align: left">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #595959">{{f.label}}</span>
+          <span aria-hidden="true" style="flex: 1; border-bottom: 2px dotted #C4C4C4; transform: translateY(-4px)"></span>
+          <span style="font-size: 16px; font-weight: 600">{{f.value}}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+      </sc-for>
+    </div>
+
+    <section aria-label="How it splits" style="margin-top: 4px; padding: 12px 14px; border: 1.5px dashed #BDBDBD; border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 14px">
+      <sc-for list="{{shares}}" as="s" hint-placeholder-count="4">
+        <p style="margin: 0; display: flex; justify-content: space-between; min-height: 24px; align-items: center"><span>{{s.name}}</span><span>310.00</span></p>
+      </sc-for>
+      <p style="margin: 6px 0 0; padding-top: 6px; border-top: 1.5px solid #111111; display: flex; justify-content: space-between; font-weight: 700"><span>TOTAL</span><span>1,240.00</span></p>
+      <p style="margin: 4px 0 0; display: flex; justify-content: space-between; font-weight: 700; color: #1D4ED8"><span>YOU GET BACK</span><span>930.00</span></p>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      fields: [
+        { label: 'PAID BY', value: 'You' },
+        { label: 'SPLIT', value: 'Equally · all 4' },
+        { label: 'DATE', value: 'Today' }
+      ],
+      shares: ['You', 'Rahul', 'Neha', 'Bilal'].map((name) => ({ name }))
+    };
+  }
+}
+</script>
+</body>
+</html>

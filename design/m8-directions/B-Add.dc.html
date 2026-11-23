@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>B · Add expense</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4F39F6}a:hover{color:#3A28C4}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #2A2257; color: #15122B; font-family: Inter, system-ui, sans-serif">
+  <div role="dialog" aria-label="Add expense" style="position: absolute; left: 0; right: 0; top: 16px; bottom: 0; background: #FFFFFF; border-radius: 32px 32px 0 0; display: flex; flex-direction: column; gap: 18px; padding: 8px 20px 0">
+    <span aria-hidden="true" style="align-self: center; width: 40px; height: 5px; border-radius: 3px; background: #DCD8EE; display: block"></span>
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <button type="button" aria-label="Cancel" style="width: 44px; height: 44px; border: 0; border-radius: 14px; background: #F1F0FA; display: flex; align-items: center; justify-content: center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15122B" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 20px; font-weight: 800">New expense</h2>
+      <button type="button" style="min-height: 44px; padding: 0 22px; border: 0; border-radius: 22px; background: #4F39F6; font-family: 'Bricolage Grotesque', sans-serif; font-size: 17px; font-weight: 800; color: #FFFFFF">Save</button>
+    </div>
+
+    <label style="display: flex; align-items: baseline; gap: 6px; padding: 8px 0 0">
+      <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 40px; font-weight: 600; color: #7A7499">₹</span>
+      <input value="1,240" inputmode="decimal" aria-label="Amount in rupees" style="width: 100%; border: 0; background: none; font-family: 'Bricolage Grotesque', sans-serif; font-size: 72px; font-weight: 800; letter-spacing: -0.03em; color: #15122B; outline: none">
+    </label>
+
+    <input value="Breakfast at Infantaria" aria-label="What was it for?" style="min-height: 52px; padding: 0 18px; border: 0; border-radius: 18px; background: #F1F0FA; font: inherit; font-size: 17px; font-weight: 500; color: #15122B">
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h3 style="margin: 0; font-size: 13px; font-weight: 700; color: #5E5878">Who paid?</h3>
+      <div role="radiogroup" aria-label="Who paid" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{payers}}" as="p" hint-placeholder-count="4">
+          <button type="button" role="radio" aria-checked="{{p.checked}}" style="display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 76px; padding: 8px 0; border: 2px solid {{p.ring}}; border-radius: 18px; background: {{p.bg}}; font: inherit; font-size: 13px; font-weight: 600; color: #15122B">
+            <span style="width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #FFFFFF; background: {{p.color}}">{{p.initial}}</span>
+            {{p.name}}
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h3 style="margin: 0; font-size: 13px; font-weight: 700; color: #5E5878">Split</h3>
+        <div role="radiogroup" aria-label="Split" style="display: flex; gap: 4px; padding: 3px; border-radius: 22px; background: #F1F0FA">
+          <button type="button" role="radio" aria-checked="true" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 19px; background: #15122B; font: inherit; font-size: 13px; font-weight: 700; color: #FFFFFF">Equally</button>
+          <button type="button" role="radio" aria-checked="false" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 19px; background: none; font: inherit; font-size: 13px; font-weight: 600; color: #3D3858">Unequally</button>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 15px; color: #3D3858">₹310 each for all 4 · <strong style="color: #3A28C4">you get back ₹930</strong></p>
+    </section>
+
+    <button type="button" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 22px; background: #F1F0FA; font: inherit; font-size: 14px; font-weight: 600; color: #15122B">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F39F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Today
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = { Asha: '#4F39F6', Rahul: '#C2410C', Neha: '#0B7A5A', Bilal: '#A21CAF' };
+    return {
+      payers: [['Asha', 'You'], ['Rahul', 'Rahul'], ['Neha', 'Neha'], ['Bilal', 'Bilal']].map(([n, label], i) => ({
+        initial: n[0], name: label, color: C[n], checked: i === 0 ? 'true' : 'false',
+        ring: i === 0 ? '#4F39F6' : '#ECEAF6', bg: i === 0 ? '#EEEBFF' : '#FFFFFF'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

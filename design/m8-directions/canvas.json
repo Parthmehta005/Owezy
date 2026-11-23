@@ -1,0 +1,29 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-11-24T10:00:00Z" },
+  "title": "Owezy M8 design directions",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": { "x": 0, "y": 0, "w": 390, "h": 844, "title": "A · Group screen (light)" },
+    "A-Balances.dc.html": { "x": 470, "y": 0, "w": 390, "h": 844, "title": "A · Balances (dark)" },
+    "A-Add.dc.html": { "x": 940, "y": 0, "w": 390, "h": 844, "title": "A · Add expense (light)" },
+    "B-Group.dc.html": { "x": 0, "y": 1264, "w": 390, "h": 844, "title": "B · Group screen (light)" },
+    "B-Balances.dc.html": { "x": 470, "y": 1264, "w": 390, "h": 844, "title": "B · Balances (dark)" },
+    "B-Add.dc.html": { "x": 940, "y": 1264, "w": 390, "h": 844, "title": "B · Add expense (light)" },
+    "C-Group.dc.html": { "x": 0, "y": 2528, "w": 390, "h": 844, "title": "C · Group screen (light)" },
+    "C-Balances.dc.html": { "x": 470, "y": 2528, "w": 390, "h": 844, "title": "C · Balances (dark)" },
+    "C-Add.dc.html": { "x": 940, "y": 2528, "w": 390, "h": 844, "title": "C · Add expense (light)" }
+  },
+  "order": [
+    "Main.dc.html", "A-Balances.dc.html", "A-Add.dc.html",
+    "B-Group.dc.html", "B-Balances.dc.html", "B-Add.dc.html",
+    "C-Group.dc.html", "C-Balances.dc.html", "C-Add.dc.html"
+  ],
+  "notes": {
+    "titleA": { "x": 0, "y": -300, "text": "A · Calm: soft cards, deep teal", "kind": "title1", "maxW": 1330 },
+    "titleB": { "x": 0, "y": 964, "text": "B · Bold: indigo hero, chunky type", "kind": "title1", "maxW": 1330 },
+    "titleC": { "x": 0, "y": 2228, "text": "C · Receipt: ink, mono numbers", "kind": "title1", "maxW": 1330 }
+  },
+  "designSystems": []
+}

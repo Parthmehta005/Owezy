@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>C · Group screen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D4ED8}a:hover{color:#1E3A8A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #FFFFFF; color: #111111; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="display: flex; align-items: center; gap: 8px; padding: 12px 10px 8px 16px; border-bottom: 1.5px solid #111111">
+    <button type="button" style="display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 700; letter-spacing: 0.08em; color: #111111">
+      GOA TRIP
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2.4" stroke-linecap="square" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div style="flex: 1"></div>
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #595959">4 PEOPLE</span>
+    <button type="button" aria-label="Group settings" style="width: 44px; height: 44px; border: 0; background: none; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+    </button>
+  </header>
+
+  <main style="display: flex; flex-direction: column; gap: 18px; padding: 16px 16px 0">
+    <section aria-label="Your balance" style="border: 1.5px solid #111111; border-radius: 6px; padding: 14px 16px 6px">
+      <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #595959">YOU GET BACK</p>
+      <p style="margin: 2px 0 8px; font-family: 'IBM Plex Mono', monospace; font-size: 46px; font-weight: 700; letter-spacing: -0.02em; color: #1D4ED8">₹895</p>
+      <ul style="list-style: none; margin: 0; padding: 0; border-top: 1.5px dashed #BDBDBD">
+        <sc-for list="{{people}}" as="p" hint-placeholder-count="3">
+          <li style="display: flex; align-items: baseline; gap: 6px; min-height: 40px; padding-top: 12px; box-sizing: border-box; font-size: 15px">
+            <span>{{p.text}}</span>
+            <span aria-hidden="true" style="flex: 1; border-bottom: 2px dotted #BDBDBD; transform: translateY(-4px)"></span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: {{p.tone}}">{{p.amount}}</span>
+          </li>
+        </sc-for>
+      </ul>
+    </section>
+
+    <div role="tablist" style="display: flex; gap: 20px; border-bottom: 1.5px solid #E2E2E2">
+      <button type="button" role="tab" aria-selected="true" style="min-height: 44px; padding: 0; border: 0; border-bottom: 3px solid #111111; margin-bottom: -1.5px; background: none; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; color: #111111">EXPENSES</button>
+      <button type="button" role="tab" aria-selected="false" style="min-height: 44px; padding: 0; border: 0; background: none; font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 500; letter-spacing: 0.06em; color: #595959">BALANCES</button>
+    </div>
+
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column">
+        <h3 style="margin: 0 0 2px; display: flex; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #595959">
+          {{d.label}}
+          <span aria-hidden="true" style="flex: 1; border-top: 1.5px dashed #D0D0D0"></span>
+        </h3>
+        <ul style="list-style: none; margin: 0; padding: 0">
+          <sc-for list="{{d.rows}}" as="r" hint-placeholder-count="2">
+            <li style="display: flex; align-items: center; gap: 12px; min-height: 60px">
+              <span style="width: 34px; height: 34px; box-sizing: border-box; border: 1.5px solid #111111; border-radius: 4px; flex: none; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700">{{r.initial}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+                <span style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #595959">{{r.sub}}</span>
+              </span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: {{r.tone}}">{{r.amount}}</span>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+    </sc-for>
+  </main>
+
+  <button type="button" style="position: absolute; right: 16px; bottom: 24px; display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 20px; border: 0; border-radius: 8px; background: #111111; color: #FFFFFF; font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: 0.06em">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    ADD EXPENSE
+  </button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const gets = '#1D4ED8', owes = '#B93D0A';
+    const row = (payer, title, sub, amount, tone) => ({ initial: payer.slice(0, 2).toUpperCase(), title, sub, amount, tone });
+    return {
+      people: [
+        { text: 'Rahul owes you', amount: '₹965', tone: gets },
+        { text: 'Neha owes you', amount: '₹815', tone: gets },
+        { text: 'You owe Bilal', amount: '₹885', tone: owes }
+      ],
+      days: [
+        { label: 'TODAY', rows: [
+          row('Asha', 'Dinner at Thalassa', 'you paid 3,600', '+2,700', gets),
+          row('Rahul', 'Cab to Baga beach', 'rahul paid 450', '−150', owes)
+        ] },
+        { label: 'YESTERDAY', rows: [
+          row('Neha', 'Scooter rental', 'neha paid 1,200', '−300', owes),
+          row('Asha', 'Groceries', 'you paid 860', '+645', gets)
+        ] },
+        { label: 'FRI 20 NOV', rows: [
+          row('Bilal', 'Villa deposit', 'bilal paid 8,000', '−2,000', owes)
+        ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

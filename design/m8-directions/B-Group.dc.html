@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>B · Group screen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4F39F6}a:hover{color:#3A28C4}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #FFFFFF; color: #15122B; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <section aria-label="Your balance" style="background: #4F39F6; color: #FFFFFF; border-radius: 0 0 32px 32px; padding: 8px 0 20px; display: flex; flex-direction: column; gap: 12px">
+    <header style="display: flex; align-items: center; gap: 8px; padding: 4px 8px 0 20px">
+      <button type="button" style="display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; font-family: 'Bricolage Grotesque', sans-serif; font-size: 22px; font-weight: 800; color: #FFFFFF">
+        Goa trip
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div style="flex: 1"></div>
+      <button type="button" aria-label="Group settings" style="width: 44px; height: 44px; border: 0; border-radius: 14px; background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+      </button>
+    </header>
+    <div style="padding: 4px 20px 0">
+      <p style="margin: 0; font-size: 15px; font-weight: 600; color: #E0DBFF">You get back</p>
+      <p style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 60px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">₹895</p>
+    </div>
+    <ul style="list-style: none; margin: 0; padding: 0 20px; display: flex; gap: 8px; overflow-x: auto">
+      <sc-for list="{{people}}" as="p" hint-placeholder-count="3">
+        <li style="flex: none; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 6px; border-radius: 22px; background: rgba(255,255,255,0.14); font-size: 14px; font-weight: 600; white-space: nowrap">
+          <span style="width: 32px; height: 32px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; background: #FFFFFF; color: {{p.color}}">{{p.initial}}</span>
+          {{p.text}}
+        </li>
+      </sc-for>
+    </ul>
+  </section>
+
+  <main style="display: flex; flex-direction: column; gap: 14px; padding: 16px 20px 0">
+    <div role="tablist" style="display: flex; gap: 8px">
+      <button type="button" role="tab" aria-selected="true" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 22px; background: #15122B; font: inherit; font-size: 15px; font-weight: 700; color: #FFFFFF">Expenses</button>
+      <button type="button" role="tab" aria-selected="false" style="min-height: 44px; padding: 0 20px; border: 0; border-radius: 22px; background: #F1F0FA; font: inherit; font-size: 15px; font-weight: 600; color: #3D3858">Balances</button>
+    </div>
+
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="3">
+      <section style="display: flex; flex-direction: column">
+        <h3 style="margin: 0 0 2px; font-size: 13px; font-weight: 700; color: #5E5878">{{d.label}}</h3>
+        <ul style="list-style: none; margin: 0; padding: 0">
+          <sc-for list="{{d.rows}}" as="r" hint-placeholder-count="2">
+            <li style="display: flex; align-items: center; gap: 12px; min-height: 64px">
+              <span style="width: 42px; height: 42px; border-radius: 14px; flex: none; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #FFFFFF; background: {{r.color}}">{{r.initial}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span>
+                <span style="font-size: 13px; color: #5E5878">{{r.sub}}</span>
+              </span>
+              <span style="padding: 6px 10px; border-radius: 12px; font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: {{r.tone}}; background: {{r.bg}}">{{r.amount}}</span>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+    </sc-for>
+  </main>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 16px 20px; background: linear-gradient(to bottom, rgba(255,255,255,0), #FFFFFF 40%)">
+    <button type="button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; height: 60px; border: 0; border-radius: 30px; background: #4F39F6; color: #FFFFFF; font-family: 'Bricolage Grotesque', sans-serif; font-size: 19px; font-weight: 800">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      Add expense
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = { Asha: '#4F39F6', Rahul: '#C2410C', Neha: '#0B7A5A', Bilal: '#A21CAF' };
+    const lent = (a) => ({ amount: '+' + a, tone: '#3A28C4', bg: '#EEEBFF' });
+    const owe = (a) => ({ amount: '−' + a, tone: '#B3390B', bg: '#FFF0E8' });
+    const row = (payer, title, sub, eff) => ({ initial: payer[0], color: C[payer], title, sub, ...eff });
+    return {
+      people: [
+        { initial: 'R', color: C.Rahul, text: 'Rahul owes you ₹965' },
+        { initial: 'N', color: C.Neha, text: 'Neha owes you ₹815' },
+        { initial: 'B', color: C.Bilal, text: 'You owe Bilal ₹885' }
+      ],
+      days: [
+        { label: 'Today', rows: [
+          row('Asha', 'Dinner at Thalassa', 'You paid ₹3,600', lent('₹2,700')),
+          row('Rahul', 'Cab to Baga beach', 'Rahul paid ₹450', owe('₹150'))
+        ] },
+        { label: 'Yesterday', rows: [
+          row('Neha', 'Scooter rental', 'Neha paid ₹1,200', owe('₹300')),
+          row('Asha', 'Groceries', 'You paid ₹860', lent('₹645'))
+        ] },
+        { label: 'Fri, 20 Nov', rows: [
+          row('Bilal', 'Villa deposit', 'Bilal paid ₹8,000', owe('₹2,000'))
+        ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

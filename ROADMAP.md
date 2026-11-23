@@ -221,6 +221,7 @@ v1 works, but it looks like a template: stock shadcn styling, a plain-text summa
 - Balances as one card per person ("You ↔ Rahul") showing direction, with the simplified view as a short list of payments.
 - Warmer empty states with a clear next step. Light motion (rows sliding in, the total counting to its new value, tab transitions) that respects "reduce motion".
 - [ ] Design direction: 2–3 mockups of the group screen, balances and add sheet (light + dark, phone size). The owner picks one; the choices (colours, type, radius, density) are recorded here
+  - Mockups made 2026-11-24, waiting for the owner's pick: see [design/m8-directions/README.md](design/m8-directions/README.md)
 - [ ] Design tokens: palette, type scale, radius, shadows, tinted dark mode, applied to `globals.css` and the `ui/` components; contrast ≥ 4.5:1 checked for every pair
 - [ ] Member avatars (deterministic colour per member) across chips, rows, pickers and balances
 - [ ] Group screen: balance card with the per-person breakdown, header avatar stack, restyled tabs and add button

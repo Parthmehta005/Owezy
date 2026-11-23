@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A · Balances, dark</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#4FD1B5}a:hover{color:#7FE0CB}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #0E1513; color: #E7EFEC; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="display: flex; align-items: center; gap: 8px; padding: 12px 12px 8px 16px">
+    <button type="button" style="display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; font: inherit; color: inherit; font-size: 22px; font-weight: 800; letter-spacing: -0.02em">
+      Goa trip
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9DB0AA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div style="flex: 1"></div>
+    <button type="button" aria-label="Group settings" style="width: 44px; height: 44px; border: 0; background: none; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#E7EFEC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+    </button>
+  </header>
+
+  <main style="display: flex; flex-direction: column; gap: 16px; padding: 4px 16px 0">
+    <div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; background: #17211E; border-radius: 16px">
+      <button type="button" role="tab" aria-selected="false" style="min-height: 44px; border: 0; border-radius: 12px; background: none; font: inherit; font-size: 15px; font-weight: 600; color: #9DB0AA">Expenses</button>
+      <button type="button" role="tab" aria-selected="true" style="min-height: 44px; border: 0; border-radius: 12px; background: #263330; font: inherit; font-size: 15px; font-weight: 700; color: #E7EFEC">Balances</button>
+    </div>
+
+    <button type="button" role="switch" aria-checked="false" style="display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 8px 16px; border: 0; border-radius: 18px; background: #17211E; font: inherit; color: inherit; text-align: left">
+      <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 15px; font-weight: 700">Simplify debts</span>
+        <span style="font-size: 13px; color: #9DB0AA">6 → 3 payments settle everyone</span>
+      </span>
+      <span aria-hidden="true" style="width: 44px; height: 26px; border-radius: 13px; background: #34433F; position: relative; display: block">
+        <span style="position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #E7EFEC; display: block"></span>
+      </span>
+    </button>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h3 style="margin: 0; padding-left: 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #9DB0AA">You and each person</h3>
+      <sc-for list="{{mine}}" as="p" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 12px 16px; background: #17211E; border-radius: 20px">
+          <span style="width: 42px; height: 42px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #0E1513; background: {{p.color}}">{{p.initial}}</span>
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 16px; font-weight: 700">{{p.name}}</span>
+            <span style="font-size: 13px; font-weight: 600; color: {{p.tone}}">{{p.text}}</span>
+          </span>
+          <span style="font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; color: {{p.tone}}">{{p.amount}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h3 style="margin: 0; padding-left: 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #9DB0AA">Between others</h3>
+      <ul style="list-style: none; margin: 0; padding: 0 16px; background: #17211E; border-radius: 20px">
+        <sc-for list="{{others}}" as="o" hint-placeholder-count="3">
+          <li style="display: flex; align-items: center; gap: 10px; min-height: 56px; border-top: {{o.border}}">
+            <span style="display: flex">
+              <span style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #0E1513; background: {{o.fromColor}}">{{o.fromInitial}}</span>
+              <span style="width: 28px; height: 28px; margin-left: -6px; border-radius: 50%; border: 2px solid #17211E; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #0E1513; background: {{o.toColor}}">{{o.toInitial}}</span>
+            </span>
+            <span style="flex: 1; font-size: 15px">{{o.text}}</span>
+            <span style="font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums">{{o.amount}}</span>
+          </li>
+        </sc-for>
+      </ul>
+    </section>
+  </main>
+
+  <button type="button" style="position: absolute; right: 16px; bottom: 24px; display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 22px 0 18px; border: 0; border-radius: 28px; background: #4FD1B5; color: #0E1513; font: inherit; font-size: 16px; font-weight: 700">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E1513" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    Add expense
+  </button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const C = { Asha: '#4FD1B5', Rahul: '#8FA8FF', Neha: '#FFA36B', Bilal: '#C9A7FF' };
+    const gets = '#4FD1B5', owes = '#FFA36B';
+    return {
+      mine: [
+        { initial: 'R', name: 'Rahul', color: C.Rahul, text: 'owes you', amount: '₹965', tone: gets },
+        { initial: 'N', name: 'Neha', color: C.Neha, text: 'owes you', amount: '₹815', tone: gets },
+        { initial: 'B', name: 'Bilal', color: C.Bilal, text: 'you owe', amount: '₹885', tone: owes }
+      ],
+      others: [
+        { fromInitial: 'R', fromColor: C.Rahul, toInitial: 'B', toColor: C.Bilal, text: 'Rahul owes Bilal', amount: '₹2,000', border: '0' },
+        { fromInitial: 'N', fromColor: C.Neha, toInitial: 'B', toColor: C.Bilal, text: 'Neha owes Bilal', amount: '₹1,700', border: '1px solid #263330' },
+        { fromInitial: 'R', fromColor: C.Rahul, toInitial: 'N', toColor: C.Neha, text: 'Rahul owes Neha', amount: '₹150', border: '1px solid #263330' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
