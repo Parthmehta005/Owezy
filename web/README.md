@@ -76,27 +76,99 @@ Each push to `main` redeploys automatically. The server region (Mumbai, `bom1`) 
 ### 4. Production (M7)
 This moves the live address (`https://owezy-chi.vercel.app`) onto the **prod** project, `owezy`. Every other deployment (previews of branches) stays on **dev**. The prod database starts **empty**: groups made while testing on dev don't move over.
 
-Part A, before the switch, so prod's database is ready first:
+#### Part A: prod's database (done before the switch)
 1. In Supabase, open the **owezy** (prod) project. Check that **Project Settings → General** shows the region **South Asia (Mumbai)**.
 2. Click **Connect** → **Session pooler**, copy the connection string, and put the prod database password in place of `[YOUR-PASSWORD]`. Save it in a new file `web/.env.prod.local` as `SUPABASE_PROD_DB_URL=<that string>`. This file is gitignored and only `npm run db:push:prod` reads it. Never put it in Vercel.
 3. Tell Claude. Claude then runs `npm run db:push:prod`, which shows what it would apply, and then applies the migrations to prod.
 
-Part B, sign-in on prod:
-4. Google Cloud → **APIs & Services → Credentials** → your OAuth client: under **Authorized redirect URIs**, make sure `https://<prod-ref>.supabase.co/auth/v1/callback` is there. The ref is the subdomain in the prod Project URL.
-5. Supabase **owezy → Authentication → Sign In / Providers → Google**: turn it on, paste the same Client ID and secret as dev, and save.
-6. Supabase **owezy → Authentication → URL Configuration**: set **Site URL** to `https://owezy-chi.vercel.app`. Under **Redirect URLs**, add `https://owezy-chi.vercel.app/**`. Save.
-7. Google Cloud → **OAuth consent screen**: while it's in "Testing", only the Gmail addresses listed under **Test users** can sign in. Add your friends there, or click **Publish app**. Owezy asks only for name and email, so Google doesn't need to review it.
+Do Parts B, C and D in order. Each step says where to click and what you should see. Keep two browser tabs open: **Supabase** (https://supabase.com/dashboard) and **Google Cloud** (https://console.cloud.google.com).
 
-Part C, the switch in Vercel (project → **Settings → Environment Variables**):
-8. For `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, edit each one and untick **Production**, leaving **Preview** and **Development** ticked. These keep the dev values.
-9. Add both names again with the **prod** values (Supabase **owezy → Project Settings → Data API** and **API Keys**), ticking only **Production**.
-10. **Deployments** → the latest Production deployment → **⋯ → Redeploy**. Environment changes only apply to new deployments.
+#### Part B: sign-in on prod (about 10 minutes)
 
-Part D, testing previews (optional but recommended):
-11. **Settings → Deployment Protection**: leave **Vercel Authentication** on for previews. Under **Protection Bypass for Automation**, create a secret and add it to `web/.env.test.local` as `VERCEL_AUTOMATION_BYPASS_SECRET=<secret>`. The browser tests use it to get past the login wall.
-12. Preview addresses look like `owezy-git-<branch>-<team>.vercel.app`. In Supabase **owezy-dev → Authentication → URL Configuration → Redirect URLs**, add `https://owezy-*-<team>.vercel.app/**`, with your team part copied from a real preview address.
+**B1. Find prod's sign-in callback address (Supabase)**
+1. In the Supabase dashboard, open the **owezy** project (not owezy-dev). Its name shows at the top left.
+2. In the left sidebar, click **Authentication** (the people icon).
+3. In Authentication's own menu, under **Configuration**, click **Sign In / Providers**.
+4. Scroll to the provider list and click **Google**. A panel opens on the right.
+5. Near the bottom of that panel is **Callback URL (for OAuth)**, which looks like `https://abcdefgh.supabase.co/auth/v1/callback`. Click its **Copy** button. Leave this panel open; you'll come back in B3.
 
-Then run the browser tests against a preview (they refuse to run unless it uses the dev project):
+**B2. Tell Google about that address (Google Cloud)**
+1. In Google Cloud, check the project picker at the top left shows your Owezy project. If not, click it and choose it.
+2. Click the menu (☰) at the top left → **APIs & Services** → **Credentials**. (Newer consoles call this page **Google Auth Platform → Clients**; either works.)
+3. Under **OAuth 2.0 Client IDs** (or **Clients**), click the client you made in step 2, e.g. "Web client 1".
+4. Scroll to **Authorized redirect URIs**. One line already holds the dev address (`https://<dev-ref>.supabase.co/auth/v1/callback`).
+5. Click **+ Add URI** and paste the prod address you copied in B1.
+6. Click **Save** at the bottom. "OAuth client saved" appears. It can take a few minutes to take effect.
+7. Stay on this page, because B3 needs the **Client ID** and **Client secret**:
+   - **Client ID** is shown at the top right (ends in `.apps.googleusercontent.com`). Copy it.
+   - **Client secret**: if you can't see or copy it (Google now hides old secrets), click **+ Add secret**, then copy the new secret it shows. The old secret keeps working for dev, so nothing breaks.
+
+**B3. Turn on Google sign-in in prod (Supabase)**
+1. Back in the Supabase tab, in the **Google** panel of the **owezy** project:
+2. Switch on **Enable Sign in with Google**.
+3. Paste the Client ID into **Client IDs**, and the secret into **Client Secret (for OAuth)**.
+4. Click **Save**. Google now shows as **Enabled** in the provider list.
+
+**B4. Tell prod which website it belongs to (Supabase)**
+1. Still in **owezy → Authentication**, under **Configuration**, click **URL Configuration**.
+2. In **Site URL**, delete what's there (probably `http://localhost:3000`) and type `https://owezy-chi.vercel.app`. Click **Save changes**.
+3. Under **Redirect URLs**, click **Add URL**, type `https://owezy-chi.vercel.app/**` (with the two stars), and click **Save URLs**. It now appears in the list.
+
+**B5. Let your friends sign in (Google Cloud)**
+While the Google app is in "Testing", only Gmail addresses you list can sign in. Choose one of these:
+- **Publish (easiest for a group of friends):** ☰ → **APIs & Services** → **OAuth consent screen** (newer consoles: **Google Auth Platform → Audience**) → **Publish app** → **Confirm**. Owezy only asks for name and email, so Google doesn't review it.
+  - Friends may see a "Google hasn't verified this app" notice. They tap **Advanced → Go to …** once.
+- **Or list them:** on the same page, under **Test users**, click **+ Add users**, enter each friend's Gmail, and **Save**. The limit is 100 people.
+
+#### Part C: point the live site at prod (Vercel, about 5 minutes)
+Do this only after Part B. The prod database is already set up (Part A).
+
+**C1. Get prod's two values (Supabase)**
+1. In the **owezy** project, click the gear icon (**Project Settings**) at the bottom of the left sidebar.
+2. Click **Data API** and copy the **Project URL** (`https://<prod-ref>.supabase.co`). Paste it into a notepad for a minute.
+3. Click **API Keys** and copy the **Publishable key** (starts with `sb_publishable_`). Paste it into the notepad too. Do **not** use the secret key.
+
+**C2. Keep the existing (dev) values for previews only (Vercel)**
+1. Go to https://vercel.com, open the **owezy** project, and click **Settings** (top tabs) → **Environment Variables** (left).
+2. You'll see `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, each labelled **All Environments** (or Production, Preview, Development).
+3. For `NEXT_PUBLIC_SUPABASE_URL`, click the **⋯** at the end of its row → **Edit**.
+4. Under **Environments**, untick **Production**, leaving **Preview** and **Development** ticked. Don't change the value. Click **Save**.
+5. Do the same for `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+6. Both rows now say **Preview, Development**.
+
+**C3. Add the prod values for Production (Vercel)**
+1. On the same page, find the form to add a variable (at the top, or the **Add New** / **Add Environment Variable** button).
+2. **Key:** `NEXT_PUBLIC_SUPABASE_URL`. **Value:** the prod Project URL from C1. **Environments:** only **Production**. Click **Save**.
+3. Again with **Key:** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, **Value:** the prod publishable key, **Environments:** only **Production**. **Save**.
+4. You now have four rows: two for **Production** (prod values) and two for **Preview, Development** (dev values).
+
+**C4. Rebuild the live site with the new values (Vercel)**
+1. Click the **Deployments** tab at the top.
+2. The top row with a **Production** label (and **Current**) is the live one. Click the **⋯** at the end of that row → **Redeploy** → **Redeploy** again to confirm.
+3. Wait until it shows **Ready** (about 1–2 minutes).
+4. On your phone, open https://owezy-chi.vercel.app and sign in with Google. You should land on **New group**, because prod is empty. Your test groups stay on dev.
+
+Then tell Claude, who checks that the site really uses prod (without creating anything there).
+
+#### Part D: let Claude test preview links (Vercel, optional, about 5 minutes)
+Previews are the copies Vercel builds for branches other than `main`. They use dev, and Vercel puts a login wall in front of them.
+
+**D1. Create a pass for the browser tests (Vercel)**
+1. In the **owezy** project → **Settings** → **Deployment Protection** (left).
+2. Leave **Vercel Authentication** on (**Standard Protection**), so strangers can't open previews.
+3. Scroll to **Protection Bypass for Automation** and click **Add Secret** (or **Create**). Leave the note empty or type "playwright", and confirm.
+4. Copy the secret it shows.
+
+**D2. Save it on your computer**
+1. Open the file `web/.env.test.local` in VS Code or Notepad. It already has a `SUPABASE_DEV_DB_URL=...` line.
+2. Add a new line: `VERCEL_AUTOMATION_BYPASS_SECRET=<paste the secret>`. Save. (The file is gitignored, so it never goes to GitHub.)
+
+**D3. Allow sign-in on preview addresses (Supabase, owezy-dev)**
+1. In Vercel, open **Deployments** and click any deployment. Under **Domains** you'll see an address like `owezy-git-main-parths-projects-1a2b3c.vercel.app`. The part after `owezy-git-main-` is your team part, here `parths-projects-1a2b3c`.
+2. In Supabase, open **owezy-dev** (the dev one) → **Authentication** → **URL Configuration**.
+3. Under **Redirect URLs**, click **Add URL**, type `https://owezy-*-<team part>.vercel.app/**` (e.g. `https://owezy-*-parths-projects-1a2b3c.vercel.app/**`), and **Save URLs**.
+
+Then tell Claude. Claude can push a test branch, wait for its preview, and run all the browser tests against it:
 
 ```bash
 E2E_BASE_URL=https://<preview-address> npm run test:e2e            # bash
