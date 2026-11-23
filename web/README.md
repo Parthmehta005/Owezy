@@ -115,10 +115,12 @@ Do Parts B, C and D in order. Each step says where to click and what you should 
 3. Under **Redirect URLs**, click **Add URL**, type `https://owezy-chi.vercel.app/**` (with the two stars), and click **Save URLs**. It now appears in the list.
 
 **B5. Let your friends sign in (Google Cloud)**
-While the Google app is in "Testing", only Gmail addresses you list can sign in. Choose one of these:
-- **Publish (easiest for a group of friends):** ☰ → **APIs & Services** → **OAuth consent screen** (newer consoles: **Google Auth Platform → Audience**) → **Publish app** → **Confirm**. Owezy only asks for name and email, so Google doesn't review it.
-  - Friends may see a "Google hasn't verified this app" notice. They tap **Advanced → Go to …** once.
-- **Or list them:** on the same page, under **Test users**, click **+ Add users**, enter each friend's Gmail, and **Save**. The limit is 100 people.
+While the Google app's publishing status is **Testing**, only the Gmail addresses you list can use Google sign-in. That's the simplest setup for a group of friends:
+1. Click ☰ → **Google Auth Platform** → **Audience**. (Older consoles: **APIs & Services → OAuth consent screen**.)
+2. Leave **Publishing status** as **Testing**. Don't click Publish.
+3. Under **Test users**, click **+ Add users**, enter each friend's Gmail (one per line), and **Save**. Up to 100 people. Add new friends here before they try Google sign-in. Email-link sign-in works for anyone without this.
+
+Publishing (so anyone can use Google sign-in) needs a home page, a privacy policy page and an authorized domain on the **Branding** page. Owezy has no privacy page yet, and Google may not accept a `vercel.app` address as your domain. Leave publishing until Owezy has a privacy page, and ideally its own domain.
 
 #### Part C: point the live site at prod (Vercel, about 5 minutes)
 Do this only after Part B. The prod database is already set up (Part A).
