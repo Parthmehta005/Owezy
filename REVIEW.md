@@ -77,6 +77,6 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 - [ ] Lighthouse mobile scores: Performance ≥ 90, Accessibility ≥ 95.
 - [ ] Installs as a PWA on Android/iOS.
-- [ ] Vercel and Supabase run in Mumbai.
+- [x] Vercel and Supabase run in Mumbai. (Vercel functions in bom1 via vercel.json; both Supabase projects on ap-south-1, prod confirmed when its migrations were applied.)
 - [ ] Production sign-in redirect URLs are set.
 - [ ] Playwright two-user tests pass against the preview deploy.
