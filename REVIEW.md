@@ -76,7 +76,7 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 ## M7. Polish & deploy
 
 - [x] Lighthouse mobile scores: Performance ≥ 90, Accessibility ≥ 95. (Owner ran Lighthouse in Chrome DevTools on the live prod site: 99 / 100 on both the login and group pages. The remaining unscored hints are Next.js's own polyfills and shared bundle, plus the single 11 KB stylesheet.)
-- [ ] Installs as a PWA on Android/iOS.
+- [ ] Installs as a PWA on Android/iOS. (Android: verified by the owner on the live site; icon, full-screen launch into the group, and pull-to-refresh all work. iPhone: still to check, since the owner has no iPhone yet. Open follow-up, see ROADMAP.)
 - [x] Vercel and Supabase run in Mumbai. (Vercel functions in bom1 via vercel.json; both Supabase projects on ap-south-1, prod confirmed when its migrations were applied.)
 - [x] Production sign-in redirect URLs are set. (Owner signed in with Google on https://owezy-chi.vercel.app and created a group; it landed in the prod database.)
 - [x] Playwright two-user tests pass against the preview deploy. (51 tests x 2 engines on a protected branch preview via the bypass secret; the guard refuses the live site because it uses prod.)

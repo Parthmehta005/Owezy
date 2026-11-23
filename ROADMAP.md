@@ -185,7 +185,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Simplify toggle + payment-count line
 - [x] Tests for view numbers vs `core/` on a fixture group
 
-### ⬜ M7. Polish and deploy
+### ✅ M7. Polish and deploy
 **Goal:** the app is live on a `*.vercel.app` URL against the prod Supabase project. It installs to a phone's home screen, both test users can use it on their phones, and it meets the Lighthouse targets in REVIEW.md.
 **Scope:** in: PWA manifest and real icons (replacing Next's default favicon), loading/empty/error states, pull-to-refresh, switching Vercel production to the prod project, prod migrations and sign-in URLs, Playwright against the preview deploy, Lighthouse fixes. Out: everything in "Not in v1".
 - [x] App icon, favicon and `manifest.ts`
@@ -193,7 +193,7 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 - [x] Apply migrations to prod; prod sign-in redirect URLs (owner steps)
 - [x] Switch the Vercel production environment to the `owezy` (prod) project; preview deployments stay on `owezy-dev`
 - [x] Pull-to-refresh in the installed app (iPhone home-screen apps have none built in)
-- [ ] Playwright against preview; Lighthouse fixes; phone test
+- [x] Playwright against preview; Lighthouse fixes; phone test
 
 ## Verification
 - `npm run test`: Vitest runs the applicable ported cases from `test_logic.py` (splits, rounding, netting, settle-to-zero) plus the new ones.
@@ -203,6 +203,9 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
   - Both edit the same expense; the second save gets the conflict message.
   - B joins through the invite link and claims a placeholder name.
 - Manual: open the Vercel link on a phone, add it to the home screen, and add an expense in 3 taps plus typing.
+
+## Open follow-up from v1
+- [ ] iPhone home-screen check (REVIEW.md M7): add to the home screen from Safari, then check it opens full-screen into the group, pull-to-refresh works, the clock and battery are readable, and nothing sits under the notch or home bar. Android is verified; the iPhone engine is covered by Playwright (WebKit), but not on a real device.
 
 ## Not in v1 (planned add-ons)
 - Live updates (Supabase Realtime)
