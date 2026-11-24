@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { CloudOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOnline } from "@/lib/hooks/use-online";
 
@@ -11,7 +12,10 @@ export default function ErrorPage({ error, retry }: { error: unknown; retry: () 
   useEffect(() => console.error(error), [error]);
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 pt-[env(safe-area-inset-top)] text-center">
-      <h1 className="text-xl font-semibold">{online ? "Something went wrong" : "You're offline"}</h1>
+      <span aria-hidden className="flex size-14 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+        <CloudOff className="size-7" />
+      </span>
+      <h1 className="text-xl font-bold">{online ? "Something went wrong" : "You're offline"}</h1>
       <p className="max-w-xs text-muted-foreground">
         {online
           ? "This screen didn't load. It's usually a passing hiccup, so try again."

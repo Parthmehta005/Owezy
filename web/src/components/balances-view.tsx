@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Smartphone } from "lucide-react";
+import { Bell, CheckCheck, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "cn";
 import { Avatar } from "@/components/avatar";
@@ -30,7 +30,10 @@ export function BalancesView({
   if (raw.length === 0) {
     return (
       <section aria-labelledby="balances-heading" className="flex flex-col items-center gap-2 py-12 text-center">
-        <h2 id="balances-heading" className="text-lg font-semibold">
+        <span aria-hidden className="mb-2 flex size-14 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+          <CheckCheck className="size-7" />
+        </span>
+        <h2 id="balances-heading" className="text-lg font-bold">
           All settled up
         </h2>
         <p className="max-w-xs text-sm text-muted-foreground">No one owes anyone in this group.</p>

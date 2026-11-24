@@ -44,7 +44,7 @@ async function Join({ params }: { params: PageProps<"/join/[code]">["params"] })
     <>
       <div className="space-y-1 text-center">
         <p className="text-sm text-muted-foreground">You&apos;re invited to</p>
-        <h1 className="text-3xl font-semibold tracking-tight">{preview.groupName}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">{preview.groupName}</h1>
       </div>
       <JoinForm code={code} unclaimed={preview.unclaimed} defaultName={profile.displayName} />
     </>

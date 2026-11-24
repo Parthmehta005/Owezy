@@ -16,7 +16,7 @@ export default function NewGroupPage() {
         <Link href="/" className="-ml-2 inline-flex min-h-11 items-center rounded px-2 text-sm text-muted-foreground hover:text-foreground">
           Cancel
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">New group</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight">New group</h1>
         <p className="text-muted-foreground">Name it, add the people, and start splitting.</p>
       </div>
       <Suspense

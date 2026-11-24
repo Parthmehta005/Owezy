@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar } from "@/components/avatar";
 import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +29,7 @@ export function JoinForm({
 
       {unclaimed.length > 0 && (
         <section aria-labelledby="claim-heading" className="space-y-3">
-          <h2 id="claim-heading" className="font-medium">
+          <h2 id="claim-heading" className="font-semibold">
             Which one are you?
           </h2>
           <ul className="grid grid-cols-2 gap-2">
@@ -38,6 +39,7 @@ export function JoinForm({
                   <input type="hidden" name="code" value={code} />
                   <input type="hidden" name="claim_member_id" value={m.id} />
                   <Button type="submit" variant="outline" size="lg" className="w-full" disabled={pending}>
+                    <Avatar id={m.id} name={m.displayName} size="xs" />
                     <span className="sr-only">I&apos;m </span>
                     <span className="truncate">{m.displayName}</span>
                   </Button>
@@ -49,7 +51,7 @@ export function JoinForm({
       )}
 
       <section aria-labelledby="new-heading" className="space-y-3">
-        <h2 id="new-heading" className="font-medium">
+        <h2 id="new-heading" className="font-semibold">
           {unclaimed.length > 0 ? "Not on the list?" : "Your name in this group"}
         </h2>
         <form action={action} className="flex gap-2">

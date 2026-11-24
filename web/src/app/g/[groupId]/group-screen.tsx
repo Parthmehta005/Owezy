@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Pencil, Plus, Settings } from "lucide-react";
+import { Pencil, Plus, ReceiptText, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
 import { AvatarColors } from "@/components/avatar";
 import { BalanceSummary } from "@/components/balance-summary";
@@ -223,10 +223,13 @@ export function GroupScreen({
           <TabsContent value="expenses" className="flex flex-col text-base">
             {bundle.expenses.length === 0 ? (
               <section aria-labelledby="expenses-heading" className="flex flex-1 flex-col items-center justify-center gap-2 py-12 text-center">
-                <h2 id="expenses-heading" className="text-lg font-medium">
+                <span aria-hidden className="mb-2 flex size-14 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
+                  <ReceiptText className="size-7" />
+                </span>
+                <h2 id="expenses-heading" className="text-lg font-bold">
                   No expenses yet
                 </h2>
-                <p className="max-w-xs text-sm text-muted-foreground">Expenses added to this group will show up here.</p>
+                <p className="max-w-xs text-sm text-muted-foreground">Tap Add expense to log the first one. Everyone in the group will see it.</p>
               </section>
             ) : (
               <ExpenseList

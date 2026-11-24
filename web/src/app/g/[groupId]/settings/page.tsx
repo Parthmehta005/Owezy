@@ -28,7 +28,7 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
 
   return (
     <>
-      <header className="sticky top-0 z-10 flex items-center gap-1 border-b bg-background/95 px-2 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-1 bg-background/95 px-2 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
         <Link
           href={`/g/${group.id}`}
           className="flex min-h-11 min-w-0 items-center gap-1 rounded-md px-2 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -37,24 +37,26 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
           <span className="truncate">{group.name}</span>
         </Link>
       </header>
-      <main className="flex flex-1 flex-col gap-10 px-4 py-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+      <main className="flex flex-1 flex-col gap-8 px-4 pt-2 pb-8">
+        <h1 className="px-1 text-2xl font-extrabold tracking-tight">Settings</h1>
 
-        <section aria-labelledby="invite-heading" className="space-y-3">
-          <h2 id="invite-heading" className="font-medium">
+        <section aria-labelledby="invite-heading" className="space-y-2">
+          <h2 id="invite-heading" className="px-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
             Invite people
           </h2>
-          <InviteLink code={view.inviteCode} groupName={group.name} />
+          <div className="rounded-2xl bg-card p-4">
+            <InviteLink code={view.inviteCode} groupName={group.name} />
+          </div>
         </section>
 
         <RenameForm groupId={group.id} name={group.name} />
 
-        <section aria-labelledby="members-heading" className="space-y-4">
-          <h2 id="members-heading" className="font-medium">
+        <section aria-labelledby="members-heading" className="space-y-2">
+          <h2 id="members-heading" className="px-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
             Members
           </h2>
           <AvatarColors memberIds={members.map((m) => m.id)}>
-            <ul className="divide-y border-y">
+            <ul className="divide-y rounded-2xl bg-card px-4">
               {members.map((m) => (
                 <MemberRow key={m.id} groupId={group.id} member={m} />
               ))}

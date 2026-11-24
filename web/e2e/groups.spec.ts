@@ -80,7 +80,9 @@ test("two people share a group through an invite link", async ({ browser }, test
   const c = await phoneFor(browser, testInfo, await createDevUser("chitra", "Chitra"));
   const pageC = await c.newPage();
   await pageC.goto(invite);
-  await expect(pageC.locator("#claim-heading + ul button")).toHaveText(["I'm Neha"]);
+  const claimable = pageC.locator("#claim-heading + ul button");
+  await expect(claimable).toHaveCount(1);
+  await expect(claimable).toHaveAccessibleName("I'm Neha");
 
   await Promise.all([a.close(), b.close(), c.close()]);
 });

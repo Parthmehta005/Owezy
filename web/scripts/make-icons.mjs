@@ -14,7 +14,7 @@ const DEST = {
   "icon-maskable-512.png": "public/icon-maskable-512.png",
 };
 const out = (name) => DEST[name] ?? `${TMP}/${name}`;
-const BG = "#4f39f6";
+const BG = "#2457d6"; // cobalt, the app's brand colour (M8)
 // A coin split in two: two half-discs pulled apart along a diagonal.
 // Drawn on a 512 canvas around the centre; `scale` shrinks the mark for maskable safe zones.
 const mark = (scale) => `
