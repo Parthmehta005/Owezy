@@ -1,4 +1,6 @@
-# M8 design directions (waiting for the owner's pick)
+# M8 design directions
+
+**Decided 2026-11-24:** a mix, mostly A, with C's sharper balance box and new UX. The full list is in [ROADMAP.md](../../ROADMAP.md) under M8. Kept here for reference.
 
 **View them here:** https://claude.ai/artifact/7aSrNyYzcq8xXZacMGWMCF (private to the owner; open it while signed in to claude.ai).
 

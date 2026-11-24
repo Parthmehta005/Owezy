@@ -211,26 +211,45 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
 v1 works, but it looks like a template: stock shadcn styling, a plain-text summary, text-only rows and a bare balances list. v2 starts with a design pass, then adds features **one milestone at a time, each only after the owner's go-ahead**. The order below is a suggestion and can be changed before a milestone starts.
 
 ### ⬜ M8. A better UI
-**Goal:** the owner picks a design direction from mockups, and every screen is rebuilt in it. Opening a group answers "where do I stand, and with whom?" at a glance, and the app looks like a product rather than a template, in light and dark mode on Android and iPhone. All existing tests still pass, and the mobile rules (44px taps, keyboard-safe sheets, safe areas, Lighthouse ≥ 90/95) still hold.
-**Scope:** in: visual design system, layout and component restyle of every existing screen, avatars, motion, empty states, screenshot tests. Out: new features (categories, settle-up and so on come in later milestones); behaviour changes beyond layout. The Expenses / Balances / add-sheet flows keep working the same way.
-**Ideas the mockups will explore:**
-- A brand palette and a display typeface for amounts. Dark mode tinted with the brand colour, not flat grey.
-- Coloured initial avatars per member, used wherever a name appears.
-- A balance card at the top: your total, plus the people behind it ("Rahul owes you ₹700 · Neha ₹1,300"). The members row moves into the header (avatar stack) and settings.
-- Expense rows with the payer's avatar and a coloured "you lent / you owe" amount. Whole rupees drop the ".00" (₹900, but ₹10.50).
-- Balances as one card per person ("You ↔ Rahul") showing direction, with the simplified view as a short list of payments.
-- Warmer empty states with a clear next step. Light motion (rows sliding in, the total counting to its new value, tab transitions) that respects "reduce motion".
-- [ ] Design direction: 2–3 mockups of the group screen, balances and add sheet (light + dark, phone size). The owner picks one; the choices (colours, type, radius, density) are recorded here
-  - Mockups made 2026-11-24, waiting for the owner's pick: see [design/m8-directions/README.md](design/m8-directions/README.md)
-- [ ] Design tokens: palette, type scale, radius, shadows, tinted dark mode, applied to `globals.css` and the `ui/` components; contrast ≥ 4.5:1 checked for every pair
-- [ ] Member avatars (deterministic colour per member) across chips, rows, pickers and balances
-- [ ] Group screen: balance card with the per-person breakdown, header avatar stack, restyled tabs and add button
-- [ ] Expense list: avatar rows, effect amounts, sticky date headers, whole rupees without ".00" (`formatInr` option + tests)
-- [ ] Balances: per-person cards and the simplified payments list
-- [ ] Add/edit sheet restyle (same flow, same 3 taps, number pad still opens straight away)
+**Goal:** every screen is rebuilt in the direction the owner chose (mostly design A, plus C's sharper balance box and new UX, recorded below), in light and dark mode on Android and iPhone:
+- Opening a group answers "where do I stand, and with whom?" at a glance.
+- The default group follows how often and how recently you open each one.
+- A half-filled expense can be minimised and resumed.
+
+All existing tests still pass (updated where the UI changed), and the mobile rules (44px taps, keyboard-safe sheets, safe areas, Lighthouse ≥ 90/95) still hold.
+**Scope:** in: design tokens, avatars (Google photo or letter), the frecency default group, whole-rupee amounts, and restyled group, balances and add screens with the UX below, the Pay/Remind "coming soon" UI, minimise/resume, the other screens restyled, light motion, screenshot tests. Out: real payments or reminders (M9); categories and the rest of v2.
+**Owner's decisions (2026-11-24, from the mockups in [design/m8-directions](design/m8-directions/README.md)):**
+- **Group screen:**
+  - Opens the group you open most often, weighted toward recent opens. A dropdown switches groups.
+  - Top right: the first 3 member avatars (you first), a ⋯ that opens a sheet listing all members, and the settings gear.
+  - Avatars are the Google photo when there is one, else a coloured letter, everywhere a person appears.
+  - The balance box is filled with the brand colour, with ~8px corners and no lines between the people in it.
+  - Expense rows have a round payer avatar; the rest is as in design A. The members chip row goes away.
+- **Balances (as in A):**
+  - The Simplify switch on top. On turns both sections into payments: yours under "You and each person", the rest under "Between others".
+  - Cards in "You and each person" have **Pay** (you owe) and **Remind** (they owe you), both "Coming soon" until M9.
+- **Add expense (as in A):**
+  - Order: amount, what for, Paid by (defaults to you; expands inline; picking collapses it) with a Today chip beside it, an Equally | Unequally toggle, then the people list, always visible.
+  - Unequal: once all but one person have amounts, the one untouched field fills with what's left ("auto"); typing in it makes it manual.
+  - Minimise: the collapse button, swipe-down or tapping outside keep the draft on the phone until it's saved or discarded. A "Continue expense" bar reopens it. Cancel discards, with a confirm.
+- **Colours** (not green, no purple, no gradients):
+  - Cobalt blue brand (`#2457D6` light, `#7FA4FF` dark) on a cool grey / blue-black page.
+  - "You get back" is cobalt and "you owe" is burnt orange (`#C2410C` / `#FF9A5C`).
+  - Plus Jakarta Sans. Whole rupees drop ".00".
+- **Default group algorithm:** each open adds 1 to a score on your member row, after decaying it with a 7-day half-life; re-opens within 30 minutes don't count. Home opens the highest decayed score, and the switcher uses the same order.
+- [x] Design direction: mockups made; the owner picked a mix (above)
+- [ ] Design tokens (palette, font, radii; `ui/` primitives restyled) + a test that every text/background pair is ≥ 4.5:1
+- [ ] Avatars: `members.avatar_url` (migration, trigger, backfill, pgTAP) + `Avatar` component everywhere
+- [ ] Frecency default group: migration + `record_group_open` RPC + `core/frecency.ts` + home and switcher order
+- [ ] Whole rupees without ".00" (`formatInr` option)
+- [ ] Group screen: header avatars + ⋯ members sheet + gear, balance box, avatar rows
+- [ ] Balances: Simplify on top, "You and each person" with Pay/Remind (coming soon), "Between others"
+- [ ] Add sheet layout: amount, what for, Paid by (inline) + date chip, split toggle, people list
+- [ ] Unequal auto-fill of the last untouched person (`autoFillRemainder` in `core/splits.ts`)
+- [ ] Minimise and resume the add/edit sheet (draft kept on the phone)
 - [ ] Sign-in, new group, join, settings, error and empty screens restyled
-- [ ] Motion, with `prefers-reduced-motion` respected
-- [ ] Playwright screenshot tests of key screens (light/dark, both engines); tap-size, contrast and Lighthouse re-checked; owner checks on a phone
+- [ ] Light motion, off with "reduce motion"
+- [ ] Screenshot tests, full e2e on both engines, tap sizes, Lighthouse, prod migration, owner's phone check
 
 ### ⬜ M9. Settle up (and pay with UPI)
 **Goal:** from Balances, either person can record "Rahul paid Asha ₹700", and everyone's balances drop accordingly. If the person being paid has added a UPI ID, **Pay with UPI** opens the payer's UPI app (GPay, PhonePe, Paytm…) with the amount filled in; after paying, they confirm it in Owezy. Payments show in the expense list and can be edited or deleted with Undo, like expenses.

@@ -83,11 +83,15 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 
 ## M8. A better UI
 
-- [ ] The owner chose a direction from the mockups, and the chosen tokens are written in ROADMAP.md.
+- [x] The owner chose a direction from the mockups, and the decisions are written in ROADMAP.md.
 - [ ] Every screen uses the new tokens and components (no leftover stock styling), in light and dark mode.
 - [ ] The group screen shows your total and the people behind it without scrolling, on a small phone (360×640).
 - [ ] Add an expense is still 3 taps plus typing, and the number pad still opens straight away.
-- [ ] Every text/background pair is ≥ 4.5:1; every tap target ≥ 44px; motion is off with "reduce motion".
+- [ ] Unequal auto-fill gives the last untouched person exactly the remainder; saved shares add up to the total.
+- [ ] A minimised expense survives a reload and is saved exactly once.
+- [ ] Opening a group often makes it the default; a group opened once long ago doesn't win.
+- [ ] Members' Google photos show to fellow members only; a broken photo falls back to the letter.
+- [ ] Every text/background pair is ≥ 4.5:1 (tested); every tap target ≥ 44px; motion is off with "reduce motion".
 - [ ] Screenshot tests cover the key screens in light/dark on both engines; the full e2e suite passes.
 - [ ] Lighthouse mobile still ≥ 90 performance, ≥ 95 accessibility.
 - [ ] Owner checked it on a phone.
