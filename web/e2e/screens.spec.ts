@@ -1,5 +1,5 @@
 import type { Browser, Page, TestInfo } from "@playwright/test";
-import { expect, test } from "./support/test";
+import { expect, passVercelProtection, test } from "./support/test";
 import { cleanupDevUsers, closeDb, createDevUser, phoneFor, type DevUser } from "./support/dev-users";
 
 /**
@@ -86,6 +86,7 @@ for (const scheme of ["light", "dark"] as const) {
 test("on a small phone, your total and who's behind it fit without scrolling", async ({ browser }, testInfo) => {
   const { asha, groupId } = await goaTrip("screens-small");
   const context = await browser.newContext({ ...testInfo.project.use, viewport: { width: 360, height: 640 } });
+  await passVercelProtection(context, testInfo.project.use.baseURL);
   await context.addCookies(asha.cookies.map((c) => ({ ...c, url: testInfo.project.use.baseURL! })));
   const page = await context.newPage();
   await page.goto(`/g/${groupId}`);
