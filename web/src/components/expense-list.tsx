@@ -71,7 +71,11 @@ function ExpenseRow({
 }) {
   const effect: Effect = meId ? expenseEffect(expense, meId) : { kind: "not_involved" };
   return (
-    <li data-testid="expense-row" data-pending={expense.pending || undefined}>
+    <li
+      data-testid="expense-row"
+      data-pending={expense.pending || undefined}
+      className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
+    >
       {/* Tap to edit. Not while it's still saving. */}
       <button
         type="button"

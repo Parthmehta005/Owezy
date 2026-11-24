@@ -248,7 +248,7 @@ All existing tests still pass (updated where the UI changed), and the mobile rul
 - [x] Unequal auto-fill of the last untouched person (`autoFillRemainder` in `core/splits.ts`)
 - [x] Minimise and resume the add/edit sheet (draft kept on the phone)
 - [x] Sign-in, new group, join, settings, error and empty screens restyled
-- [ ] Light motion, off with "reduce motion"
+- [x] Light motion, off with "reduce motion"
 - [ ] Screenshot tests, full e2e on both engines, tap sizes, Lighthouse, prod migration, owner's phone check
 
 ### ⬜ M9. Settle up (and pay with UPI)

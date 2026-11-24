@@ -1,8 +1,11 @@
+"use client";
+
 import { cn } from "cn";
 import { Avatar } from "@/components/avatar";
 import { formatRupees } from "@/core/money";
 import type { DebtLine, MySummary } from "@/lib/balances-view";
 import type { BundleMember } from "@/lib/data/bundle";
+import { useCountedNumber } from "@/lib/hooks/use-counted-number";
 
 /** How many people the box lists before "and N more". */
 const SHOWN = 3;
@@ -27,6 +30,7 @@ export function BalanceSummary({
 }) {
   const byId = new Map(members.map((m) => [m.id, m]));
   const filled = summary.kind !== "settled";
+  const total = useCountedNumber(summary.kind === "settled" ? 0 : summary.amountPaise);
   const rest = people.length - SHOWN;
   return (
     <section
@@ -44,7 +48,9 @@ export function BalanceSummary({
       ) : (
         <>
           <p className="text-sm font-semibold">{summary.kind === "gets_back" ? "You get back" : "You owe"}</p>
-          <p className="text-[2.75rem] leading-tight font-extrabold tracking-tight tabular-nums">{formatRupees(summary.amountPaise)}</p>
+          <p className="text-[2.75rem] leading-tight font-extrabold tracking-tight tabular-nums" data-testid="summary-total">
+            {formatRupees(total)}
+          </p>
         </>
       )}
       {filled && people.length > 0 && (
