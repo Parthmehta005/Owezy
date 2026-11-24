@@ -251,6 +251,7 @@ All existing tests still pass (updated where the UI changed), and the mobile rul
 - [x] Sign-in, new group, join, settings, error and empty screens restyled
 - [x] Light motion, off with "reduce motion"
 - [x] Screenshot tests, full e2e on both engines, tap sizes, Lighthouse, prod migration, owner's phone check (Lighthouse left to the owner, see Open follow-ups)
+- [x] Follow-up (owner request): light / dark / system switch in group settings, remembered on the phone
 
 ### ⬜ M9. Settle up (and pay with UPI)
 **Goal:** from Balances, either person can record "Rahul paid Asha ₹700", and everyone's balances drop accordingly. If the person being paid has added a UPI ID, **Pay with UPI** opens the payer's UPI app (GPay, PhonePe, Paytm…) with the amount filled in; after paying, they confirm it in Owezy. Payments show in the expense list and can be edited or deleted with Undo, like expenses.

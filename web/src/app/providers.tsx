@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
+import { ThemeColorSync } from "@/components/theme-switcher";
 import { Toaster } from "@/components/ui/sonner";
 
 let browserQueryClient: QueryClient | undefined;
@@ -30,6 +31,7 @@ function getQueryClient() {
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <ThemeColorSync />
       <QueryClientProvider client={getQueryClient()}>{children}</QueryClientProvider>
       {/* Bottom, where thumbs are, but above the + button and the iPhone home bar.
           Action buttons (Undo) are full 44px tap targets. */}

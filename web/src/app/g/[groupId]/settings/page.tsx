@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { AvatarColors } from "@/components/avatar";
 import { InviteLink } from "@/components/invite-link";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { getCurrentUser } from "@/lib/auth/user";
 import { getGroupView } from "@/lib/data/groups";
 import { AddMembersForm, LeaveGroup, MemberRow, RenameForm } from "./settings-forms";
@@ -50,6 +51,14 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
         </section>
 
         <RenameForm groupId={group.id} name={group.name} />
+
+        <section aria-labelledby="appearance-heading" className="space-y-2">
+          <h2 id="appearance-heading" className="px-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+            Appearance
+          </h2>
+          <ThemeSwitcher />
+          <p className="px-1 text-sm text-muted-foreground">Saved on this phone, for all your groups.</p>
+        </section>
 
         <section aria-labelledby="members-heading" className="space-y-2">
           <h2 id="members-heading" className="px-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
