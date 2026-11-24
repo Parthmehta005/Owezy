@@ -86,6 +86,14 @@ export async function setAvatar(user: DevUser, url: string) {
   );
 }
 
+/** Pretend a user has a usage history in a group (their frecency score, as of `daysAgo`). */
+export async function setGroupUsage(user: DevUser, groupId: string, score: number, daysAgo: number) {
+  await (await db()).query(
+    "update public.members set open_score = $3, opened_at = now() - make_interval(days => $4) where user_id = $1 and group_id = $2",
+    [user.id, groupId, score, daysAgo],
+  );
+}
+
 /** Put a user's session cookies into a browser context. */
 export async function signIn(context: BrowserContext, user: DevUser, baseURL: string) {
   await context.addCookies(user.cookies.map((c) => ({ ...c, url: baseURL })));

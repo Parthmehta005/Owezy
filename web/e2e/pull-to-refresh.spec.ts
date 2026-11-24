@@ -24,8 +24,8 @@ async function openGroup(browser: Browser, testInfo: TestInfo, tag: string, inst
     });
   }
   const page = await context.newPage();
-  // Server-rendered, so it shows before its scripts are live; this save is sent once hydrated.
-  const hydrated = page.waitForRequest((r) => r.url().includes("/rest/v1/profiles"));
+  // Server-rendered, so it shows before its scripts are live; this visit is recorded once hydrated.
+  const hydrated = page.waitForRequest((r) => r.url().includes("/rest/v1/rpc/record_group_open"));
   await page.goto(`/g/${groupId}`);
   await hydrated;
   await expect(page.getByRole("heading", { name: "No expenses yet" })).toBeVisible();

@@ -20,13 +20,13 @@ export default function GroupPage({ params }: PageProps<"/g/[groupId]">) {
 async function Group({ params }: { params: PageProps<"/g/[groupId]">["params"] }) {
   const { groupId } = await params;
   const user = await getCurrentUser();
-  const [{ bundle, loadedAt }, groups] = await Promise.all([loadBundle(groupId, user.id), listMyGroups()]);
+  const [{ bundle, loadedAt }, groups] = await Promise.all([loadBundle(groupId, user.id), listMyGroups(user.id)]);
   if (!bundle) notFound();
 
   // The server's copy seeds the browser cache, which then keeps it fresh.
   return (
     <>
-      <RememberLastGroup userId={user.id} groupId={bundle.group.id} />
+      <RememberLastGroup groupId={bundle.group.id} />
       <GroupScreen groupId={groupId} userId={user.id} initial={bundle} initialAt={loadedAt} groups={groups} />
     </>
   );

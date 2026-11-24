@@ -4,19 +4,17 @@ import { useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 /**
- * Records the open group as the user's last group, so "/" brings them back
- * here next time. RLS only accepts a group the user is in. Best effort: a
- * failure here just means "/" picks a different group.
+ * Counts this visit towards the group's "frecency" score, which decides the
+ * group "/" opens (see core/frecency.ts and public.record_group_open). Best
+ * effort: a failure only means this visit isn't counted.
  */
-export function RememberLastGroup({ userId, groupId }: { userId: string; groupId: string }) {
+export function RememberLastGroup({ groupId }: { groupId: string }) {
   useEffect(() => {
     // Supabase queries are lazy: nothing is sent until the builder is awaited
     // or .then() is called, so `void query` alone would silently do nothing.
     createClient()
-      .from("profiles")
-      .update({ last_group_id: groupId })
-      .eq("id", userId)
+      .rpc("record_group_open", { group_id: groupId })
       .then(() => undefined);
-  }, [userId, groupId]);
+  }, [groupId]);
   return null;
 }

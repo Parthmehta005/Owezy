@@ -135,6 +135,8 @@ export type Database = {
           display_name: string;
           group_id: string;
           id: string;
+          open_score: number;
+          opened_at: string | null;
           sort_order: number;
           user_id: string | null;
         };
@@ -145,6 +147,8 @@ export type Database = {
           display_name: string;
           group_id: string;
           id?: string;
+          open_score?: number;
+          opened_at?: string | null;
           sort_order?: never;
           user_id?: string | null;
         };
@@ -154,6 +158,8 @@ export type Database = {
           display_name?: string;
           group_id?: string;
           id?: string;
+          open_score?: number;
+          opened_at?: string | null;
           sort_order?: never;
           user_id?: string | null;
         };
@@ -266,6 +272,7 @@ export type Database = {
         Args: { claim_member_id?: string; code: string; new_name?: string };
         Returns: string;
       };
+      record_group_open: { Args: { group_id: string }; Returns: undefined };
       restore_expense: {
         Args: { expense_id: string };
         Returns: {

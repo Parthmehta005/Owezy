@@ -25,8 +25,8 @@ test("a failed background refresh keeps the screen and offers Retry", async ({ b
   const context = await phoneFor(browser, testInfo, asha);
   const page = await context.newPage();
   // The screen is server-rendered, so it shows before its scripts are live. The
-  // "remember last group" save is sent once the group screen has hydrated.
-  const hydrated = page.waitForRequest((r) => r.url().includes("/rest/v1/profiles"));
+  // visit is recorded (record_group_open) once the group screen has hydrated.
+  const hydrated = page.waitForRequest((r) => r.url().includes("/rest/v1/rpc/record_group_open"));
   await page.goto(`/g/${groupId}`);
   await hydrated;
   await expect(page.getByRole("heading", { name: "No expenses yet" })).toBeVisible();

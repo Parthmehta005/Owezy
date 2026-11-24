@@ -1,4 +1,5 @@
 import "server-only";
+import { rankByFrecency } from "@/core/frecency";
 import { createClient } from "@/lib/supabase/server";
 
 export interface GroupSummary {
@@ -53,10 +54,19 @@ export async function getGroupView(groupId: string, userId: string): Promise<Gro
   };
 }
 
-/** Every group the signed-in user is in, by name. */
-export async function listMyGroups(): Promise<GroupSummary[]> {
+/**
+ * Every group the signed-in user is in, the one they use most (weighted to
+ * recent use) first. See core/frecency.ts.
+ */
+export async function listMyGroups(userId: string): Promise<GroupSummary[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("groups").select("id, name").order("name");
+  const { data, error } = await supabase
+    .from("members")
+    .select("open_score, opened_at, groups(id, name)")
+    .eq("user_id", userId);
   if (error) throw error;
-  return data;
+  const entries = data.flatMap((m) =>
+    m.groups ? [{ id: m.groups.id, name: m.groups.name, score: m.open_score, openedAt: m.opened_at ? new Date(m.opened_at) : null }] : [],
+  );
+  return rankByFrecency(entries, new Date()).map(({ id, name }) => ({ id, name }));
 }
