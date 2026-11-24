@@ -56,7 +56,8 @@ test("tap an expense to edit it", async ({ browser }, testInfo) => {
   await openRow(page);
   await expect(page.getByLabel("Amount in rupees")).toHaveValue("900");
   await expect(page.getByLabel("What was it for?")).toHaveValue("Dinner");
-  await expect(page.getByRole("button", { name: /^Split/ })).toContainText("Equally, all 3");
+  await expect(page.getByRole("radio", { name: "Equally", exact: true })).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByRole("checkbox", { checked: true })).toHaveCount(3);
 
   await page.getByLabel("Amount in rupees").fill("1200");
   await page.getByLabel("What was it for?").fill("Dinner and dessert");
@@ -78,8 +79,7 @@ test("an unequal expense reopens with its amounts", async ({ browser }, testInfo
   const { asha, groupId } = await setUp("edit-unequal", (ids) => ({ [ids.Asha]: 70000, [ids.Rahul]: 20000, [ids.Neha]: 0 }));
   const { context, page } = await openGroup(browser, testInfo, asha, groupId);
   await openRow(page);
-  await expect(page.getByRole("button", { name: /^Split/ })).toContainText("Unequally");
-  await page.getByRole("button", { name: /^Split/ }).click();
+  await expect(page.getByRole("radio", { name: "Unequally" })).toHaveAttribute("aria-checked", "true");
   await expect(page.getByLabel(/Asha/)).toHaveValue("700");
   await expect(page.getByLabel(/Rahul/)).toHaveValue("200");
   await expect(page.getByTestId("split-remaining")).toHaveText("✓ All ₹900 assigned");

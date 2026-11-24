@@ -69,9 +69,7 @@ test("every tap target is at least 44px tall", async ({ browser }, testInfo) => 
   await page.getByRole("button", { name: "Add expense" }).click();
   await page.keyboard.type("900");
   await page.getByRole("button", { name: /Paid by/ }).click();
-  await check(page, "add sheet + payer list");
-  await page.getByRole("button", { name: /^Split/ }).click();
-  await check(page, "add sheet + equal split");
+  await check(page, "add sheet + payer list + equal split");
   await page.getByRole("radio", { name: "Unequally" }).click();
   await check(page, "add sheet + unequal split");
   await page.getByLabel("What was it for?").fill("Tap test dinner");

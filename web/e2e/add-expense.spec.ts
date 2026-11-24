@@ -154,9 +154,10 @@ test("split between some people, or unequally, with Save only when it adds up", 
   await openSheet(page);
   await page.keyboard.type("1000");
   await page.getByLabel("What was it for?").fill("Groceries");
-  await page.getByRole("button", { name: /^Split/ }).click();
+  // The people list is always there under the Equally | Unequally toggle.
+  await expect(page.getByRole("radio", { name: "Equally", exact: true })).toHaveAttribute("aria-checked", "true");
   await page.getByRole("checkbox", { name: /Neha/ }).click();
-  await expect(page.getByRole("button", { name: /^Split/ })).toContainText("Equally, 2 people");
+  await expect(page.getByRole("checkbox", { checked: true })).toHaveCount(2);
   await expect(page.getByRole("checkbox", { name: /Rahul/ })).toContainText("₹500");
   // Nobody included: a problem, and no Save.
   await page.getByRole("checkbox", { name: /Asha/ }).click();
@@ -173,7 +174,6 @@ test("split between some people, or unequally, with Save only when it adds up", 
   await openSheet(page);
   await page.keyboard.type("1000");
   await page.getByLabel("What was it for?").fill("Hotel");
-  await page.getByRole("button", { name: /^Split/ }).click();
   await page.getByRole("radio", { name: "Unequally" }).click();
   const remaining = page.getByTestId("split-remaining");
   await page.getByLabel(/Asha/).fill("700");
@@ -185,7 +185,7 @@ test("split between some people, or unequally, with Save only when it adds up", 
   await page.getByLabel(/Rahul/).fill("299,50"); // comma decimal works here too
   await page.getByLabel(/Neha/).fill("0.50");
   await expect(remaining).toHaveText("✓ All ₹1,000 assigned");
-  await expect(page.getByRole("button", { name: /^Split/ })).toContainText("Unequally");
+  await expect(page.getByRole("radio", { name: "Unequally" })).toHaveAttribute("aria-checked", "true");
   await expect(save).toBeEnabled();
   await save.click();
   await expect(page.getByTestId("expense-row").first()).not.toHaveAttribute("data-pending");

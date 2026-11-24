@@ -2,7 +2,7 @@
 
 import { Avatar } from "@/components/avatar";
 import { useRef, useState, type FormEvent } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { CalendarDays, Check, ChevronDown } from "lucide-react";
 import { cn } from "cn";
 import { addDays, dateLabel } from "@/core/dates";
 import { expenseEffect } from "@/core/effect";
@@ -81,8 +81,6 @@ function parseShareText(text: string) {
   }
 }
 
-type Panel = "payer" | "split" | null;
-
 export function ExpenseSheet({
   open,
   onOpenChange,
@@ -106,7 +104,7 @@ export function ExpenseSheet({
   return (
     <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent
-        className="h-[calc(100dvh-0.75rem-env(safe-area-inset-top))] data-[vaul-drawer-direction=bottom]:max-h-none"
+        className="h-[calc(100dvh-0.75rem-env(safe-area-inset-top))] bg-background data-[vaul-drawer-direction=bottom]:max-h-none"
         // Start on the amount (not the Cancel button), so the number pad is up.
         onOpenAutoFocus={(e) => {
           e.preventDefault();
@@ -145,7 +143,7 @@ function ExpenseForm({
   const [splitMode, setSplitMode] = useState(draft.splitMode);
   const [includedIds, setIncludedIds] = useState<string[]>(draft.includedIds ?? members.map((m) => m.id));
   const [unequalTexts, setUnequalTexts] = useState<Record<string, string>>(draft.unequalTexts ?? {});
-  const [panel, setPanel] = useState<Panel>(null);
+  const [payerOpen, setPayerOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const descriptionRef = useRef<HTMLInputElement>(null);
 
@@ -162,14 +160,7 @@ function ExpenseForm({
         });
   const shares = split.shares;
   const canSave = Boolean(total && shares && description.trim()) && !submitted;
-  const splitLabel =
-    splitMode === "unequal"
-      ? "Unequally"
-      : included.length === members.length
-        ? `Equally, all ${members.length}`
-        : `Equally, ${included.length} ${included.length === 1 ? "person" : "people"}`;
   const payer = members.find((m) => m.id === payerId);
-  const payerLabel = payerId === meId ? "You" : (payer?.displayName ?? "Choose");
 
   function save(event?: FormEvent) {
     event?.preventDefault();
@@ -195,56 +186,61 @@ function ExpenseForm({
   return (
     <form onSubmit={save} className="flex min-h-0 flex-1 flex-col">
       {/* Actions at the top: the on-screen keyboard covers the bottom half of the screen. */}
-      <div className="flex items-center justify-between gap-2 border-b px-2 pb-2">
+      <div className="flex items-center justify-between gap-2 px-2 pb-2">
         <Button type="button" variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
-        <DrawerTitle className="text-base font-semibold">{draft.mode === "edit" ? "Edit expense" : "Add expense"}</DrawerTitle>
-        <Button type="submit" disabled={!canSave}>
+        <DrawerTitle className="text-base font-bold">{draft.mode === "edit" ? "Edit expense" : "Add expense"}</DrawerTitle>
+        <Button type="submit" disabled={!canSave} className="rounded-full px-5">
           Save
         </Button>
       </div>
-      <DrawerDescription className="sr-only">Enter the amount, what it was for, who paid and the date.</DrawerDescription>
+      <DrawerDescription className="sr-only">Enter the amount, what it was for, who paid and how to split it.</DrawerDescription>
 
-      <div className="flex-1 space-y-5 overflow-y-auto px-4 py-5">
+      <div className="flex-1 space-y-5 overflow-y-auto px-4 pt-2 pb-6">
         {draft.error && (
           <p role="alert" className="rounded-lg border border-negative/30 bg-negative/10 px-3 py-2 text-sm text-negative">
             {draft.error}
           </p>
         )}
 
-        <div className="flex items-baseline gap-1 border-b pb-1 focus-within:border-primary">
-          <span aria-hidden className="text-3xl text-muted-foreground">
-            ₹
-          </span>
-          <Label htmlFor="amount" className="sr-only">
-            Amount in rupees
+        {/* 1. Amount, big and centred. */}
+        <div className="flex flex-col items-center">
+          <Label htmlFor="amount" className="text-xs font-semibold text-muted-foreground">
+            Amount<span className="sr-only"> in rupees</span>
           </Label>
-          <input
-            id="amount"
-            name="amount"
-            inputMode="decimal"
-            enterKeyHint="next"
-            autoComplete="off"
-            placeholder="0"
-            value={amountText}
-            onChange={(e) => setAmountText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                descriptionRef.current?.focus();
-              }
-            }}
-            aria-invalid={amountText.trim() !== "" && !total ? true : undefined}
-            className="h-14 w-full min-w-0 bg-transparent text-4xl font-semibold tabular-nums outline-none placeholder:text-muted-foreground/50"
-          />
+          <div className="flex items-baseline justify-center gap-1">
+            <span aria-hidden className="text-3xl font-bold text-muted-foreground">
+              ₹
+            </span>
+            <input
+              id="amount"
+              name="amount"
+              inputMode="decimal"
+              enterKeyHint="next"
+              autoComplete="off"
+              placeholder="0"
+              value={amountText}
+              onChange={(e) => setAmountText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  descriptionRef.current?.focus();
+                }
+              }}
+              aria-invalid={amountText.trim() !== "" && !total ? true : undefined}
+              style={{ width: `calc(${Math.max(1, amountText.length)}ch + 0.1em)` }}
+              className="h-16 max-w-[80vw] bg-transparent text-left text-5xl font-extrabold tracking-tight tabular-nums outline-none placeholder:text-muted-foreground/40"
+            />
+          </div>
+          {amountText.trim() !== "" && !total && <p className="text-sm text-destructive">Enter an amount like 450 or 99.50</p>}
         </div>
-        {amountText.trim() !== "" && !total && (
-          <p className="-mt-3 text-sm text-destructive">Enter an amount like 450 or 99.50</p>
-        )}
 
-        <div className="space-y-2">
-          <Label htmlFor="description">What was it for?</Label>
+        {/* 2. What it was for. */}
+        <div className="space-y-1.5">
+          <Label htmlFor="description" className="text-xs font-semibold text-muted-foreground">
+            What was it for?
+          </Label>
           <Input
             ref={descriptionRef}
             id="description"
@@ -255,72 +251,84 @@ function ExpenseForm({
             autoCapitalize="sentences"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            className="h-12"
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Chip label="Paid by" value={payerLabel} open={panel === "payer"} onClick={() => setPanel(panel === "payer" ? null : "payer")} />
-          <Chip label="Split" value={splitLabel} open={panel === "split"} onClick={() => setPanel(panel === "split" ? null : "split")} />
-          <label className="relative flex min-h-11 items-center gap-1 rounded-full border px-3 text-sm focus-within:ring-3 focus-within:ring-ring/50">
-            <span className="text-muted-foreground">Date</span>
-            <span className="font-medium">{dateLabel(date, today)}</span>
-            <ChevronDown aria-hidden className="size-4 text-muted-foreground" />
-            {/* The phone's own date picker, laid over the chip. */}
-            <input
-              type="date"
-              aria-label="Date"
-              value={date}
-              min="2000-01-01"
-              max={addDays(today, 365)}
-              onChange={(e) => e.target.value && setDate(e.target.value)}
-              // -inset-px: cover the chip's border too, so the target is the full 44px.
-              className="absolute -inset-px cursor-pointer opacity-0"
-            />
-          </label>
+        {/* 3. Who paid (you by default; the list opens inline) and the date. */}
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              aria-expanded={payerOpen}
+              onClick={() => setPayerOpen((o) => !o)}
+              className={cn(
+                "flex min-h-11 items-center gap-2 rounded-full border bg-card py-1 pr-3 pl-1 text-sm font-semibold",
+                payerOpen && "border-primary",
+              )}
+            >
+              {payer && <Avatar id={payer.id} name={payer.displayName} photoUrl={payer.avatarUrl} size="xs" />}
+              Paid by {payerId === meId ? "you" : (payer?.displayName ?? "…")}
+              <ChevronDown aria-hidden className={cn("size-4 text-muted-foreground transition-transform", payerOpen && "rotate-180")} />
+            </button>
+            <label className="relative flex min-h-11 items-center gap-2 rounded-full border bg-card px-3 text-sm font-semibold focus-within:ring-3 focus-within:ring-ring/50">
+              <CalendarDays aria-hidden className="size-4 text-primary" />
+              <span>{dateLabel(date, today)}</span>
+              {/* The phone's own date picker, laid over the chip. */}
+              <input
+                type="date"
+                aria-label="Date"
+                value={date}
+                min="2000-01-01"
+                max={addDays(today, 365)}
+                onChange={(e) => e.target.value && setDate(e.target.value)}
+                // -inset-px: cover the chip's border too, so the target is the full 44px.
+                className="absolute -inset-px cursor-pointer opacity-0"
+              />
+            </label>
+          </div>
+          {payerOpen && (
+            <fieldset className="overflow-hidden rounded-2xl bg-card">
+              <legend className="sr-only">Who paid?</legend>
+              {members.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={m.id === payerId}
+                  onClick={() => {
+                    setPayerId(m.id);
+                    setPayerOpen(false);
+                  }}
+                  className="flex min-h-12 w-full items-center gap-3 border-b px-3 text-left last:border-b-0"
+                >
+                  <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
+                  <span className="flex-1">{m.id === meId ? `${m.displayName} (you)` : m.displayName}</span>
+                  {m.id === payerId && <Check aria-hidden className="size-4 text-primary" />}
+                </button>
+              ))}
+            </fieldset>
+          )}
         </div>
 
-        {panel === "payer" && (
-          <fieldset className="rounded-lg border">
-            <legend className="sr-only">Who paid?</legend>
-            {members.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                role="radio"
-                aria-checked={m.id === payerId}
-                onClick={() => {
-                  setPayerId(m.id);
-                  setPanel(null);
-                }}
-                className="flex min-h-12 w-full items-center gap-3 border-b px-4 text-left last:border-b-0"
-              >
-                <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
-                <span className="flex-1">{m.id === meId ? `${m.displayName} (you)` : m.displayName}</span>
-                {m.id === payerId && <Check aria-hidden className="size-4 text-primary" />}
-              </button>
-            ))}
-          </fieldset>
-        )}
-
-        {panel === "split" && (
-          <SplitPanel
-            members={members}
-            meId={meId}
-            mode={splitMode}
-            onModeChange={setSplitMode}
-            includedIds={includedIds}
-            onToggle={(id) => setIncludedIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))}
-            equalShares={splitMode === "equal" ? shares : null}
-            unequalTexts={unequalTexts}
-            onUnequalChange={(id, text) => setUnequalTexts((t) => ({ ...t, [id]: text }))}
-            totalPaise={total}
-            remainingPaise={split.remainingPaise}
-          />
-        )}
+        {/* 4 + 5. How to split, and the people in it (always visible). */}
+        <SplitPanel
+          members={members}
+          meId={meId}
+          mode={splitMode}
+          onModeChange={setSplitMode}
+          includedIds={includedIds}
+          onToggle={(id) => setIncludedIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]))}
+          equalShares={splitMode === "equal" ? shares : null}
+          unequalTexts={unequalTexts}
+          onUnequalChange={(id, text) => setUnequalTexts((t) => ({ ...t, [id]: text }))}
+          totalPaise={total}
+          remainingPaise={split.remainingPaise}
+        />
         {split.problem && <p className="text-sm text-destructive">{split.problem}</p>}
 
         {preview && (
-          <p className="text-sm text-muted-foreground" data-testid="expense-preview">
+          <p className="mx-auto w-fit rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-accent-foreground" data-testid="expense-preview">
             {preview}
           </p>
         )}
@@ -333,25 +341,6 @@ function ExpenseForm({
         )}
       </div>
     </form>
-  );
-}
-
-function Chip({ label, value, open, onClick }: { label: string; value: string; open?: boolean; onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={!onClick}
-      aria-expanded={onClick ? open : undefined}
-      className={cn(
-        "flex min-h-11 items-center gap-1 rounded-full border px-3 text-sm disabled:opacity-100",
-        open && "border-primary",
-      )}
-    >
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-      {onClick && <ChevronDown aria-hidden className={cn("size-4 text-muted-foreground transition-transform", open && "rotate-180")} />}
-    </button>
   );
 }
 
@@ -388,8 +377,8 @@ function SplitPanel({
   else if (remainingPaise !== null) status = `${formatRupees(-remainingPaise)} over`;
 
   return (
-    <div className="space-y-3 rounded-lg border p-3">
-      <div role="radiogroup" aria-label="How to split" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+    <div className="space-y-3">
+      <div role="radiogroup" aria-label="How to split" className="grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1">
         {(["equal", "unequal"] as const).map((m) => (
           <button
             key={m}
@@ -397,7 +386,10 @@ function SplitPanel({
             role="radio"
             aria-checked={mode === m}
             onClick={() => onModeChange(m)}
-            className={cn("min-h-11 rounded-md text-sm font-medium", mode === m ? "bg-background shadow-sm" : "text-muted-foreground")}
+            className={cn(
+              "min-h-11 rounded-xl text-sm font-semibold",
+              mode === m ? "bg-card shadow-sm dark:bg-secondary" : "text-muted-foreground",
+            )}
           >
             {m === "equal" ? "Equally" : "Unequally"}
           </button>
@@ -405,7 +397,7 @@ function SplitPanel({
       </div>
 
       {mode === "equal" ? (
-        <div>
+        <div className="rounded-2xl bg-card px-3" role="group" aria-label="People in it">
           {members.map((m) => {
             const on = includedIds.includes(m.id);
             return (
@@ -436,16 +428,17 @@ function SplitPanel({
           })}
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-1 rounded-2xl bg-card px-3 py-2" role="group" aria-label="Each person's share">
           {members.map((m) => {
             const text = unequalTexts[m.id] ?? "";
             const bad = parseShareText(text) === null;
             return (
               <div key={m.id} className="flex min-h-12 items-center gap-3">
+                <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
                 <label htmlFor={`share-${m.id}`} className="flex-1 truncate">
                   {name(m)}
                 </label>
-                <div className={cn("flex w-32 items-center rounded-lg border px-2", bad && "border-destructive")}>
+                <div className={cn("flex w-32 items-center rounded-xl border bg-background px-2", bad && "border-destructive")}>
                   <span aria-hidden className="text-muted-foreground">
                     ₹
                   </span>
