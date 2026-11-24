@@ -1,4 +1,4 @@
-import { formatInr } from "@/core/money";
+import { formatRupees } from "@/core/money";
 import type { MySummary } from "@/lib/balances-view";
 
 /** The big line at the top of the group screen: your net across the whole group. */
@@ -19,7 +19,7 @@ export function BalanceSummary({ summary }: { summary: MySummary }) {
                 : "text-3xl font-semibold text-negative tabular-nums"
             }
           >
-            {formatInr(summary.amountPaise)}
+            {formatRupees(summary.amountPaise)}
           </p>
         </>
       )}

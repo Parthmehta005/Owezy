@@ -45,7 +45,7 @@ test("add an expense in 3 taps plus typing", async ({ browser }, testInfo) => {
   await page.keyboard.type("900");
   await page.getByLabel("What was it for?").click(); // tap 2
   await page.keyboard.type("Dinner");
-  await expect(page.getByTestId("expense-preview")).toHaveText("You get back ₹600.00");
+  await expect(page.getByTestId("expense-preview")).toHaveText("You get back ₹600");
   await page.getByRole("button", { name: "Save" }).click(); // tap 3
 
   await expect(page.getByRole("dialog")).toBeHidden();
@@ -53,7 +53,7 @@ test("add an expense in 3 taps plus typing", async ({ browser }, testInfo) => {
   await expect(row).toHaveCount(1);
   await expect(row).toContainText("Dinner");
   await expect(row).toContainText("you lent");
-  await expect(row).toContainText("₹600.00");
+  await expect(row).toContainText("₹600");
   await expect(row).not.toHaveAttribute("data-pending"); // confirmed by the server
 
   const [saved] = await storedExpenses(asha, groupId);
@@ -157,7 +157,7 @@ test("split between some people, or unequally, with Save only when it adds up", 
   await page.getByRole("button", { name: /^Split/ }).click();
   await page.getByRole("checkbox", { name: /Neha/ }).click();
   await expect(page.getByRole("button", { name: /^Split/ })).toContainText("Equally, 2 people");
-  await expect(page.getByRole("checkbox", { name: /Rahul/ })).toContainText("₹500.00");
+  await expect(page.getByRole("checkbox", { name: /Rahul/ })).toContainText("₹500");
   // Nobody included: a problem, and no Save.
   await page.getByRole("checkbox", { name: /Asha/ }).click();
   await page.getByRole("checkbox", { name: /Rahul/ }).click();
@@ -177,14 +177,14 @@ test("split between some people, or unequally, with Save only when it adds up", 
   await page.getByRole("radio", { name: "Unequally" }).click();
   const remaining = page.getByTestId("split-remaining");
   await page.getByLabel(/Asha/).fill("700");
-  await expect(remaining).toHaveText("₹300.00 left");
+  await expect(remaining).toHaveText("₹300 left");
   await expect(save).toBeDisabled();
   await page.getByLabel(/Rahul/).fill("400");
-  await expect(remaining).toHaveText("₹100.00 over");
+  await expect(remaining).toHaveText("₹100 over");
   await expect(save).toBeDisabled();
   await page.getByLabel(/Rahul/).fill("299,50"); // comma decimal works here too
   await page.getByLabel(/Neha/).fill("0.50");
-  await expect(remaining).toHaveText("✓ All ₹1,000.00 assigned");
+  await expect(remaining).toHaveText("✓ All ₹1,000 assigned");
   await expect(page.getByRole("button", { name: /^Split/ })).toContainText("Unequally");
   await expect(save).toBeEnabled();
   await save.click();

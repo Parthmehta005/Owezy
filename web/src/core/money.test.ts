@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertPaise, formatInr, parseAmount, toAmountInput } from "./money";
+import { assertPaise, formatInr, formatRupees, parseAmount, toAmountInput } from "./money";
 
 describe("parseAmount", () => {
   // test_logic.py: TestMoney.test_parse_valid_amounts
@@ -100,5 +100,17 @@ describe("toAmountInput", () => {
     for (const paise of [1, 50, 1050, 90000, 120000025]) {
       expect(parseAmount(toAmountInput(paise), { allowZero: true })).toBe(paise);
     }
+  });
+});
+
+describe("formatRupees", () => {
+  it("drops .00 for whole rupees and keeps paise", () => {
+    expect(formatRupees(90000)).toBe("₹900");
+    expect(formatRupees(12000000)).toBe("₹1,20,000");
+    expect(formatRupees(1050)).toBe("₹10.50");
+    expect(formatRupees(5)).toBe("₹0.05");
+    expect(formatRupees(0)).toBe("₹0");
+    expect(formatRupees(-150)).toBe("-₹1.50");
+    expect(formatRupees(-10000)).toBe("-₹100");
   });
 });

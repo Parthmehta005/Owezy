@@ -6,7 +6,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "cn";
 import { addDays, dateLabel } from "@/core/dates";
 import { expenseEffect } from "@/core/effect";
-import { formatInr, parseAmount, toAmountInput } from "@/core/money";
+import { formatRupees, parseAmount, toAmountInput } from "@/core/money";
 import { buildShares } from "@/core/splits";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
@@ -186,9 +186,9 @@ function ExpenseForm({
     const effect = expenseEffect({ payerId, totalPaise: total, shares }, meId);
     preview =
       effect.kind === "lent"
-        ? `You get back ${formatInr(effect.amountPaise)}`
+        ? `You get back ${formatRupees(effect.amountPaise)}`
         : effect.kind === "borrowed"
-          ? `You owe ${formatInr(effect.amountPaise)}`
+          ? `You owe ${formatRupees(effect.amountPaise)}`
           : "No change to your balance";
   }
 
@@ -383,9 +383,9 @@ function SplitPanel({
   const name = (m: BundleMember) => (m.id === meId ? `${m.displayName} (you)` : m.displayName);
   let status = "";
   if (totalPaise === null) status = "Enter the total first";
-  else if (remainingPaise === 0) status = `✓ All ${formatInr(totalPaise)} assigned`;
-  else if (remainingPaise !== null && remainingPaise > 0) status = `${formatInr(remainingPaise)} left`;
-  else if (remainingPaise !== null) status = `${formatInr(-remainingPaise)} over`;
+  else if (remainingPaise === 0) status = `✓ All ${formatRupees(totalPaise)} assigned`;
+  else if (remainingPaise !== null && remainingPaise > 0) status = `${formatRupees(remainingPaise)} left`;
+  else if (remainingPaise !== null) status = `${formatRupees(-remainingPaise)} over`;
 
   return (
     <div className="space-y-3 rounded-lg border p-3">
@@ -429,7 +429,7 @@ function SplitPanel({
                 <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
                 <span className="flex-1 truncate">{name(m)}</span>
                 {on && equalShares?.[m.id] !== undefined && (
-                  <span className="text-sm text-muted-foreground tabular-nums">{formatInr(equalShares[m.id])}</span>
+                  <span className="text-sm text-muted-foreground tabular-nums">{formatRupees(equalShares[m.id])}</span>
                 )}
               </button>
             );

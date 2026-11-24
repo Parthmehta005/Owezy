@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { dateLabel, groupByDate, indiaDate } from "@/core/dates";
 import { expenseEffect, type Effect } from "@/core/effect";
-import { formatInr } from "@/core/money";
+import { formatRupees } from "@/core/money";
 import { Avatar } from "@/components/avatar";
 import type { BundleExpense, BundleMember } from "@/lib/data/bundle";
 
@@ -83,7 +83,7 @@ function ExpenseRow({
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{expense.description}</p>
         <p className="truncate text-sm text-muted-foreground">
-          {payerName} paid {formatInr(expense.totalPaise)}
+          {payerName} paid {formatRupees(expense.totalPaise)}
           {expense.pending && <span className="italic"> · Saving…</span>}
         </p>
       </div>
@@ -99,14 +99,14 @@ function EffectLabel({ effect }: { effect: Effect }) {
       return (
         <div className="shrink-0 text-right">
           <p className="text-xs text-positive">you lent</p>
-          <p className="font-medium text-positive tabular-nums">{formatInr(effect.amountPaise)}</p>
+          <p className="font-medium text-positive tabular-nums">{formatRupees(effect.amountPaise)}</p>
         </div>
       );
     case "borrowed":
       return (
         <div className="shrink-0 text-right">
           <p className="text-xs text-negative">you borrowed</p>
-          <p className="font-medium text-negative tabular-nums">{formatInr(effect.amountPaise)}</p>
+          <p className="font-medium text-negative tabular-nums">{formatRupees(effect.amountPaise)}</p>
         </div>
       );
     case "even":

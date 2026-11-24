@@ -56,6 +56,15 @@ export function formatInr(paise: Paise): string {
   return `${sign}₹${RUPEES_FORMAT.format(rupees)}.${String(rest).padStart(2, "0")}`;
 }
 
+/**
+ * Format paise for the screen: like formatInr, but whole rupees drop the
+ * ".00" ("₹900", "₹1,20,000"), while paise still show ("₹10.50", "₹0.05").
+ */
+export function formatRupees(paise: Paise): string {
+  const full = formatInr(paise);
+  return full.endsWith(".00") ? full.slice(0, -3) : full;
+}
+
 /** Paise as text for an amount field: "900", "10.50" (no ₹, no grouping), so it reads back with parseAmount. */
 export function toAmountInput(paise: Paise): string {
   assertPaise(paise);

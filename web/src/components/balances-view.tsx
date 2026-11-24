@@ -1,4 +1,4 @@
-import { formatInr } from "@/core/money";
+import { formatRupees } from "@/core/money";
 import { paymentCount, type DebtLine } from "@/lib/balances-view";
 
 const toneClass = { positive: "text-positive", negative: "text-negative", neutral: "" } as const;
@@ -58,7 +58,7 @@ export function BalancesView({
         {lines.map((l) => (
           <li key={`${l.from}-${l.to}`} data-testid="debt-row" className="flex min-h-14 items-center justify-between gap-3 py-3">
             <span className={`min-w-0 ${toneClass[l.tone]}`}>{l.text}</span>
-            <span className={`shrink-0 font-medium tabular-nums ${toneClass[l.tone]}`}>{formatInr(l.amountPaise)}</span>
+            <span className={`shrink-0 font-medium tabular-nums ${toneClass[l.tone]}`}>{formatRupees(l.amountPaise)}</span>
           </li>
         ))}
       </ul>

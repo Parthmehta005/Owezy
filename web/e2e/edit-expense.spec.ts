@@ -66,7 +66,7 @@ test("tap an expense to edit it", async ({ browser }, testInfo) => {
 
   const row = page.getByTestId("expense-row");
   await expect(row).toContainText("Dinner and dessert");
-  await expect(row).toContainText("Rahul paid ₹1,200.00");
+  await expect(row).toContainText("Rahul paid ₹1,200");
   await expect(row).not.toHaveAttribute("data-pending");
   const saved = await stored(asha, expenseId);
   expect(saved).toMatchObject({ description: "Dinner and dessert", total_paise: 120000, payer_member_id: ids.Rahul, version: 2 });
@@ -82,7 +82,7 @@ test("an unequal expense reopens with its amounts", async ({ browser }, testInfo
   await page.getByRole("button", { name: /^Split/ }).click();
   await expect(page.getByLabel(/Asha/)).toHaveValue("700");
   await expect(page.getByLabel(/Rahul/)).toHaveValue("200");
-  await expect(page.getByTestId("split-remaining")).toHaveText("✓ All ₹900.00 assigned");
+  await expect(page.getByTestId("split-remaining")).toHaveText("✓ All ₹900 assigned");
   await context.close();
 });
 

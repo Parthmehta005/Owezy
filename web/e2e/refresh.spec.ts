@@ -77,8 +77,8 @@ test("an expense added on one phone appears on the other on return", async ({ br
   await pageB.evaluate(() => document.dispatchEvent(new Event("visibilitychange", { bubbles: true })));
   const row = pageB.getByTestId("expense-row");
   await expect(row).toContainText("Dinner");
-  await expect(row).toContainText("Asha paid ₹900.00");
+  await expect(row).toContainText("Asha paid ₹900");
   await expect(row).toContainText("you borrowed");
-  await expect(row).toContainText("₹450.00");
+  await expect(row).toContainText("₹450");
   await Promise.all([a.close(), b.close()]);
 });
