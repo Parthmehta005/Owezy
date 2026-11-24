@@ -90,39 +90,44 @@ export function BalancesView({
                   data-from={name(l.from)}
                   data-to={name(l.to)}
                   data-amount={formatRupees(l.amountPaise)}
-                  className="rounded-2xl bg-card p-4"
+                  className="flex items-center gap-3 rounded-2xl bg-card py-2 pr-2 pl-4"
                 >
-                  <div className="flex items-center gap-3">
-                    {other && <Avatar id={other.id} name={other.displayName} photoUrl={other.avatarUrl} />}
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-bold">{otherName}</p>
-                      <p className={cn("text-sm font-semibold", youOwe ? "text-negative" : "text-positive")}>
-                        {youOwe ? "you owe" : "owes you"}
-                      </p>
-                    </div>
-                    <p className={cn("text-xl font-extrabold tabular-nums", youOwe ? "text-negative" : "text-positive")}>
-                      {formatRupees(l.amountPaise)}
+                  {other && <Avatar id={other.id} name={other.displayName} photoUrl={other.avatarUrl} />}
+                  <div className="min-w-0 flex-1 py-1">
+                    <p className="truncate font-bold">{otherName}</p>
+                    <p className={cn("text-sm font-semibold", youOwe ? "text-negative" : "text-positive")}>
+                      {youOwe ? "you owe" : "owes you"}
                     </p>
                   </div>
-                  {/* Wired to UPI apps and reminders in M9; for now they say so. */}
-                  <button
-                    type="button"
-                    onClick={() =>
-                      toast(youOwe ? "Paying with GPay, Paytm or PhonePe is coming soon." : "Reminders are coming soon.", {
-                        description: youOwe
-                          ? `You'll be able to pay ${otherName} ${formatRupees(l.amountPaise)} straight from here.`
-                          : `You'll be able to nudge ${otherName} about ${formatRupees(l.amountPaise)}.`,
-                      })
-                    }
-                    className={cn(
-                      "mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl text-sm font-bold",
-                      youOwe ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground",
-                    )}
-                  >
-                    {youOwe ? <Smartphone aria-hidden className="size-4" /> : <Bell aria-hidden className="size-4" />}
-                    {youOwe ? `Pay ${otherName}` : `Remind ${otherName}`}
-                    <span className="rounded-full bg-background/25 px-2 py-0.5 text-[0.7rem] font-semibold">Coming soon</span>
-                  </button>
+                  <div className="flex flex-col items-end">
+                    <p className={cn("pr-2 text-lg font-extrabold tabular-nums", youOwe ? "text-negative" : "text-positive")}>
+                      {formatRupees(l.amountPaise)}
+                    </p>
+                    {/* A small pill, under the amount. The button itself is 44px tall for thumbs.
+                        Wired to UPI apps and reminders in M9; for now it says so. */}
+                    <button
+                      type="button"
+                      aria-label={`${youOwe ? `Pay ${otherName}` : `Remind ${otherName}`} (coming soon)`}
+                      onClick={() =>
+                        toast(youOwe ? "Paying with GPay, Paytm or PhonePe is coming soon." : "Reminders are coming soon.", {
+                          description: youOwe
+                            ? `You'll be able to pay ${otherName} ${formatRupees(l.amountPaise)} straight from here.`
+                            : `You'll be able to nudge ${otherName} about ${formatRupees(l.amountPaise)}.`,
+                        })
+                      }
+                      className="flex min-h-11 items-center px-1"
+                    >
+                      <span
+                        className={cn(
+                          "flex h-7 items-center gap-1 rounded-full px-2.5 text-xs font-bold",
+                          youOwe ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground",
+                        )}
+                      >
+                        {youOwe ? <Smartphone aria-hidden className="size-3.5" /> : <Bell aria-hidden className="size-3.5" />}
+                        {youOwe ? "Pay" : "Remind"}
+                      </span>
+                    </button>
+                  </div>
                 </li>
               );
             })}

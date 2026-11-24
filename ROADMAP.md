@@ -204,13 +204,14 @@ Number format: Indian grouping via `Intl.NumberFormat('en-IN')` (`₹12,00,000.0
   - B joins through the invite link and claims a placeholder name.
 - Manual: open the Vercel link on a phone, add it to the home screen, and add an expense in 3 taps plus typing.
 
-## Open follow-up from v1
+## Open follow-ups
 - [ ] iPhone home-screen check (REVIEW.md M7): add to the home screen from Safari, then check it opens full-screen into the group, pull-to-refresh works, the clock and battery are readable, and nothing sits under the notch or home bar. Android is verified; the iPhone engine is covered by Playwright (WebKit), but not on a real device.
+- [ ] Lighthouse on the live site after M8 (REVIEW.md M8): Chrome DevTools, mobile, on the login and group pages; targets Performance ≥ 90, Accessibility ≥ 95. The owner will run it later.
 
 ## v2 plan (after v1)
 v1 works, but it looks like a template: stock shadcn styling, a plain-text summary, text-only rows and a bare balances list. v2 starts with a design pass, then adds features **one milestone at a time, each only after the owner's go-ahead**. The order below is a suggestion and can be changed before a milestone starts.
 
-### ⬜ M8. A better UI
+### ✅ M8. A better UI
 **Goal:** every screen is rebuilt in the direction the owner chose (mostly design A, plus C's sharper balance box and new UX, recorded below), in light and dark mode on Android and iPhone:
 - Opening a group answers "where do I stand, and with whom?" at a glance.
 - The default group follows how often and how recently you open each one.
@@ -249,7 +250,7 @@ All existing tests still pass (updated where the UI changed), and the mobile rul
 - [x] Minimise and resume the add/edit sheet (draft kept on the phone)
 - [x] Sign-in, new group, join, settings, error and empty screens restyled
 - [x] Light motion, off with "reduce motion"
-- [ ] Screenshot tests, full e2e on both engines, tap sizes, Lighthouse, prod migration, owner's phone check
+- [x] Screenshot tests, full e2e on both engines, tap sizes, Lighthouse, prod migration, owner's phone check (Lighthouse left to the owner, see Open follow-ups)
 
 ### ⬜ M9. Settle up (and pay with UPI)
 **Goal:** from Balances, either person can record "Rahul paid Asha ₹700", and everyone's balances drop accordingly. If the person being paid has added a UPI ID, **Pay with UPI** opens the payer's UPI app (GPay, PhonePe, Paytm…) with the amount filled in; after paying, they confirm it in Owezy. Payments show in the expense list and can be edited or deleted with Undo, like expenses.

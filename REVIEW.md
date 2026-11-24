@@ -93,8 +93,8 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 - [x] Members' Google photos show to fellow members only; a broken photo falls back to the letter. (pgTAP + e2e; mutation-checked.)
 - [x] Every text/background pair is ≥ 4.5:1 (tested); every tap target ≥ 44px; motion is off with "reduce motion". (Contrast unit test, tap-size e2e incl. new sheets, motion e2e.)
 - [x] Screenshot tests cover the key screens in light/dark on both engines; the full e2e suite passes. (71 runs pass + 1 Chromium-only skip.)
-- [ ] Lighthouse mobile still ≥ 90 performance, ≥ 95 accessibility.
-- [ ] Owner checked it on a phone.
+- [ ] Lighthouse mobile still ≥ 90 performance, ≥ 95 accessibility. (Owner to run on the live site later; tracked under "Open follow-ups" in ROADMAP.md. Local throttled measurements improved on M7.)
+- [x] Owner checked it on a phone. (Live site, 2026-11-24; asked for a smaller Pay/Remind button, done.)
 
 ## M9. Settle up
 

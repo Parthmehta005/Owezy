@@ -53,7 +53,7 @@ async function open(browser: Browser, testInfo: TestInfo, user: DevUser, path: s
   return { context, page };
 }
 
-const snap = (page: Page, name: string) => expect(page).toHaveScreenshot(name, { maxDiffPixelRatio: 0.01 });
+const snap = (page: Page, name: string) => expect(page).toHaveScreenshot(name, { maxDiffPixelRatio: 0.002 });
 
 for (const scheme of ["light", "dark"] as const) {
   test(`key screens look as designed (${scheme})`, async ({ browser }, testInfo) => {
