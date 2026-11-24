@@ -77,3 +77,8 @@ export function simplifiedDebts(bundle: GroupBundle, balances: Balances): Debt[]
 export function paymentCount(raw: number, simplified: number): string {
   return `${raw} → ${simplified} ${simplified === 1 ? "payment" : "payments"}`;
 }
+
+/** Lines involving you ("You and each person") and the rest ("Between others"), keeping their order. */
+export function splitMine(lines: readonly DebtLine[]): { mine: DebtLine[]; others: DebtLine[] } {
+  return { mine: lines.filter((l) => l.tone !== "neutral"), others: lines.filter((l) => l.tone === "neutral") };
+}

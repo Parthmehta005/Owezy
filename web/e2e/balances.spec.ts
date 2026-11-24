@@ -72,19 +72,17 @@ async function coreView(user: DevUser, groupId: string) {
   return { balances, raw: asSet(pairwiseDebts(expenses)), simplified: asSet(simplifyDebts(order, balances)) };
 }
 
-/** The rows on screen in the same "From>To ₹N" form, with "you" swapped for the viewer's name. */
-async function shownDebts(page: Page, me: string) {
-  const texts = await page.getByTestId("debt-row").allInnerTexts();
-  return texts
-    .map((t) => {
-      const [who, amount] = t.split("\n").map((s) => s.trim()).filter(Boolean);
-      const [from, to] = who
-        .replace(/^You owe /, `${me} owes `)
-        .replace(/ owes you$/, ` owes ${me}`)
-        .split(" owes ");
-      return `${from}>${to} ${amount}`;
-    })
-    .sort();
+/** The rows on screen (both sections) in the same "From>To ₹N" form, read from the rows' data attributes. */
+async function shownDebts(page: Page) {
+  const rows = await page
+    .getByTestId("debt-row")
+    .evaluateAll((els) => els.map((e) => `${e.getAttribute("data-from")}>${e.getAttribute("data-to")} ${e.getAttribute("data-amount")}`));
+  return rows.sort();
+}
+
+/** The rows under one section heading. */
+function section(page: Page, heading: "You and each person" | "Between others") {
+  return page.getByRole("region", { name: heading }).getByTestId("debt-row");
 }
 
 async function openGroup(browser: Browser, testInfo: TestInfo, user: DevUser, groupId: string) {
@@ -107,7 +105,7 @@ test("summary, raw debts and simplified debts match core, in Indian number forma
   // Raw debts.
   await page.getByRole("tab", { name: "Balances" }).click();
   await expect(page.getByTestId("debt-row")).toHaveCount(core.raw.length);
-  expect(await shownDebts(page, "Asha")).toEqual(core.raw);
+  expect(await shownDebts(page)).toEqual(core.raw);
   expect(core.raw).toEqual(["Bilal>Neha ₹1,20,000", "Bilal>Rahul ₹300", "Neha>Asha ₹1,000", "Rahul>Asha ₹1,000"]);
   const simplify = page.getByRole("switch", { name: /Simplify/ });
   await expect(simplify).toHaveAttribute("aria-checked", "false");
@@ -117,8 +115,14 @@ test("summary, raw debts and simplified debts match core, in Indian number forma
   await simplify.click();
   await expect(simplify).toHaveAttribute("aria-checked", "true");
   await expect(page.getByTestId("debt-row")).toHaveCount(core.simplified.length);
-  expect(await shownDebts(page, "Asha")).toEqual(core.simplified);
+  expect(await shownDebts(page)).toEqual(core.simplified);
   expect(core.simplified).toEqual(["Bilal>Asha ₹1,300", "Bilal>Neha ₹1,19,000", "Rahul>Asha ₹700"]);
+  // Both sections switched to payments: yours under "You and each person", the rest under "Between others".
+  await expect(section(page, "You and each person")).toHaveCount(2);
+  await expect(section(page, "Between others")).toHaveCount(1);
+  await expect(section(page, "Between others")).toContainText("Bilal owes Neha");
+  await section(page, "You and each person").first().getByRole("button", { name: /Remind Bilal/ }).click();
+  await expect(page.getByText("Reminders are coming soon.")).toBeVisible();
 
   // The choice survives a trip to the Expenses tab and back.
   await page.getByRole("tab", { name: "Expenses" }).click();
@@ -132,8 +136,16 @@ test("someone who owes sees it from their side", async ({ browser }, testInfo) =
   const { context, page } = await openGroup(browser, testInfo, bilal, groupId);
   await expect(page.getByTestId("my-summary")).toHaveText(/You owe\s*₹1,20,300/);
   await page.getByRole("tab", { name: "Balances" }).click();
-  await expect(page.getByTestId("debt-row").first()).toHaveText(/You owe Neha\s*₹1,20,000/);
-  await expect(page.getByTestId("debt-row").nth(1)).toHaveText(/You owe Rahul\s*₹300/);
+  const mine = section(page, "You and each person");
+  await expect(mine.first()).toContainText("Neha");
+  await expect(mine.first()).toContainText("you owe");
+  await expect(mine.first()).toContainText("₹1,20,000");
+  await expect(mine.nth(1)).toContainText("Rahul");
+  await expect(mine.nth(1)).toContainText("₹300");
+
+  // Pay is shown where you owe; it isn't wired up yet, and says so.
+  await mine.first().getByRole("button", { name: /Pay Neha/ }).click();
+  await expect(page.getByText("Paying with GPay, Paytm or PhonePe is coming soon.")).toBeVisible();
   await context.close();
 });
 
@@ -148,10 +160,10 @@ test("balances move the moment an expense is added, and a new group is all settl
   await page.getByRole("button", { name: "Save" }).click();
   await expect(page.getByTestId("my-summary")).toHaveText(/You get back\s*₹2,150/);
   await page.getByRole("tab", { name: "Balances" }).click();
-  await expect(page.getByTestId("debt-row").filter({ hasText: "Bilal owes you" })).toHaveText(/₹50/);
+  await expect(page.locator('[data-testid="debt-row"][data-from="Bilal"][data-to="Asha"]')).toHaveAttribute("data-amount", "₹50");
   await expect(page.getByTestId("debt-row")).toHaveCount(5);
   await expect.poll(async () => (await coreView(asha, groupId)).raw.length).toBe(5); // saved on the server too
-  expect(await shownDebts(page, "Asha")).toEqual((await coreView(asha, groupId)).raw);
+  expect(await shownDebts(page)).toEqual((await coreView(asha, groupId)).raw);
 
   // A fresh group: nothing owed.
   await page.goto("/new");

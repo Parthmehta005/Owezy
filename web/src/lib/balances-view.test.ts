@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { computeBalances, pairwiseDebts } from "@/core/balances";
 import { simplifyDebts } from "@/core/simplify";
 import type { BundleExpense, GroupBundle } from "@/lib/data/bundle";
-import { debtLines, groupBalances, mySummary, paymentCount, rawDebts, simplifiedDebts } from "./balances-view";
+import { debtLines, groupBalances, mySummary, paymentCount, rawDebts, simplifiedDebts, splitMine } from "./balances-view";
 
 /**
  * Fixture group (amounts in paise), worked out by hand:
@@ -129,5 +129,24 @@ describe("simplified debts", () => {
 
   it("count one payment in the singular", () => {
     expect(paymentCount(1, 1)).toBe("1 → 1 payment");
+  });
+});
+
+describe("splitMine", () => {
+  it("splits raw debts into yours and between others", () => {
+    const bundle = fixture("asha");
+    const { mine, others } = splitMine(debtLines(bundle, rawDebts(bundle)));
+    expect(mine.map((l) => l.text)).toEqual(["Rahul owes you", "Neha owes you"]);
+    expect(others.map((l) => l.text)).toEqual(["Bilal owes Neha", "Bilal owes Rahul"]);
+  });
+
+  it("with Simplify on, both sections show payments instead", () => {
+    const bundle = fixture("asha");
+    const { mine, others } = splitMine(debtLines(bundle, simplifiedDebts(bundle, groupBalances(bundle))));
+    expect(mine.map((l) => [l.text, l.amountPaise])).toEqual([
+      ["Bilal owes you", 130000],
+      ["Rahul owes you", 70000],
+    ]);
+    expect(others.map((l) => [l.text, l.amountPaise])).toEqual([["Bilal owes Neha", 11900000]]);
   });
 });

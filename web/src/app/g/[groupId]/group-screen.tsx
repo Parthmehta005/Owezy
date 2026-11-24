@@ -219,6 +219,7 @@ export function GroupScreen({
               simplified={view?.simplified ?? []}
               simplify={simplify}
               onSimplifyChange={setSimplify}
+              members={bundle.members}
             />
           </TabsContent>
         </Tabs>
