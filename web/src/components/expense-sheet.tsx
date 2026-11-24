@@ -7,7 +7,7 @@ import { cn } from "cn";
 import { addDays, dateLabel } from "@/core/dates";
 import { expenseEffect } from "@/core/effect";
 import { formatRupees, parseAmount, toAmountInput } from "@/core/money";
-import { buildShares } from "@/core/splits";
+import { autoFillRemainder, buildShares } from "@/core/splits";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
@@ -150,13 +150,24 @@ function ExpenseForm({
   const total = tryParse(amountText);
   // Keep member order (it decides who gets leftover paise in an equal split).
   const included = members.map((m) => m.id).filter((id) => includedIds.includes(id));
+  // Unequal: empty fields are undefined, unreadable ones null. Once only one
+  // person is left empty, their share fills itself with what's left.
+  const typedAmounts = Object.fromEntries(
+    members.map((m) => {
+      const text = unequalTexts[m.id] ?? "";
+      return [m.id, text.trim() === "" ? undefined : parseShareText(text)];
+    }),
+  );
+  const autoFill = splitMode === "unequal" ? autoFillRemainder(total, typedAmounts) : null;
   const split =
     splitMode === "equal"
       ? buildShares({ mode: "equal", totalPaise: total, memberIds: included })
       : buildShares({
           mode: "unequal",
           totalPaise: total,
-          amounts: Object.fromEntries(members.map((m) => [m.id, parseShareText(unequalTexts[m.id] ?? "")])),
+          amounts: Object.fromEntries(
+            members.map((m) => [m.id, autoFill?.memberId === m.id ? autoFill.paise : (typedAmounts[m.id] ?? 0)]),
+          ),
         });
   const shares = split.shares;
   const canSave = Boolean(total && shares && description.trim()) && !submitted;
@@ -324,6 +335,7 @@ function ExpenseForm({
           onUnequalChange={(id, text) => setUnequalTexts((t) => ({ ...t, [id]: text }))}
           totalPaise={total}
           remainingPaise={split.remainingPaise}
+          autoFill={autoFill}
         />
         {split.problem && <p className="text-sm text-destructive">{split.problem}</p>}
 
@@ -356,6 +368,7 @@ function SplitPanel({
   onUnequalChange,
   totalPaise,
   remainingPaise,
+  autoFill,
 }: {
   members: BundleMember[];
   meId: string | null;
@@ -368,6 +381,8 @@ function SplitPanel({
   onUnequalChange: (id: string, text: string) => void;
   totalPaise: number | null;
   remainingPaise: number | null;
+  /** Unequal: the one person whose share filled itself with what's left. */
+  autoFill: { memberId: string; paise: number } | null;
 }) {
   const name = (m: BundleMember) => (m.id === meId ? `${m.displayName} (you)` : m.displayName);
   let status = "";
@@ -432,11 +447,17 @@ function SplitPanel({
           {members.map((m) => {
             const text = unequalTexts[m.id] ?? "";
             const bad = parseShareText(text) === null;
+            const auto = autoFill?.memberId === m.id ? autoFill.paise : null;
             return (
               <div key={m.id} className="flex min-h-12 items-center gap-3">
                 <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
-                <label htmlFor={`share-${m.id}`} className="flex-1 truncate">
-                  {name(m)}
+                <label htmlFor={`share-${m.id}`} className="flex min-w-0 flex-1 items-center gap-2">
+                  <span className="truncate">{name(m)}</span>
+                  {auto !== null && (
+                    <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-accent-foreground" data-testid="auto-filled">
+                      auto<span className="sr-only">: filled with what&apos;s left</span>
+                    </span>
+                  )}
                 </label>
                 <div className={cn("flex w-32 items-center rounded-xl border bg-background px-2", bad && "border-destructive")}>
                   <span aria-hidden className="text-muted-foreground">
@@ -446,11 +467,15 @@ function SplitPanel({
                     id={`share-${m.id}`}
                     inputMode="decimal"
                     autoComplete="off"
-                    placeholder="0"
+                    // The filled-in share shows as the field's hint; typing replaces it and makes it manual.
+                    placeholder={auto !== null ? toAmountInput(auto) : "0"}
                     value={text}
                     onChange={(e) => onUnequalChange(m.id, e.target.value)}
                     aria-invalid={bad || undefined}
-                    className="h-11 w-full min-w-0 bg-transparent px-1 text-right text-base tabular-nums outline-none"
+                    className={cn(
+                      "h-11 w-full min-w-0 bg-transparent px-1 text-right text-base tabular-nums outline-none",
+                      auto !== null && "font-semibold placeholder:text-foreground",
+                    )}
                   />
                 </div>
               </div>

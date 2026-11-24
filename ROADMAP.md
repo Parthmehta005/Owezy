@@ -245,7 +245,7 @@ All existing tests still pass (updated where the UI changed), and the mobile rul
 - [x] Group screen: header avatars + ⋯ members sheet + gear, balance box, avatar rows
 - [x] Balances: Simplify on top, "You and each person" with Pay/Remind (coming soon), "Between others"
 - [x] Add sheet layout: amount, what for, Paid by (inline) + date chip, split toggle, people list
-- [ ] Unequal auto-fill of the last untouched person (`autoFillRemainder` in `core/splits.ts`)
+- [x] Unequal auto-fill of the last untouched person (`autoFillRemainder` in `core/splits.ts`)
 - [ ] Minimise and resume the add/edit sheet (draft kept on the phone)
 - [ ] Sign-in, new group, join, settings, error and empty screens restyled
 - [ ] Light motion, off with "reduce motion"

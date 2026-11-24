@@ -192,3 +192,45 @@ test("split between some people, or unequally, with Save only when it adds up", 
   expect(await sharesOf("Hotel")).toEqual({ Asha: 70000, Rahul: 29950, Neha: 50 });
   await context.close();
 });
+
+test("unequal: the last person left fills in with what's left", async ({ browser }, testInfo) => {
+  const { asha, groupId, context, page } = await setUp(browser, testInfo, "autofill");
+  await openSheet(page);
+  await page.keyboard.type("1240");
+  await page.getByLabel("What was it for?").fill("Breakfast");
+  await page.getByRole("radio", { name: "Unequally" }).click();
+  const save = page.getByRole("button", { name: "Save" });
+
+  // Two people typed, one left: Neha's share fills itself (₹1,240 − ₹400 − ₹300).
+  await page.getByLabel(/Asha/).fill("400");
+  await expect(page.getByTestId("auto-filled")).toHaveCount(0);
+  await page.getByLabel(/Rahul/).fill("300");
+  const neha = page.getByLabel(/Neha/);
+  await expect(page.getByTestId("auto-filled")).toHaveCount(1);
+  await expect(neha).toHaveAttribute("placeholder", "540");
+  await expect(page.getByTestId("split-remaining")).toHaveText("✓ All ₹1,240 assigned");
+  await expect(save).toBeEnabled();
+
+  // Typing in it makes it manual; emptying it again brings the auto value back.
+  await neha.fill("500");
+  await expect(page.getByTestId("auto-filled")).toHaveCount(0);
+  await expect(page.getByTestId("split-remaining")).toHaveText("₹40 left");
+  await expect(save).toBeDisabled();
+  await neha.fill("");
+  await expect(neha).toHaveAttribute("placeholder", "540");
+
+  // Over the total: nothing to fill.
+  await page.getByLabel(/Rahul/).fill("900");
+  await expect(page.getByTestId("auto-filled")).toHaveCount(0);
+  await expect(page.getByTestId("split-remaining")).toHaveText("₹60 over");
+  await page.getByLabel(/Rahul/).fill("300");
+
+  await save.click();
+  await expect(page.getByTestId("expense-row").first()).not.toHaveAttribute("data-pending");
+  const [row] = await storedExpenses(asha, groupId);
+  const names = Object.fromEntries(
+    ((await asha.api.from("members").select("id, display_name").eq("group_id", groupId)).data ?? []).map((m) => [m.id, m.display_name]),
+  );
+  expect(Object.fromEntries(row.expense_shares.map((s) => [names[s.member_id], s.share_paise]))).toEqual({ Asha: 40000, Rahul: 30000, Neha: 54000 });
+  await context.close();
+});

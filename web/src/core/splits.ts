@@ -82,3 +82,29 @@ export function buildShares(
   for (const [id, v] of entries) if (v) shares[id] = v;
   return { shares: validateUnequal(input.totalPaise, shares), remainingPaise: 0, problem: null };
 }
+
+/**
+ * Unequal split, "last empty one fills itself": once every person but one has
+ * an amount, that one person's share is whatever is left of the total.
+ *
+ * `amounts` per member: a number (typed), `undefined` (left empty) or `null`
+ * (typed but unreadable). Returns the member to auto-fill and their share, or
+ * null when it doesn't apply: no valid total, not exactly one empty field,
+ * an unreadable amount, or the typed amounts already exceed the total.
+ */
+export function autoFillRemainder(
+  totalPaise: Paise | null,
+  amounts: Readonly<Record<MemberId, Paise | null | undefined>>,
+): { memberId: MemberId; paise: Paise } | null {
+  if (totalPaise === null) return null;
+  const entries = Object.entries(amounts);
+  const empty = entries.filter(([, v]) => v === undefined);
+  if (empty.length !== 1 || entries.length < 2) return null;
+  let typed = 0;
+  for (const [, v] of entries) {
+    if (v === null) return null;
+    if (v !== undefined) typed += v;
+  }
+  const left = totalPaise - typed;
+  return left >= 0 ? { memberId: empty[0][0], paise: left } : null;
+}

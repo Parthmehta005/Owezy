@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildShares, splitEqual, validateUnequal } from "./splits";
+import { autoFillRemainder, buildShares, splitEqual, validateUnequal } from "./splits";
 
 const sum = (shares: Record<string, number>) => Object.values(shares).reduce((a, b) => a + b, 0);
 
@@ -95,5 +95,30 @@ describe("buildShares", () => {
 
   it("unequal: without a total there is nothing to compare against", () => {
     expect(buildShares({ mode: "unequal", totalPaise: null, amounts: { A: 500 } })).toEqual({ shares: null, remainingPaise: null, problem: null });
+  });
+});
+
+describe("autoFillRemainder", () => {
+  it("fills the one empty person with what's left", () => {
+    expect(autoFillRemainder(100000, { a: 40000, b: 30000, c: undefined })).toEqual({ memberId: "c", paise: 30000 });
+  });
+
+  it("can fill with zero when the others already add up", () => {
+    expect(autoFillRemainder(100000, { a: 60000, b: 40000, c: undefined })).toEqual({ memberId: "c", paise: 0 });
+  });
+
+  it("waits until only one field is empty", () => {
+    expect(autoFillRemainder(100000, { a: 40000, b: undefined, c: undefined })).toBeNull();
+    expect(autoFillRemainder(100000, { a: 40000, b: 60000, c: 0 })).toBeNull(); // nothing empty
+  });
+
+  it("doesn't fill when the total is missing, a field is unreadable, or the others are over", () => {
+    expect(autoFillRemainder(null, { a: 40000, b: undefined })).toBeNull();
+    expect(autoFillRemainder(100000, { a: null, b: 1000, c: undefined })).toBeNull();
+    expect(autoFillRemainder(100000, { a: 70000, b: 40000, c: undefined })).toBeNull();
+  });
+
+  it("needs at least two people", () => {
+    expect(autoFillRemainder(100000, { a: undefined })).toBeNull();
   });
 });
