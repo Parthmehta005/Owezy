@@ -20,7 +20,7 @@ function expense(id: string, payerId: string, totalPaise: number, shares: Record
 function fixture(me: string | null): GroupBundle {
   return {
     group: { id: "g", name: "Goa trip" },
-    members: ids.map((id) => ({ id, displayName: id[0].toUpperCase() + id.slice(1), isPlaceholder: false, isMe: id === me })),
+    members: ids.map((id) => ({ id, displayName: id[0].toUpperCase() + id.slice(1), isPlaceholder: false, isMe: id === me, avatarUrl: null })),
     meId: me,
     expenses: [
       expense("rahul-600", "rahul", 60000, { rahul: 30000, bilal: 30000 }),

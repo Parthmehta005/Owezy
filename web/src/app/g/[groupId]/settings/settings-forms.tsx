@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar } from "@/components/avatar";
 import { useActionState, useState } from "react";
 import { NameChipsInput } from "@/components/name-chips-input";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,8 @@ export function MemberRow({ groupId, member }: { groupId: string; member: GroupM
   return (
     <li className="py-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
+        <Avatar id={member.id} name={member.displayName} photoUrl={member.avatarUrl} />
+        <div className="min-w-0 flex-1">
           <p className="truncate">
             {member.displayName}
             {member.isMe && <span className="text-muted-foreground"> (you)</span>}

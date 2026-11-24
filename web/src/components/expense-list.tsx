@@ -4,6 +4,7 @@ import { useState } from "react";
 import { dateLabel, groupByDate, indiaDate } from "@/core/dates";
 import { expenseEffect, type Effect } from "@/core/effect";
 import { formatInr } from "@/core/money";
+import { Avatar } from "@/components/avatar";
 import type { BundleExpense, BundleMember } from "@/lib/data/bundle";
 
 /** Today in India, fixed for the life of the screen (re-read on the next visit). */
@@ -24,7 +25,7 @@ export function ExpenseList({
   onSelect: (expense: BundleExpense) => void;
 }) {
   const today = useIndiaToday();
-  const names = new Map(members.map((m) => [m.id, m.displayName]));
+  const byId = new Map(members.map((m) => [m.id, m]));
   const days = groupByDate(expenses, (e) => e.date);
 
   return (
@@ -42,7 +43,8 @@ export function ExpenseList({
               <ExpenseRow
                 key={e.id}
                 expense={e}
-                payerName={e.payerId === meId ? "You" : (names.get(e.payerId) ?? "Someone")}
+                payer={byId.get(e.payerId)}
+                payerName={e.payerId === meId ? "You" : (byId.get(e.payerId)?.displayName ?? "Someone")}
                 meId={meId}
                 onSelect={() => onSelect(e)}
               />
@@ -56,11 +58,13 @@ export function ExpenseList({
 
 function ExpenseRow({
   expense,
+  payer,
   payerName,
   meId,
   onSelect,
 }: {
   expense: BundleExpense;
+  payer: BundleMember | undefined;
   payerName: string;
   meId: string | null;
   onSelect: () => void;
@@ -75,6 +79,7 @@ function ExpenseRow({
         disabled={expense.pending}
         className="-mx-2 flex min-h-16 w-[calc(100%+1rem)] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-muted/50 disabled:cursor-default"
       >
+      <Avatar id={expense.payerId} name={payer?.displayName ?? "?"} photoUrl={payer?.avatarUrl} />
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{expense.description}</p>
         <p className="truncate text-sm text-muted-foreground">

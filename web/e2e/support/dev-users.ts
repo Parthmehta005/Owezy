@@ -78,6 +78,14 @@ export async function createDevUser(tag: string, fullName: string): Promise<DevU
   return { id: rows[0].id, email, cookies: [...jar].map(([name, value]) => ({ name, value })), api: supabase };
 }
 
+/** Give a user a sign-in photo, as Google would at sign-in (the members' copies follow by trigger). */
+export async function setAvatar(user: DevUser, url: string) {
+  await (await db()).query(
+    "update auth.users set raw_user_meta_data = raw_user_meta_data || jsonb_build_object('avatar_url', $2::text) where id = $1",
+    [user.id, url],
+  );
+}
+
 /** Put a user's session cookies into a browser context. */
 export async function signIn(context: BrowserContext, user: DevUser, baseURL: string) {
   await context.addCookies(user.cookies.map((c) => ({ ...c, url: baseURL })));

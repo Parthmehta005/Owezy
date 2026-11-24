@@ -14,6 +14,8 @@ export interface BundleMember {
   displayName: string;
   isPlaceholder: boolean;
   isMe: boolean;
+  /** Their sign-in photo, if any (fellow members only). */
+  avatarUrl: string | null;
 }
 
 export interface BundleExpense {
@@ -56,7 +58,7 @@ export async function fetchGroupBundle(
   if (!UUID.test(groupId)) return null;
   const [groupRes, membersRes, expensesRes] = await Promise.all([
     supabase.from("groups").select("id, name").eq("id", groupId).maybeSingle(),
-    supabase.from("members").select("id, display_name, user_id").eq("group_id", groupId).order("sort_order"),
+    supabase.from("members").select("id, display_name, user_id, avatar_url").eq("group_id", groupId).order("sort_order"),
     supabase
       .from("expenses")
       .select(
@@ -77,6 +79,7 @@ export async function fetchGroupBundle(
     displayName: m.display_name,
     isPlaceholder: m.user_id === null,
     isMe: m.user_id === userId,
+    avatarUrl: m.avatar_url,
   }));
 
   return {

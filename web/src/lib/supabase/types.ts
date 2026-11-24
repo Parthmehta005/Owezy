@@ -130,6 +130,7 @@ export type Database = {
       };
       members: {
         Row: {
+          avatar_url: string | null;
           created_at: string;
           display_name: string;
           group_id: string;
@@ -139,6 +140,7 @@ export type Database = {
         };
         ComputedFields: never;
         Insert: {
+          avatar_url?: string | null;
           created_at?: string;
           display_name: string;
           group_id: string;
@@ -147,6 +149,7 @@ export type Database = {
           user_id?: string | null;
         };
         Update: {
+          avatar_url?: string | null;
           created_at?: string;
           display_name?: string;
           group_id?: string;

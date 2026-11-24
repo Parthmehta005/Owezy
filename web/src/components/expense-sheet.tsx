@@ -1,5 +1,6 @@
 "use client";
 
+import { Avatar } from "@/components/avatar";
 import { useRef, useState, type FormEvent } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "cn";
@@ -291,9 +292,10 @@ function ExpenseForm({
                   setPayerId(m.id);
                   setPanel(null);
                 }}
-                className="flex min-h-12 w-full items-center justify-between border-b px-4 text-left last:border-b-0"
+                className="flex min-h-12 w-full items-center gap-3 border-b px-4 text-left last:border-b-0"
               >
-                <span>{m.id === meId ? `${m.displayName} (you)` : m.displayName}</span>
+                <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
+                <span className="flex-1">{m.id === meId ? `${m.displayName} (you)` : m.displayName}</span>
                 {m.id === payerId && <Check aria-hidden className="size-4 text-primary" />}
               </button>
             ))}
@@ -424,6 +426,7 @@ function SplitPanel({
                 >
                   {on && <Check className="size-3.5" />}
                 </span>
+                <Avatar id={m.id} name={m.displayName} photoUrl={m.avatarUrl} size="sm" />
                 <span className="flex-1 truncate">{name(m)}</span>
                 {on && equalShares?.[m.id] !== undefined && (
                   <span className="text-sm text-muted-foreground tabular-nums">{formatInr(equalShares[m.id])}</span>

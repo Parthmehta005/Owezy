@@ -12,6 +12,7 @@ export interface GroupMember {
   /** True when this placeholder has not been claimed by a signed-in person yet. */
   isPlaceholder: boolean;
   isMe: boolean;
+  avatarUrl: string | null;
 }
 
 export interface GroupView {
@@ -33,7 +34,7 @@ export async function getGroupView(groupId: string, userId: string): Promise<Gro
   const supabase = await createClient();
   const [groupResult, membersResult] = await Promise.all([
     supabase.from("groups").select("id, name, invite_code").eq("id", groupId).maybeSingle(),
-    supabase.from("members").select("id, display_name, user_id").eq("group_id", groupId).order("sort_order"),
+    supabase.from("members").select("id, display_name, user_id, avatar_url").eq("group_id", groupId).order("sort_order"),
   ]);
   if (groupResult.error) throw groupResult.error;
   if (membersResult.error) throw membersResult.error;
@@ -47,6 +48,7 @@ export async function getGroupView(groupId: string, userId: string): Promise<Gro
       displayName: m.display_name,
       isPlaceholder: m.user_id === null,
       isMe: m.user_id === userId,
+      avatarUrl: m.avatar_url,
     })),
   };
 }
