@@ -7,23 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-jakarta);
   /* The phone's own monospace font (only the invite link uses it): one less download. */
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -51,78 +38,57 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Owezy palette (M8): cobalt brand, burnt-orange "you owe", cool grey page in
+ * light mode and blue-black in dark. No green, no purple, no gradients.
+ * Hex on purpose: src/app/theme-contrast.test.ts reads these and checks every
+ * text/background pair is at least 4.5:1 in both themes.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.511 0.23 277);
-  --primary-foreground: oklch(0.985 0 0);
-  --positive: oklch(0.527 0.137 150);
-  --negative: oklch(0.577 0.215 27);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  /* Slightly darker than shadcn's 0.556 so grey text on grey panels passes 4.5:1 (was 4.34). */
-  --muted-foreground: oklch(0.52 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.511 0.23 277);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #f5f6f8;
+  --foreground: #121826;
+  --card: #ffffff;
+  --card-foreground: #121826;
+  --popover: #ffffff;
+  --popover-foreground: #121826;
+  --primary: #2457d6;
+  --primary-foreground: #ffffff;
+  --positive: #2457d6;
+  --negative: #b33b0b;
+  --secondary: #e9edf4;
+  --secondary-foreground: #1b2436;
+  --muted: #eaeef4;
+  --muted-foreground: #556074;
+  --accent: #e5ecfc;
+  --accent-foreground: #1a3f9e;
+  --destructive: #c0262d;
+  --border: #e1e5ec;
+  --input: #d3d9e3;
+  --ring: #2457d6;
+  --radius: 1rem;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.673 0.182 277);
-  --primary-foreground: oklch(0.145 0 0);
-  --positive: oklch(0.765 0.177 152);
-  --negative: oklch(0.711 0.166 22);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.673 0.182 277);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0e1220;
+  --foreground: #e8ecf6;
+  --card: #171c2e;
+  --card-foreground: #e8ecf6;
+  --popover: #171c2e;
+  --popover-foreground: #e8ecf6;
+  --primary: #7fa4ff;
+  --primary-foreground: #0e1220;
+  --positive: #7fa4ff;
+  --negative: #ff9a5c;
+  --secondary: #232a40;
+  --secondary-foreground: #e8ecf6;
+  --muted: #1e2438;
+  --muted-foreground: #a3acc2;
+  --accent: #1f2a4a;
+  --accent-foreground: #c9d8ff;
+  --destructive: #ff7a7a;
+  --border: #262d44;
+  --input: #343c57;
+  --ring: #7fa4ff;
 }
 
 @layer base {

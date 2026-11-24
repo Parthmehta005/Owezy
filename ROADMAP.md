@@ -238,7 +238,7 @@ All existing tests still pass (updated where the UI changed), and the mobile rul
   - Plus Jakarta Sans. Whole rupees drop ".00".
 - **Default group algorithm:** each open adds 1 to a score on your member row, after decaying it with a 7-day half-life; re-opens within 30 minutes don't count. Home opens the highest decayed score, and the switcher uses the same order.
 - [x] Design direction: mockups made; the owner picked a mix (above)
-- [ ] Design tokens (palette, font, radii; `ui/` primitives restyled) + a test that every text/background pair is ≥ 4.5:1
+- [x] Design tokens (palette, font, radii; `ui/` primitives restyled) + a test that every text/background pair is ≥ 4.5:1
 - [ ] Avatars: `members.avatar_url` (migration, trigger, backfill, pgTAP) + `Avatar` component everywhere
 - [ ] Frecency default group: migration + `record_group_open` RPC + `core/frecency.ts` + home and switcher order
 - [ ] Whole rupees without ".00" (`formatInr` option)
