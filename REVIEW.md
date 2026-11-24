@@ -84,15 +84,15 @@ Used with [ROADMAP.md](ROADMAP.md). The per-commit checks apply to every commit.
 ## M8. A better UI
 
 - [x] The owner chose a direction from the mockups, and the decisions are written in ROADMAP.md.
-- [ ] Every screen uses the new tokens and components (no leftover stock styling), in light and dark mode.
-- [ ] The group screen shows your total and the people behind it without scrolling, on a small phone (360×640).
-- [ ] Add an expense is still 3 taps plus typing, and the number pad still opens straight away.
-- [ ] Unequal auto-fill gives the last untouched person exactly the remainder; saved shares add up to the total.
-- [ ] A minimised expense survives a reload and is saved exactly once.
-- [ ] Opening a group often makes it the default; a group opened once long ago doesn't win.
-- [ ] Members' Google photos show to fellow members only; a broken photo falls back to the letter.
-- [ ] Every text/background pair is ≥ 4.5:1 (tested); every tap target ≥ 44px; motion is off with "reduce motion".
-- [ ] Screenshot tests cover the key screens in light/dark on both engines; the full e2e suite passes.
+- [x] Every screen uses the new tokens and components (no leftover stock styling), in light and dark mode. (Screens reviewed in both themes; app icon moved to cobalt too.)
+- [x] The group screen shows your total and the people behind it without scrolling, on a small phone (360×640). (e2e/screens.spec.ts.)
+- [x] Add an expense is still 3 taps plus typing, and the number pad still opens straight away. (The M5 e2e still passes on both engines.)
+- [x] Unequal auto-fill gives the last untouched person exactly the remainder; saved shares add up to the total. (Unit + e2e; mutation-checked.)
+- [x] A minimised expense survives a reload and is saved exactly once. (e2e; mutation-checked.)
+- [x] Opening a group often makes it the default; a group opened once long ago doesn't win. (Unit, pgTAP and e2e; mutation-checked.)
+- [x] Members' Google photos show to fellow members only; a broken photo falls back to the letter. (pgTAP + e2e; mutation-checked.)
+- [x] Every text/background pair is ≥ 4.5:1 (tested); every tap target ≥ 44px; motion is off with "reduce motion". (Contrast unit test, tap-size e2e incl. new sheets, motion e2e.)
+- [x] Screenshot tests cover the key screens in light/dark on both engines; the full e2e suite passes. (71 runs pass + 1 Chromium-only skip.)
 - [ ] Lighthouse mobile still ≥ 90 performance, ≥ 95 accessibility.
 - [ ] Owner checked it on a phone.
 
