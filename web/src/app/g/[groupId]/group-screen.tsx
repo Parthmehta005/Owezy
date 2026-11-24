@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Settings } from "lucide-react";
+import { Pencil, Plus, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
 import { AvatarColors } from "@/components/avatar";
 import { BalanceSummary } from "@/components/balance-summary";
@@ -30,6 +30,7 @@ import {
 import { debtLines, groupBalances, mySummary, rawDebts, simplifiedDebts } from "@/lib/balances-view";
 import type { GroupSummary } from "@/lib/data/groups";
 import { useGroupBundle } from "@/lib/data/use-group-bundle";
+import { draftToResume, removeDraft, saveDraft, useDrafts } from "@/lib/expense-drafts";
 
 export function GroupScreen({
   groupId,
@@ -54,6 +55,9 @@ export function GroupScreen({
   const [today] = useState(() => indiaDate(new Date()));
   const [sheetOpen, setSheetOpen] = useState(false);
   const [draft, setDraft] = useState<ExpenseDraft | null>(null);
+  const [resumed, setResumed] = useState(false);
+  // Minimised expenses, kept on the phone until saved or discarded.
+  const drafts = useDrafts(groupId);
   const keyboardPrimer = useRef<HTMLInputElement>(null);
   const [tab, setTab] = useState("expenses");
   const [simplify, setSimplify] = useState(false);
@@ -71,8 +75,28 @@ export function GroupScreen({
 
   const nextAttempt = (d: ExpenseDraft | null) => (d?.attempt ?? 0) + 1;
 
+  function openSheet(d: ExpenseDraft, wasMinimised: boolean) {
+    setNotice(null);
+    setDraft(d);
+    setResumed(wasMinimised);
+    setSheetOpen(true);
+  }
+
+  /** Keep the draft on the phone while it has changes (or was already kept). */
+  function keepDraft(d: ExpenseDraft, changed: boolean) {
+    if (changed || resumed) saveDraft(groupId, d);
+    else removeDraft(groupId, d.id);
+  }
+
+  function discard(draftId: string) {
+    removeDraft(groupId, draftId);
+    setSheetOpen(false);
+  }
+
   /** Bring the sheet back with what was typed and why it failed; Save retries. */
   function reopenWithError(typed: ExpenseDraft, error: unknown) {
+    saveDraft(groupId, typed); // still unsaved: keep it
+    setResumed(true);
     setDraft((d) => ({
       ...typed,
       error: `Not saved: ${saveErrorMessage(error)} Your details are below; tap Save to try again.`,
@@ -84,6 +108,7 @@ export function GroupScreen({
   function save(expense: NewExpense, typed: ExpenseDraft) {
     setSheetOpen(false);
     setNotice(null);
+    removeDraft(groupId, typed.id);
     if (typed.mode === "add") {
       createExpense.mutate(expense, { onError: (error) => reopenWithError(typed, error) });
       return;
@@ -119,6 +144,7 @@ export function GroupScreen({
     if (!expense) return;
     setSheetOpen(false);
     setNotice(null);
+    removeDraft(groupId, expenseId);
     const name = expense.description;
     const deleting = deleteExpense.mutateAsync(expense);
     deleting.catch((error) => toast.error(`Couldn't delete "${name}". ${saveErrorMessage(error)}`));
@@ -141,6 +167,8 @@ export function GroupScreen({
       },
     });
   }
+
+  const resumable = draftToResume(drafts);
 
   // A refresh found the group gone for this user (e.g. they left on another device).
   if (!bundle) {
@@ -205,11 +233,7 @@ export function GroupScreen({
                 expenses={bundle.expenses}
                 members={bundle.members}
                 meId={bundle.meId}
-                onSelect={(e) => {
-                  setNotice(null);
-                  setDraft(draftFromExpense(e));
-                  setSheetOpen(true);
-                }}
+                onSelect={(e) => openSheet(drafts[e.id] ?? draftFromExpense(e), e.id in drafts)}
               />
             )}
           </TabsContent>
@@ -234,13 +258,33 @@ export function GroupScreen({
         className="fixed right-[max(1rem,calc((100vw-480px)/2+1rem))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-20 h-14 gap-2 rounded-full pr-6 pl-5 text-base font-bold shadow-lg shadow-primary/30"
         onClick={() => {
           keyboardPrimer.current?.focus();
-          setDraft(newDraft(bundle.meId ?? bundle.members[0].id, today));
-          setSheetOpen(true);
+          const minimised = Object.values(drafts).find((d) => d.mode === "add");
+          openSheet(minimised ?? newDraft(bundle.meId ?? bundle.members[0].id, today), Boolean(minimised));
         }}
       >
         <Plus aria-hidden className="size-5" strokeWidth={2.6} />
         Add expense
       </Button>
+
+      {/* A minimised expense waits here until it's saved or discarded. */}
+      {!sheetOpen && resumable && (
+        <button
+          type="button"
+          data-testid="resume-draft"
+          onClick={() => {
+            keyboardPrimer.current?.focus();
+            openSheet(resumable, true);
+          }}
+          className="fixed right-[max(1rem,calc((100vw-480px)/2+1rem))] bottom-[calc(5.5rem+env(safe-area-inset-bottom))] left-[max(1rem,calc((100vw-480px)/2+1rem))] z-20 flex min-h-12 items-center gap-3 rounded-2xl border bg-card px-4 text-left shadow-lg"
+        >
+          <Pencil aria-hidden className="size-4 shrink-0 text-primary" />
+          <span className="min-w-0 flex-1 truncate text-sm">
+            <span className="font-bold">{resumable.mode === "edit" ? "Continue editing" : "Continue expense"}</span>
+            {resumable.amountText.trim() && <span className="text-muted-foreground"> · ₹{resumable.amountText.trim()}</span>}
+            {resumable.description.trim() && <span className="text-muted-foreground"> · {resumable.description.trim()}</span>}
+          </span>
+        </button>
+      )}
 
       {draft && (
         <ExpenseSheet
@@ -250,8 +294,11 @@ export function GroupScreen({
           members={bundle.members}
           meId={bundle.meId}
           today={today}
+          resumed={resumed}
           onSave={save}
           onDelete={remove}
+          onDraftChange={keepDraft}
+          onDiscard={discard}
         />
       )}
     </AvatarColors>

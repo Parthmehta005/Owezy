@@ -234,3 +234,71 @@ test("unequal: the last person left fills in with what's left", async ({ browser
   expect(Object.fromEntries(row.expense_shares.map((s) => [names[s.member_id], s.share_paise]))).toEqual({ Asha: 40000, Rahul: 30000, Neha: 54000 });
   await context.close();
 });
+
+test("minimise keeps a half-filled expense, even across a reload, and it saves once", async ({ browser }, testInfo) => {
+  const { asha, groupId, context, page } = await setUp(browser, testInfo, "minimise");
+  await openSheet(page);
+  await page.keyboard.type("1240");
+  await page.getByLabel("What was it for?").fill("Breakfast");
+  await page.getByRole("button", { name: "Minimise" }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  const bar = page.getByTestId("resume-draft");
+  await expect(bar).toHaveText(/Continue expense · ₹1240 · Breakfast/);
+
+  // Close the app and come back: still there.
+  const counted = page.waitForRequest((r) => r.url().includes("/rest/v1/rpc/record_group_open"));
+  await page.reload();
+  await counted; // hydrated
+  await expect(bar).toBeVisible();
+  await bar.click();
+  await expect(page.getByLabel("Amount in rupees")).toHaveValue("1240");
+  await expect(page.getByLabel("What was it for?")).toHaveValue("Breakfast");
+
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByTestId("expense-row").first()).not.toHaveAttribute("data-pending");
+  await expect(bar).toBeHidden();
+  expect((await storedExpenses(asha, groupId)).map((e) => e.total_paise)).toEqual([124000]);
+  await page.reload();
+  await expect(page.getByTestId("expense-row")).toHaveCount(1);
+  await expect(bar).toBeHidden();
+  await context.close();
+});
+
+test("swiping the sheet away minimises it; Cancel asks before throwing anything away", async ({ browser }, testInfo) => {
+  const { asha, groupId, context, page } = await setUp(browser, testInfo, "discard");
+  const bar = page.getByTestId("resume-draft");
+
+  // Nothing typed: Cancel just closes, nothing kept.
+  await openSheet(page);
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(bar).toBeHidden();
+
+  // Typed, then dismissed (Escape, as a swipe or outside tap does): minimised.
+  await openSheet(page);
+  await page.keyboard.type("500");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(bar).toHaveText(/Continue expense · ₹500/);
+
+  // + opens that same expense rather than a blank one.
+  await openSheet(page);
+  await expect(page.getByLabel("Amount in rupees")).toHaveValue("500");
+
+  // Cancel asks; "Keep editing" keeps it.
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page.getByRole("alertdialog")).toContainText("Discard this expense?");
+  await page.getByRole("button", { name: "Keep editing" }).click();
+  await expect(page.getByLabel("Amount in rupees")).toHaveValue("500");
+
+  // Discard: gone for good.
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.getByRole("button", { name: "Discard" }).click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(bar).toBeHidden();
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "No expenses yet" })).toBeVisible();
+  await expect(bar).toBeHidden();
+  expect(await storedExpenses(asha, groupId)).toEqual([]);
+  await context.close();
+});

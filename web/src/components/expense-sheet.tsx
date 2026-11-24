@@ -1,8 +1,8 @@
 "use client";
 
 import { Avatar } from "@/components/avatar";
-import { useRef, useState, type FormEvent } from "react";
-import { CalendarDays, Check, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { CalendarDays, Check, ChevronDown, Minimize2 } from "lucide-react";
 import { cn } from "cn";
 import { addDays, dateLabel } from "@/core/dates";
 import { expenseEffect } from "@/core/effect";
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { BundleExpense, BundleMember } from "@/lib/data/bundle";
 import type { NewExpense } from "@/lib/data/expense-mutations";
+import { hasContent } from "@/lib/expense-drafts";
 
 /** What the sheet starts from: a fresh expense, an existing one to edit, or one whose save failed. */
 export interface ExpenseDraft {
@@ -88,18 +89,28 @@ export function ExpenseSheet({
   members,
   meId,
   today,
+  resumed,
   onSave,
   onDelete,
+  onDraftChange,
+  onDiscard,
 }: {
   open: boolean;
+  /** Closing (swipe down, tap outside, the minimise button) only minimises: the draft is kept. */
   onOpenChange: (open: boolean) => void;
   draft: ExpenseDraft;
   members: BundleMember[];
   meId: string | null;
   today: string;
+  /** This draft was minimised earlier and is being continued. */
+  resumed: boolean;
   onSave: (expense: NewExpense, draft: ExpenseDraft) => void;
   /** Edit mode only. */
   onDelete: (expenseId: string) => void;
+  /** Every change, so the draft can be kept on the phone. `changed`: differs from how it opened. */
+  onDraftChange: (draft: ExpenseDraft, changed: boolean) => void;
+  /** Cancel: throw this draft away. */
+  onDiscard: (draftId: string) => void;
 }) {
   return (
     <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
@@ -113,7 +124,8 @@ export function ExpenseSheet({
       >
         {/* Remount per draft so a retry starts from what was typed. */}
         <ExpenseForm key={`${draft.id}:${draft.attempt ?? 0}`} draft={draft} members={members} meId={meId} today={today}
-          onCancel={() => onOpenChange(false)} onSave={onSave} onDelete={onDelete} />
+          resumed={resumed} onMinimise={() => onOpenChange(false)} onDiscard={onDiscard} onDraftChange={onDraftChange}
+          onSave={onSave} onDelete={onDelete} />
       </DrawerContent>
     </Drawer>
   );
@@ -124,7 +136,10 @@ function ExpenseForm({
   members,
   meId,
   today,
-  onCancel,
+  resumed,
+  onMinimise,
+  onDiscard,
+  onDraftChange,
   onSave,
   onDelete,
 }: {
@@ -132,7 +147,10 @@ function ExpenseForm({
   members: BundleMember[];
   meId: string | null;
   today: string;
-  onCancel: () => void;
+  resumed: boolean;
+  onMinimise: () => void;
+  onDiscard: (draftId: string) => void;
+  onDraftChange: (draft: ExpenseDraft, changed: boolean) => void;
   onSave: (expense: NewExpense, draft: ExpenseDraft) => void;
   onDelete: (expenseId: string) => void;
 }) {
@@ -144,6 +162,7 @@ function ExpenseForm({
   const [includedIds, setIncludedIds] = useState<string[]>(draft.includedIds ?? members.map((m) => m.id));
   const [unequalTexts, setUnequalTexts] = useState<Record<string, string>>(draft.unequalTexts ?? {});
   const [payerOpen, setPayerOpen] = useState(false);
+  const [confirmingDiscard, setConfirmingDiscard] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const descriptionRef = useRef<HTMLInputElement>(null);
 
@@ -173,6 +192,29 @@ function ExpenseForm({
   const canSave = Boolean(total && shares && description.trim()) && !submitted;
   const payer = members.find((m) => m.id === payerId);
 
+  // What's on screen now, as a draft (kept on the phone as it changes), and how it opened.
+  const snapshot: ExpenseDraft = { ...draft, amountText, description, payerId, date, splitMode, includedIds, unequalTexts, error: undefined };
+  const [opened] = useState(snapshot);
+  const changed = hasContent(snapshot, opened);
+  const report = useRef(onDraftChange);
+  useEffect(() => {
+    report.current = onDraftChange;
+  });
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    report.current({ ...draft, amountText, description, payerId, date, splitMode, includedIds, unequalTexts, error: undefined }, changed);
+  }, [draft, amountText, description, payerId, date, splitMode, includedIds, unequalTexts, changed]);
+
+  /** Cancel: throw it away, asking first if there's anything to lose. */
+  function cancel() {
+    if (resumed || changed) setConfirmingDiscard(true);
+    else onDiscard(draft.id);
+  }
+
   function save(event?: FormEvent) {
     event?.preventDefault();
     if (!canSave || !total || !shares) return;
@@ -197,16 +239,32 @@ function ExpenseForm({
   return (
     <form onSubmit={save} className="flex min-h-0 flex-1 flex-col">
       {/* Actions at the top: the on-screen keyboard covers the bottom half of the screen. */}
-      <div className="flex items-center justify-between gap-2 px-2 pb-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancel
-        </Button>
-        <DrawerTitle className="text-base font-bold">{draft.mode === "edit" ? "Edit expense" : "Add expense"}</DrawerTitle>
+      <div className="flex items-center justify-between gap-1 px-2 pb-2">
+        <div className="flex items-center">
+          <Button type="button" variant="ghost" size="icon" aria-label="Minimise" title="Minimise" onClick={onMinimise}>
+            <Minimize2 aria-hidden className="size-5" />
+          </Button>
+          <Button type="button" variant="ghost" className="px-2" onClick={cancel}>
+            Cancel
+          </Button>
+        </div>
+        <DrawerTitle className="truncate text-base font-bold">{draft.mode === "edit" ? "Edit expense" : "Add expense"}</DrawerTitle>
         <Button type="submit" disabled={!canSave} className="rounded-full px-5">
           Save
         </Button>
       </div>
       <DrawerDescription className="sr-only">Enter the amount, what it was for, who paid and how to split it.</DrawerDescription>
+      {confirmingDiscard && (
+        <div role="alertdialog" aria-label="Discard?" className="mx-4 mb-2 flex flex-wrap items-center gap-2 rounded-2xl bg-card p-3 shadow-sm">
+          <p className="flex-1 text-sm font-semibold">{draft.mode === "edit" ? "Discard your changes?" : "Discard this expense?"}</p>
+          <Button type="button" variant="ghost" onClick={() => setConfirmingDiscard(false)}>
+            Keep editing
+          </Button>
+          <Button type="button" variant="destructive" onClick={() => onDiscard(draft.id)}>
+            Discard
+          </Button>
+        </div>
+      )}
 
       <div className="flex-1 space-y-5 overflow-y-auto px-4 pt-2 pb-6">
         {draft.error && (
