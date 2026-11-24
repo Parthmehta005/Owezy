@@ -1,7 +1,19 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "./support/test";
 import { cleanupDevUsers, closeDb, createDevUser, phoneFor } from "./support/dev-users";
 
 test.beforeAll(cleanupDevUsers);
+
+/** Opens the members sheet from the header (avatars + ⋯), checks its rows (you first), and closes it. */
+async function expectMembers(page: Page, names: string[], notJoined: string[]) {
+  await page.getByRole("button", { name: /members: show everyone/ }).click();
+  const list = page.getByTestId("members-list");
+  await expect(list.getByTestId("member-name")).toHaveText(names);
+  await expect(list.locator("li").filter({ hasText: "Not joined yet" }).getByTestId("member-name")).toHaveText(notJoined);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("members-list")).toBeHidden();
+}
+
 test.afterAll(async () => {
   await cleanupDevUsers();
   await closeDb();
@@ -37,8 +49,7 @@ test("two people share a group through an invite link", async ({ browser }, test
   await pageA.getByRole("button", { name: "Create group" }).click();
   await expect(pageA).toHaveURL(/\/g\/[0-9a-f-]{36}$/);
   const groupUrl = pageA.url();
-  const membersA = pageA.locator("#members-heading + ul li");
-  await expect(membersA).toHaveText(["Asha (you)", /^Rahul/, /^Neha/]);
+  await expectMembers(pageA, ["Asha (you)", "Rahul", "Neha"], ["Rahul", "Neha"]);
 
   // A copies the invite link from settings.
   await pageA.getByRole("link", { name: "Group settings" }).click();
@@ -53,11 +64,11 @@ test("two people share a group through an invite link", async ({ browser }, test
   await expect(pageB.getByRole("heading", { level: 1 })).toHaveText("Goa trip");
   await pageB.getByRole("button", { name: "I'm Rahul" }).click();
   await expect(pageB).toHaveURL(groupUrl);
-  await expect(pageB.locator("#members-heading + ul li")).toHaveText(["Asha", "Rahul (you)", /^Neha/]);
+  await expectMembers(pageB, ["Rahul (you)", "Asha", "Neha"], ["Neha"]);
 
   // A sees Rahul has joined; Neha is still a placeholder.
   await pageA.goto(groupUrl);
-  await expect(membersA).toHaveText(["Asha (you)", "Rahul", "Neha (not joined yet)"]);
+  await expectMembers(pageA, ["Asha (you)", "Rahul", "Neha"], ["Neha"]);
 
   // "/" brings both back to the group.
   for (const page of [pageA, pageB]) {

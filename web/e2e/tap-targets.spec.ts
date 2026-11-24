@@ -80,6 +80,11 @@ test("every tap target is at least 44px tall", async ({ browser }, testInfo) => 
   await page.getByTestId("expense-row").first().waitFor();
   await page.waitForTimeout(500);
   await check(page, "group with an expense");
+  await page.getByRole("button", { name: /members: show everyone/ }).click();
+  await page.getByTestId("members-list").waitFor();
+  await check(page, "members sheet");
+  await page.keyboard.press("Escape");
+  await page.getByTestId("members-list").waitFor({ state: "hidden" });
   await page.getByRole("tab", { name: "Balances" }).click();
   await page.getByRole("switch", { name: /Simplify/ }).click();
   await check(page, "balances, simplified");

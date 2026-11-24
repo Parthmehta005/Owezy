@@ -6,15 +6,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Settings } from "lucide-react";
 import { indiaDate } from "@/core/dates";
+import { AvatarColors } from "@/components/avatar";
 import { BalanceSummary } from "@/components/balance-summary";
 import { BalancesView } from "@/components/balances-view";
 import { ExpenseList } from "@/components/expense-list";
 import { ExpenseSheet, draftFromExpense, newDraft, type ExpenseDraft } from "@/components/expense-sheet";
 import { GroupSwitcher } from "@/components/group-switcher";
+import { MembersButton } from "@/components/members-button";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { groupKeys, type BundleMember, type GroupBundle } from "@/lib/data/bundle";
+import { groupKeys, type GroupBundle } from "@/lib/data/bundle";
 import {
   isConflict,
   isGone,
@@ -61,6 +63,8 @@ export function GroupScreen({
     return {
       summary: mySummary(bundle, balances),
       raw: debtLines(bundle, rawDebts(bundle)),
+      // Your own standing with each person, for the balance box.
+      mine: debtLines(bundle, rawDebts(bundle)).filter((l) => l.tone !== "neutral"),
       simplified: debtLines(bundle, simplifiedDebts(bundle, balances)),
     };
   }, [bundle]);
@@ -151,10 +155,12 @@ export function GroupScreen({
   }
 
   return (
-    <>
+    <AvatarColors memberIds={bundle.members.map((m) => m.id)}>
       <PullToRefresh onRefresh={() => refetch()} />
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
+      <header className="sticky top-0 z-10 flex items-center gap-1 bg-background/95 px-4 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-2 backdrop-blur">
         <GroupSwitcher current={bundle.group} groups={groups} />
+        <span className="flex-1" />
+        <MembersButton members={bundle.members} />
         <Link
           href={`/g/${bundle.group.id}/settings`}
           className="flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -163,7 +169,7 @@ export function GroupScreen({
           <span className="sr-only">Group settings</span>
         </Link>
       </header>
-      <main className="flex flex-1 flex-col gap-8 px-4 pt-6 pb-28">
+      <main className="flex flex-1 flex-col gap-5 px-4 pt-3 pb-28">
         {notice && (
           <p role="alert" className="rounded-lg border border-negative/30 bg-negative/10 px-3 py-2 text-sm text-negative">
             {notice}
@@ -178,8 +184,9 @@ export function GroupScreen({
             </Button>
           </div>
         )}
-        {view?.summary && <BalanceSummary summary={view.summary} />}
-        <Members members={bundle.members} />
+        {view?.summary && (
+          <BalanceSummary summary={view.summary} people={view.mine} members={bundle.members} onShowAll={() => setTab("balances")} />
+        )}
         <Tabs value={tab} onValueChange={setTab} className="flex-1 gap-4">
           <TabsList className="w-full">
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
@@ -222,16 +229,16 @@ export function GroupScreen({
           focus to the amount and the number pad stays up. */}
       <input ref={keyboardPrimer} aria-hidden tabIndex={-1} inputMode="decimal" className="fixed top-0 left-0 size-px opacity-0" />
       <Button
-        size="icon-lg"
-        className="fixed right-[max(1.25rem,calc((100vw-480px)/2+1.25rem))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-20 size-14 rounded-full shadow-lg"
+        size="lg"
+        className="fixed right-[max(1rem,calc((100vw-480px)/2+1rem))] bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-20 h-14 gap-2 rounded-full pr-6 pl-5 text-base font-bold shadow-lg shadow-primary/30"
         onClick={() => {
           keyboardPrimer.current?.focus();
           setDraft(newDraft(bundle.meId ?? bundle.members[0].id, today));
           setSheetOpen(true);
         }}
       >
-        <Plus aria-hidden className="size-6" />
-        <span className="sr-only">Add expense</span>
+        <Plus aria-hidden className="size-5" strokeWidth={2.6} />
+        Add expense
       </Button>
 
       {draft && (
@@ -246,32 +253,6 @@ export function GroupScreen({
           onDelete={remove}
         />
       )}
-    </>
-  );
-}
-
-function Members({ members }: { members: BundleMember[] }) {
-  return (
-    <section aria-labelledby="members-heading" className="space-y-3">
-      <h2 id="members-heading" className="text-sm font-medium text-muted-foreground">
-        {members.length} {members.length === 1 ? "member" : "members"}
-      </h2>
-      <ul className="flex flex-wrap gap-2">
-        {members.map((m) => (
-          <li
-            key={m.id}
-            className={
-              m.isPlaceholder
-                ? "rounded-full border border-dashed px-3 py-1 text-sm text-muted-foreground"
-                : "rounded-full bg-muted px-3 py-1 text-sm"
-            }
-          >
-            {m.displayName}
-            {m.isMe && <span className="text-muted-foreground"> (you)</span>}
-            {m.isPlaceholder && <span className="sr-only"> (not joined yet)</span>}
-          </li>
-        ))}
-      </ul>
-    </section>
+    </AvatarColors>
   );
 }

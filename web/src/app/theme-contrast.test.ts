@@ -14,7 +14,7 @@ function tokens(selector: ":root" | ".dark"): Record<string, string> {
   return Object.fromEntries([...block.matchAll(/--([a-z-]+):\s*(#[0-9a-f]{6});/gi)].map((m) => [m[1], m[2].toLowerCase()]));
 }
 
-/** [text, background] pairs the UI uses. "white" is the text on the filled balance box. */
+/** [text, background] pairs the UI uses. */
 const PAIRS: [string, string][] = [
   ...["background", "card", "muted", "secondary"].map((bg): [string, string] => ["foreground", bg]),
   ...["background", "card", "muted"].map((bg): [string, string] => ["muted-foreground", bg]),
@@ -25,6 +25,7 @@ const PAIRS: [string, string][] = [
     ["destructive", bg],
   ]),
   ["primary-foreground", "primary"],
+  ["primary-foreground", "negative"], // text on the "You owe" balance box
   ["accent-foreground", "accent"],
   ["secondary-foreground", "secondary"],
   ["card-foreground", "card"],

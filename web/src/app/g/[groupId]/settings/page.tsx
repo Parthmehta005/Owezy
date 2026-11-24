@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
+import { AvatarColors } from "@/components/avatar";
 import { InviteLink } from "@/components/invite-link";
 import { getCurrentUser } from "@/lib/auth/user";
 import { getGroupView } from "@/lib/data/groups";
@@ -52,11 +53,13 @@ async function Settings({ params }: { params: PageProps<"/g/[groupId]/settings">
           <h2 id="members-heading" className="font-medium">
             Members
           </h2>
-          <ul className="divide-y border-y">
-            {members.map((m) => (
-              <MemberRow key={m.id} groupId={group.id} member={m} />
-            ))}
-          </ul>
+          <AvatarColors memberIds={members.map((m) => m.id)}>
+            <ul className="divide-y border-y">
+              {members.map((m) => (
+                <MemberRow key={m.id} groupId={group.id} member={m} />
+              ))}
+            </ul>
+          </AvatarColors>
           <AddMembersForm groupId={group.id} existingNames={members.map((m) => m.displayName)} />
         </section>
 

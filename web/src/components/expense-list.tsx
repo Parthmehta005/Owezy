@@ -29,16 +29,16 @@ export function ExpenseList({
   const days = groupByDate(expenses, (e) => e.date);
 
   return (
-    <section aria-labelledby="expenses-heading" className="space-y-4">
+    <section aria-labelledby="expenses-heading" className="space-y-5">
       <h2 id="expenses-heading" className="sr-only">
         Expenses
       </h2>
       {days.map((day) => (
         <div key={day.date}>
-          <h3 className="pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          <h3 className="px-1 pb-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
             {dateLabel(day.date, today)}
           </h3>
-          <ul className="divide-y">
+          <ul className="divide-y rounded-2xl bg-card px-3">
             {day.items.map((e) => (
               <ExpenseRow
                 key={e.id}
@@ -77,11 +77,11 @@ function ExpenseRow({
         type="button"
         onClick={onSelect}
         disabled={expense.pending}
-        className="-mx-2 flex min-h-16 w-[calc(100%+1rem)] items-center gap-3 rounded-lg px-2 py-3 text-left hover:bg-muted/50 disabled:cursor-default"
+        className="flex min-h-16 w-full items-center gap-3 py-3 text-left disabled:cursor-default"
       >
       <Avatar id={expense.payerId} name={payer?.displayName ?? "?"} photoUrl={payer?.avatarUrl} />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium">{expense.description}</p>
+        <p className="truncate font-semibold">{expense.description}</p>
         <p className="truncate text-sm text-muted-foreground">
           {payerName} paid {formatRupees(expense.totalPaise)}
           {expense.pending && <span className="italic"> · Saving…</span>}
@@ -98,15 +98,15 @@ function EffectLabel({ effect }: { effect: Effect }) {
     case "lent":
       return (
         <div className="shrink-0 text-right">
-          <p className="text-xs text-positive">you lent</p>
-          <p className="font-medium text-positive tabular-nums">{formatRupees(effect.amountPaise)}</p>
+          <p className="text-xs font-semibold text-positive">you lent</p>
+          <p className="font-bold text-positive tabular-nums">{formatRupees(effect.amountPaise)}</p>
         </div>
       );
     case "borrowed":
       return (
         <div className="shrink-0 text-right">
-          <p className="text-xs text-negative">you borrowed</p>
-          <p className="font-medium text-negative tabular-nums">{formatRupees(effect.amountPaise)}</p>
+          <p className="text-xs font-semibold text-negative">you borrowed</p>
+          <p className="font-bold text-negative tabular-nums">{formatRupees(effect.amountPaise)}</p>
         </div>
       );
     case "even":

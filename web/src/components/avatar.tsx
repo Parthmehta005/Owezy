@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "cn";
-import { avatarColor, initialOf } from "@/lib/avatar";
+import { avatarColor, groupAvatarColors, initialOf } from "@/lib/avatar";
 
 const SIZES = {
   xs: "size-7 text-[11px]",
@@ -10,6 +10,13 @@ const SIZES = {
   md: "size-10 text-sm",
   lg: "size-11 text-base",
 } as const;
+
+const GroupColors = createContext<Map<string, string> | null>(null);
+
+/** Gives everyone in a group a distinct avatar colour (by member order) for the avatars inside. */
+export function AvatarColors({ memberIds, children }: { memberIds: readonly string[]; children: ReactNode }) {
+  return <GroupColors.Provider value={groupAvatarColors(memberIds)}>{children}</GroupColors.Provider>;
+}
 
 /**
  * A member's round avatar: their Google photo when they have one, else their
@@ -34,6 +41,7 @@ export function Avatar({
   label?: string;
   className?: string;
 }) {
+  const groupColors = useContext(GroupColors);
   const [failed, setFailed] = useState(false);
   const img = useRef<HTMLImageElement>(null);
   // A photo that failed while the page was still server-rendered fired its
@@ -54,7 +62,7 @@ export function Avatar({
         SIZES[size],
         className,
       )}
-      style={showPhoto ? undefined : { backgroundColor: avatarColor(id) }}
+      style={showPhoto ? undefined : { backgroundColor: groupColors?.get(id) ?? avatarColor(id) }}
     >
       {showPhoto ? (
         // A plain <img>: small external photos (Google), no optimisation needed.

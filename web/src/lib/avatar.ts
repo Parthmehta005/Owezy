@@ -13,7 +13,15 @@ export const AVATAR_COLORS = [
   "#1f6fb2", // sky
 ] as const;
 
-/** A stable colour for a member: the same member always gets the same one. */
+/**
+ * Colours for a group's members, by member order, so the first eight people
+ * in a group never share a colour (and keep theirs as others join).
+ */
+export function groupAvatarColors(memberIds: readonly string[]): Map<string, string> {
+  return new Map(memberIds.map((id, i) => [id, AVATAR_COLORS[i % AVATAR_COLORS.length]]));
+}
+
+/** A stable colour for a member when the group isn't known: the same member always gets the same one. */
 export function avatarColor(memberId: string): string {
   let hash = 0;
   for (let i = 0; i < memberId.length; i++) hash = (hash * 31 + memberId.charCodeAt(i)) >>> 0;
